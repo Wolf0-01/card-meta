@@ -1,0 +1,73 @@
+import Link from "next/link";
+
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+
+const navigation = [
+  { href: "/cards", label: "Cards" },
+  { href: "/decks", label: "Decks" },
+  { href: "/tier-list", label: "Tier List" },
+  { href: "/tournaments", label: "Tournaments" },
+  { href: "/news", label: "News" },
+];
+
+export default function Navbar() {
+  return (
+    <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+
+        {/* Logo */}
+        <Link
+          href="/"
+          className="
+            text-2xl
+            font-extrabold
+            tracking-wide
+            text-foreground
+            transition-colors
+            duration-200
+            hover:text-primary
+          "
+        >
+          Card Meta
+        </Link>
+
+        {/* Navigation */}
+        <div className="hidden items-center gap-8 md:flex">
+          {navigation.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="
+                text-sm
+                font-medium
+                text-foreground-secondary
+                transition-colors
+                duration-200
+                hover:text-foreground
+              "
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Right Side */}
+        <div className="hidden items-center gap-4 lg:flex">
+
+          <Input
+            type="search"
+            placeholder="Search cards..."
+            className="w-64"
+          />
+
+          <Button href="/login">
+            Login
+          </Button>
+
+        </div>
+
+      </div>
+    </nav>
+  );
+}

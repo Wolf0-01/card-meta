@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+/* =========================================================
+   DESIGN TOKENS
+========================================================= */
+
+:root {
+
+  /* ===========================
+     BACKGROUNDS
+  =========================== */
+
+  --background: #0b1220;
+  --background-secondary: #111827;
+
+  --surface: #1b2437;
+  --surface-hover: #24324d;
+
+  /* ===========================
+     TEXT
+  =========================== */
+
+  --foreground: #f8fafc;
+  --foreground-secondary: #cbd5e1;
+  --foreground-muted: #94a3b8;
+
+  /* ===========================
+     BORDERS
+  =========================== */
+
+  --border: #334155;
+  --border-light: rgba(255, 255, 255, 0.08);
+
+  /* ===========================
+     BRAND
+  =========================== */
+
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+
+  /* ===========================
+     STATUS
+  =========================== */
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  /* ===========================
+     BORDER RADIUS
+  =========================== */
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  /* ===========================
+     SHADOWS
+  =========================== */
+
+  --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.25);
+  --shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.35);
+  --shadow-modal: 0 20px 50px rgba(0, 0, 0, 0.45);
+
+  /* ===========================
+     TRANSITIONS
+  =========================== */
+
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+}
+
+/* =========================================================
+   TAILWIND THEME
+========================================================= */
+
+@theme inline {
+
+  /* Fonts */
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Colors */
+
+  --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
+
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+
+  --color-foreground: var(--foreground);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-foreground-muted: var(--foreground-muted);
+
+  --color-border: var(--border);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* =========================================================
+   BODY
+========================================================= */
+
+body {
+
+  background: var(--background);
+  color: var(--foreground);
+
+  font-family:
+    var(--font-geist-sans),
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  min-height: 100vh;
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-hover);
+}
+
+/* =========================================================
+   TEXT SELECTION
+========================================================= */
+
+::selection {
+  background: var(--primary);
+  color: white;
+}

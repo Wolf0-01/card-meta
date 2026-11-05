@@ -1,0 +1,138 @@
+import { NextResponse } from "next/server";
+
+import { queryCards } from "@/lib/queryCards";
+
+export async function GET(
+  request: Request
+) {
+  try {
+    const { searchParams } = new URL(
+      request.url
+    );
+
+    const random =
+      searchParams.get("random") ===
+      "true";
+
+    const limit = Number(
+      searchParams.get("limit") ?? 50
+    );
+
+    const search =
+      searchParams.get("search") ?? "";
+
+    const type =
+      searchParams.get("type") ??
+      undefined;
+
+    const attribute =
+      searchParams.get("attribute") ??
+      undefined;
+
+    const rarity =
+      searchParams.get("rarity") ??
+      undefined;
+
+    const archetype =
+      searchParams.get("archetype") ??
+      undefined;
+
+    const monsterType =
+      searchParams.get(
+        "monsterType"
+      ) ?? undefined;
+
+    function numberParam(
+      key: string
+    ) {
+      const value =
+        searchParams.get(key);
+
+      return value
+        ? Number(value)
+        : undefined;
+    }
+
+    const level =
+      numberParam("level");
+
+    const minLevel =
+      numberParam("minLevel");
+
+    const maxLevel =
+      numberParam("maxLevel");
+
+    const minAttack =
+      numberParam("minAtk");
+
+    const maxAttack =
+      numberParam("maxAtk");
+
+    const minDefense =
+      numberParam("minDef");
+
+    const maxDefense =
+      numberParam("maxDef");
+
+    console.log(
+      "API FILTERS:",
+      Object.fromEntries(searchParams)
+    );
+
+    const result =
+      await queryCards({
+        search,
+        type,
+        attribute,
+        rarity,
+        archetype,
+        monsterType,
+        level,
+        minLevel,
+        maxLevel,
+        minAttack,
+        maxAttack,
+        minDefense,
+        maxDefense,
+        page: 1,
+        limit,
+      });
+
+    const cards = random
+      ? [...result.cards]
+          .sort(
+            () => Math.random() - 0.5
+          )
+          .slice(0, limit)
+      : result.cards;
+
+    return NextResponse.json({
+      cards,
+
+      total: random
+        ? cards.length
+        : result.total,
+
+      page: result.page,
+
+      pageSize: result.pageSize,
+
+      pages: result.pages,
+    });
+  } catch (error) {
+    console.error(
+      "API CARDS ERROR:",
+      error
+    );
+
+    return NextResponse.json(
+      {
+        error:
+          "Error al obtener las cartas",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}

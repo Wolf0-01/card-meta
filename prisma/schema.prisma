@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum DeckTrend {
+  up
+  down
+  stable
+}
+
+enum DeckZone {
+  main
+  extra
+  side
+}
+
+model Card {
+  id Int @id @default(autoincrement())
+
+  ygoproId Int? @unique
+
+  name String @unique
+
+  type String
+
+  attribute String?
+
+  level Int?
+
+  attack Int?
+
+  defense Int?
+
+  rarity String?
+
+  image String?
+
+  description String?
+
+  archetype String?
+
+  race String?
+
+  frameType String?
+
+  scale Int?
+
+  linkRating Int?
+
+  linkMarkers Json?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deckCards DeckCard[]
+
+  @@index([name])
+  @@index([type])
+}
+
+model Archetype {
+  id String @id @default(cuid())
+
+  name String
+
+  slug String @unique
+
+  image String?
+
+  description String?
+
+  decks Deck[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}
+
+model Deck {
+  id String @id @default(cuid())
+
+  name String
+
+  slug String
+
+  identifier String @unique @default(cuid())
+
+  deckHash String @unique
+
+  archetypeId String?
+
+  archetype Archetype? @relation(fields: [archetypeId], references: [id])
+
+  tier String?
+
+  tierOrder Int @default(4)
+
+  popularity Int @default(0)
+
+  tournamentResults Int @default(0)
+
+  trend DeckTrend @default(stable)
+
+  format String @default("Advanced")
+
+  description String?
+
+  image String?
+
+  wins Int @default(0)
+
+  losses Int @default(0)
+
+  cards DeckCard[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([tier])
+  @@index([tierOrder])
+  @@index([archetypeId])
+  @@index([popularity])
+  @@index([tournamentResults])
+}
+
+model DeckCard {
+  id String @id @default(cuid())
+
+  deckId String
+
+  cardId Int
+
+  quantity Int @default(1)
+
+  zone DeckZone @default(main)
+
+  deck Deck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  card Card @relation(fields: [cardId], references: [id])
+
+  @@unique([deckId, cardId, zone])
+  @@index([deckId])
+  @@index([cardId])
+}
