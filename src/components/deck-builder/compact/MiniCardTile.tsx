@@ -1,0 +1,492 @@
+"use client";
+
+import Image from "next/image";
+
+import { useState } from "react";
+
+import type {
+  DragEvent,
+  KeyboardEvent,
+  MouseEvent,
+} from "react";
+
+import type { CardPreviewData } from "@/types/CardPreviewData";
+
+import type { DeckZone } from "@/types/deck";
+
+import {
+  CARD_DRAG_TYPE,
+  DRAFT_DRAG_TYPE,
+  type DraftDragPayload,
+} from "./dnd";
+
+const ATTRIBUTE_STYLES: Record<
+  string,
+  string
+> = {
+  DARK: "bg-violet-600 text-white",
+
+  LIGHT:
+    "bg-yellow-300 text-yellow-950",
+
+  EARTH: "bg-amber-700 text-white",
+
+  WATER: "bg-sky-600 text-white",
+
+  FIRE: "bg-red-600 text-white",
+
+  WIND: "bg-emerald-600 text-white",
+
+  DIVINE: "bg-orange-500 text-white",
+};
+
+const ATTRIBUTE_LABELS: Record<
+  string,
+  string
+> = {
+  DARK: "DRK",
+  LIGHT: "LGT",
+  EARTH: "ERT",
+  WATER: "WTR",
+  FIRE: "FIR",
+  WIND: "WND",
+  DIVINE: "DIV",
+};
+
+interface MiniCardTileProps {
+  card: CardPreviewData;
+
+  mode?: "search" | "deck";
+
+  quantity?: number;
+
+  draggable?: boolean;
+
+  draftZone?: DeckZone;
+
+  onClick?: () => void;
+
+  onContextMenu?: (
+    event: MouseEvent<HTMLDivElement>
+  ) => void;
+
+  onRemoveOne?: () => void;
+
+  onRemoveAll?: () => void;
+
+  className?: string;
+}
+
+function getLevelLabel(card: CardPreviewData) {
+  if (card.linkRating) {
+    return `L${card.linkRating}`;
+  }
+
+  if (card.level) {
+    return `★${card.level}`;
+  }
+
+  return null;
+}
+
+function getKindBadge(card: CardPreviewData) {
+  const type = card.type.toLowerCase();
+
+  if (type.includes("spell")) {
+    return {
+      label: "SPL",
+      className:
+        "bg-blue-600 text-white",
+    };
+  }
+
+  if (type.includes("trap")) {
+    return {
+      label: "TRP",
+      className:
+        "bg-fuchsia-700 text-white",
+    };
+  }
+
+  return null;
+}
+
+export default function MiniCardTile({
+  card,
+  mode = "search",
+  quantity,
+  draggable = true,
+  draftZone,
+  onClick,
+  onContextMenu,
+  onRemoveOne,
+  onRemoveAll,
+  className = "",
+}: MiniCardTileProps) {
+  const [failed, setFailed] =
+    useState(false);
+
+  const imageSrc =
+    failed || !card.image
+      ? "/cards/default.jpg"
+      : card.image;
+
+  const isDeck = mode === "deck";
+
+  const levelLabel = getLevelLabel(card);
+
+  const kindBadge = getKindBadge(card);
+
+  const attributeStyle =
+    card.attribute
+      ? ATTRIBUTE_STYLES[card.attribute] ??
+        "bg-slate-600 text-white"
+      : null;
+
+  const attributeLabel =
+    card.attribute
+      ? ATTRIBUTE_LABELS[card.attribute] ??
+        card.attribute.slice(0, 3)
+      : null;
+
+  function handleDragStart(
+    event: DragEvent<HTMLDivElement>
+  ) {
+    if (draftZone) {
+      const payload: DraftDragPayload = {
+        cardId: card.id,
+        zone: draftZone,
+      };
+
+      event.dataTransfer.setData(
+        DRAFT_DRAG_TYPE,
+
+        JSON.stringify(payload)
+      );
+
+      event.dataTransfer.effectAllowed =
+        "move";
+
+      return;
+    }
+
+    event.dataTransfer.setData(
+      CARD_DRAG_TYPE,
+
+      JSON.stringify(card)
+    );
+
+    event.dataTransfer.effectAllowed =
+      "copy";
+  }
+
+  function handleKeyDown(
+    event: KeyboardEvent<HTMLDivElement>
+  ) {
+    if (
+      event.key === "Enter" ||
+      event.key === " "
+    ) {
+      event.preventDefault();
+
+      onClick?.();
+    }
+  }
+
+  return (
+    <div
+      className={`
+        group
+        relative
+        w-[88px]
+        shrink-0
+        select-none
+        ${draggable ? "cursor-grab active:cursor-grabbing" : ""}
+        ${className}
+      `}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      draggable={draggable}
+      onDragStart={handleDragStart}
+      onClick={onClick}
+      onKeyDown={
+        onClick ? handleKeyDown : undefined
+      }
+      onContextMenu={onContextMenu}
+      title={`${card.name}${
+        quantity
+          ? ` · ${quantity} copia${
+              quantity === 1 ? "" : "s"
+            }`
+          : ""
+      }`}
+    >
+      <div
+        className="
+          relative
+          aspect-[88/128]
+          overflow-hidden
+          rounded-md
+          border
+          border-border
+          bg-surface
+          shadow-sm
+          transition-all
+          duration-150
+          group-hover:border-primary
+          group-hover:shadow-md
+        "
+      >
+        <Image
+          src={imageSrc}
+          alt={card.name}
+          fill
+          sizes="88px"
+          unoptimized={failed}
+          onError={() => setFailed(true)}
+          draggable={false}
+          className="
+            object-cover
+          "
+        />
+
+        <div
+          className="
+            pointer-events-none
+            absolute
+            inset-x-0
+            top-0
+            h-8
+            bg-gradient-to-b
+            from-black/75
+            to-transparent
+          "
+        />
+
+        <div
+          className="
+            pointer-events-none
+            absolute
+            inset-x-0
+            bottom-0
+            h-10
+            bg-gradient-to-t
+            from-black/65
+            to-transparent
+          "
+        />
+
+        {attributeStyle &&
+          attributeLabel && (
+            <span
+              className={`
+                absolute
+                left-1
+                top-1
+                rounded
+                px-1
+                py-0.5
+                text-[8px]
+                font-black
+                leading-none
+                tracking-wide
+                shadow
+                ${attributeStyle}
+              `}
+            >
+              {attributeLabel}
+            </span>
+          )}
+
+        {!attributeStyle &&
+          kindBadge && (
+            <span
+              className={`
+                absolute
+                left-1
+                top-1
+                rounded
+                px-1
+                py-0.5
+                text-[8px]
+                font-black
+                leading-none
+                tracking-wide
+                shadow
+                ${kindBadge.className}
+              `}
+            >
+              {kindBadge.label}
+            </span>
+          )}
+
+        {levelLabel && (
+          <span
+            className="
+              absolute
+              right-1
+              top-1
+              rounded
+              bg-black/80
+              px-1
+              py-0.5
+              text-[8px]
+              font-black
+              leading-none
+              text-amber-300
+              shadow
+            "
+          >
+            {levelLabel}
+          </span>
+        )}
+
+        {typeof quantity === "number" &&
+          quantity > 0 && (
+            <span
+              className="
+                absolute
+                bottom-1
+                right-1
+                rounded-full
+                bg-emerald-500
+                px-1.5
+                py-0.5
+                text-[10px]
+                font-black
+                leading-none
+                text-emerald-950
+                shadow-[0_0_10px_rgba(16,185,129,0.65)]
+              "
+            >
+              x{quantity}
+            </span>
+          )}
+
+        {!isDeck && (
+          <span
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+              flex
+              items-center
+              justify-center
+              bg-black/0
+              opacity-0
+              transition
+              duration-150
+              group-hover:bg-black/45
+              group-hover:opacity-100
+            "
+          >
+            <span
+              className="
+                flex
+                h-7
+                w-7
+                items-center
+                justify-center
+                rounded-full
+                bg-emerald-500
+                text-lg
+                font-black
+                leading-none
+                text-emerald-950
+                shadow-lg
+              "
+            >
+              +
+            </span>
+          </span>
+        )}
+
+        {isDeck && (
+          <div
+            className="
+              absolute
+              bottom-1
+              left-1
+              flex
+              gap-1
+              opacity-0
+              transition
+              group-hover:opacity-100
+            "
+          >
+            <button
+              type="button"
+              aria-label={`Quitar una copia de ${card.name}`}
+              onClick={(event) => {
+                event.stopPropagation();
+
+                onRemoveOne?.();
+              }}
+              className="
+                flex
+                h-5
+                w-5
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-white/20
+                bg-black/80
+                text-xs
+                font-bold
+                text-white
+                transition-colors
+                hover:bg-amber-500
+                hover:text-amber-950
+              "
+            >
+              −
+            </button>
+
+            <button
+              type="button"
+              aria-label={`Eliminar ${card.name} del mazo`}
+              onClick={(event) => {
+                event.stopPropagation();
+
+                onRemoveAll?.();
+              }}
+              className="
+                flex
+                h-5
+                w-5
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-white/20
+                bg-black/80
+                text-xs
+                font-bold
+                text-white
+                transition-colors
+                hover:bg-red-600
+              "
+            >
+              ×
+            </button>
+          </div>
+        )}
+      </div>
+
+      {!isDeck && (
+        <p
+          className="
+            mt-1
+            truncate
+            text-[10px]
+            leading-tight
+            text-foreground-muted
+          "
+        >
+          {card.name}
+        </p>
+      )}
+    </div>
+  );
+}

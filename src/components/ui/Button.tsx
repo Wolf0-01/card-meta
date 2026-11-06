@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { ButtonHTMLAttributes, ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "outline" | "ghost" | "danger";
+type Variant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "ghost"
+  | "success"
+  | "danger";
 type Size = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -33,6 +39,9 @@ export default function Button({
 
     ghost:
       "text-foreground hover:bg-surface",
+
+    success:
+      "bg-emerald-600 text-white hover:bg-emerald-500",
 
     danger:
       "bg-red-600 text-white hover:bg-red-500",

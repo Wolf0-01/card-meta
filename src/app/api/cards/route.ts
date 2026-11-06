@@ -14,8 +14,21 @@ export async function GET(
       searchParams.get("random") ===
       "true";
 
-    const limit = Number(
-      searchParams.get("limit") ?? 50
+    const limit = Math.min(
+      Math.max(
+        Number(
+          searchParams.get("limit") ?? 50
+        ) || 50,
+        1
+      ),
+      100
+    );
+
+    const page = Math.max(
+      Number(
+        searchParams.get("page") ?? 1
+      ) || 1,
+      1
     );
 
     const search =
@@ -74,11 +87,6 @@ export async function GET(
     const maxDefense =
       numberParam("maxDef");
 
-    console.log(
-      "API FILTERS:",
-      Object.fromEntries(searchParams)
-    );
-
     const result =
       await queryCards({
         search,
@@ -94,7 +102,7 @@ export async function GET(
         maxAttack,
         minDefense,
         maxDefense,
-        page: 1,
+        page,
         limit,
       });
 

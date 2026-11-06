@@ -4,9 +4,13 @@ import {
 } from "@/lib/decks";
 
 export async function findDeckByIdentifier(
-  identifier: string
+  identifier: string,
+  viewerId: string | null = null
 ) {
-  return getDeckByIdentifier(identifier);
+  return getDeckByIdentifier(
+    identifier,
+    viewerId
+  );
 }
 
 export async function findDecksBySlug(

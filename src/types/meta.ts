@@ -45,6 +45,10 @@ identifier: string;
 
 deckHash?: string;
 
+authorId?: string | null;
+
+isPublic?: boolean;
+
 archetype:
 | ArchetypeData
 | null;

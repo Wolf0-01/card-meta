@@ -63,6 +63,10 @@ async function findDecks(
 
 export async function getAllDecks() {
   const decks = await findDecks({
+    where: {
+      isPublic: true,
+    },
+
     orderBy: [
       {
         tierOrder: "asc",
@@ -86,6 +90,8 @@ export async function getAllDecks() {
 export async function getTierDecks() {
   const decks = await findDecks({
     where: {
+      isPublic: true,
+
       tier: {
         not: null,
       },
@@ -110,6 +116,10 @@ export async function getTierDecks() {
 
 export async function getFeaturedDecks() {
   const decks = await findDecks({
+    where: {
+      isPublic: true,
+    },
+
     take: 6,
 
     orderBy: [
@@ -134,6 +144,10 @@ export async function getFeaturedDecks() {
 
 export async function getTopDecks() {
   const decks = await findDecks({
+    where: {
+      isPublic: true,
+    },
+
     take: 10,
 
     orderBy: [
@@ -157,7 +171,8 @@ export async function getTopDecks() {
 // =================================
 
 export async function getDeckByIdentifier(
-  identifier: string
+  identifier: string,
+  viewerId: string | null = null
 ) {
   if (!identifier) {
     return null;
@@ -170,6 +185,14 @@ export async function getDeckByIdentifier(
   });
 
   if (!deck) {
+    return null;
+  }
+
+  const isOwner =
+    viewerId !== null &&
+    deck.authorId === viewerId;
+
+  if (!deck.isPublic && !isOwner) {
     return null;
   }
 
@@ -190,6 +213,7 @@ export async function getDecksBySlug(
   const decks = await findDecks({
     where: {
       slug,
+      isPublic: true,
     },
 
     orderBy: {
@@ -212,6 +236,8 @@ limit = 6
 const decks = await findDecks({
 where: {
 archetypeId,
+
+  isPublic: true,
 
   NOT: {
     identifier: excludeIdentifier,
@@ -250,6 +276,10 @@ export async function getDecks({
 
   const [decks, total] = await Promise.all([
     findDecks({
+      where: {
+        isPublic: true,
+      },
+
       skip,
 
       take: pageSize,
@@ -264,7 +294,11 @@ export async function getDecks({
       ],
     }),
 
-    prisma.deck.count(),
+    prisma.deck.count({
+      where: {
+        isPublic: true,
+      },
+    }),
   ]);
 
   return {

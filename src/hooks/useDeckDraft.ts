@@ -248,6 +248,22 @@ export default function useDeckDraft() {
     setDescription("");
 
     setIsPublic(false);
+
+    /*
+     * Borramos también el almacenamiento de forma
+     * inmediata para que el borrador no reaparezca
+     * si la navegación ocurre antes del siguiente
+     * efecto de persistencia.
+     */
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(
+          STORAGE_KEY
+        );
+      } catch {
+        /* Sin acceso a localStorage. */
+      }
+    }
   }
 
   function replaceCards(

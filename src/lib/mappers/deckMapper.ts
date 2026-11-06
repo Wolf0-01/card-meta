@@ -193,6 +193,10 @@ export function mapPrismaDeck(
 
     deckHash: deck.deckHash,
 
+    authorId: deck.authorId,
+
+    isPublic: deck.isPublic,
+
     archetype,
 
     archetypeName:

@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import Container from "@/components/ui/Container";
 import DeckViewer from "@/components/decks/DeckViewer";
 
+import { getCurrentUser } from "@/lib/auth/currentUser";
+
 import {
   findDeckByIdentifier,
 } from "@/services/decks";
@@ -20,8 +22,13 @@ export async function generateMetadata({
 }: Props): Promise<Metadata> {
   const { identifier } = await params;
 
+  const user = await getCurrentUser();
+
   const deck =
-    await findDeckByIdentifier(identifier);
+    await findDeckByIdentifier(
+      identifier,
+      user?.id ?? null
+    );
 
   if (!deck) {
     return {
@@ -45,8 +52,13 @@ export default async function DeckPage({
     identifier,
   } = await params;
 
+  const user = await getCurrentUser();
+
   const deck =
-    await findDeckByIdentifier(identifier);
+    await findDeckByIdentifier(
+      identifier,
+      user?.id ?? null
+    );
 
   if (
     !deck ||
