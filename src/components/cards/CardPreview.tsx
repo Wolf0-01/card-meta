@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import Image from "next/image";
 
 interface Props {
@@ -15,6 +17,13 @@ export default function CardPreview({
   name,
   priority = false,
 }: Props) {
+  const [failed, setFailed] = useState(false);
+
+  const src =
+    failed || !image
+      ? "/cards/default.jpg"
+      : image;
+
   return (
     <div
       className="
@@ -27,14 +36,13 @@ export default function CardPreview({
       "
     >
       <Image
-        src={
-          image ??
-          "/cards/default.jpg"
-        }
+        src={src}
         alt={name}
         fill
         sizes="115px"
         priority={priority}
+        unoptimized={failed}
+        onError={() => setFailed(true)}
         className="
           object-cover
         "

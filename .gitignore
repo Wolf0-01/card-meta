@@ -25,7 +25,8 @@
 *.pem
 
 # card images (2.2 GB, stored outside the repo)
-/public/cards/
+/public/cards/*
+!/public/cards/default.jpg
 
 # debug
 npm-debug.log*
@@ -35,6 +36,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # virtual environments
 venv/

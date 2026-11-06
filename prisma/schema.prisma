@@ -18,6 +18,35 @@ enum DeckZone {
   side
 }
 
+enum UserRole {
+  user
+  admin
+}
+
+model User {
+  id String @id @default(cuid())
+
+  email String @unique
+
+  username String @unique
+
+  passwordHash String
+
+  displayName String?
+
+  avatar String?
+
+  bio String?
+
+  role UserRole @default(user)
+
+  decks Deck[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
 model Card {
   id Int @id @default(autoincrement())
 
@@ -98,6 +127,12 @@ model Deck {
 
   archetype Archetype? @relation(fields: [archetypeId], references: [id])
 
+  authorId String?
+
+  author User? @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  isPublic Boolean @default(true)
+
   tier String?
 
   tierOrder Int @default(4)
@@ -128,6 +163,8 @@ model Deck {
   @@index([tier])
   @@index([tierOrder])
   @@index([archetypeId])
+  @@index([authorId])
+  @@index([isPublic])
   @@index([popularity])
   @@index([tournamentResults])
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import Image from "next/image";
 
 interface CardImageProps {
@@ -15,6 +17,13 @@ export default function CardImage({
   priority = false,
   className = "",
 }: CardImageProps) {
+  const [failed, setFailed] = useState(false);
+
+  const imageSrc =
+    failed || !src
+      ? "/cards/default.jpg"
+      : src;
+
   return (
     <div
       className="
@@ -23,12 +32,14 @@ export default function CardImage({
       "
     >
       <Image
-        src={src ?? "/cards/default.jpg"}
+        src={imageSrc}
         alt={alt}
         width={220}
         height={320}
         priority={priority}
         sizes="220px"
+        unoptimized={failed}
+        onError={() => setFailed(true)}
         className={`
           h-auto
           w-full
