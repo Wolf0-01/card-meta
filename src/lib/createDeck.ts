@@ -6,6 +6,8 @@ import { mapPrismaDeck } from "@/lib/mappers/deckMapper";
 import type { DeckZone } from "@/types/deck";
 import type { MetaDeck } from "@/types/meta";
 
+import { DECK_RULES } from "./decks/rules";
+
 interface CreateDeckData {
   name: string;
   archetypeId?: string;
@@ -65,9 +67,9 @@ function validateDeck(
   cards: ReturnType<typeof normalizeCards>
 ) {
   const limits = {
-    main: 30,
-    extra: 15,
-    side: 15,
+    main: DECK_RULES.mainMax,
+    extra: DECK_RULES.extraMax,
+    side: DECK_RULES.sideMax,
   };
 
   const zones = {

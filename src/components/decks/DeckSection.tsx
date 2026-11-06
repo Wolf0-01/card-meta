@@ -6,6 +6,8 @@ import Grid from "@/components/ui/Grid";
 
 import DeckCard from "./DeckCard";
 
+import { DECK_RULES } from "@/lib/decks/rules";
+
 type DeckZone = "main" | "extra" | "side";
 
 interface DeckCardData {
@@ -38,10 +40,10 @@ export default function DeckSection({
   const titleUpper = title.toUpperCase();
 
   const maxCards = titleUpper.includes("MAIN")
-    ? 30
+    ? DECK_RULES.mainMax
     : titleUpper.includes("EXTRA")
-    ? 8
-    : 15;
+    ? DECK_RULES.extraMax
+    : DECK_RULES.sideMax;
 
   const emptyMessage = titleUpper.includes("MAIN")
     ? "No hay cartas en el Main Deck."

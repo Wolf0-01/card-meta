@@ -16,6 +16,8 @@ DeckCardInfo,
 DeckZone,
 } from "@/types/deck";
 
+import { DECK_RULES } from "@/lib/decks/rules";
+
 const STORAGE_KEY = "deck-builder";
 
 const ZONE_LIMITS: Record<
@@ -23,9 +25,9 @@ DeckZone,
 number
 
 > = {
-main: 30,
-extra: 15,
-side: 15,
+main: DECK_RULES.mainMax,
+extra: DECK_RULES.extraMax,
+side: DECK_RULES.sideMax,
 };
 
 const MAX_COPIES: Record<

@@ -4,10 +4,15 @@
  * puede usarse también en componentes de cliente.
  */
 export const DECK_RULES = {
-  mainMin: 40,
-  mainMax: 60,
-  extraMax: 15,
-  sideMax: 15,
+  /*
+   * Reglas de Yu-Gi-Oh! Duel Links:
+   * Main Deck 20–30, Extra Deck hasta 9 y
+   * Side Deck hasta 6.
+   */
+  mainMin: 20,
+  mainMax: 30,
+  extraMax: 9,
+  sideMax: 6,
   maxCopies: 3,
 } as const;
 

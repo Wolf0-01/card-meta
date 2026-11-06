@@ -1,5 +1,7 @@
 "use client";
 
+import { DECK_RULES } from "@/lib/decks/rules";
+
 export type DeckZone =
 | "main"
 | "extra"
@@ -59,9 +61,9 @@ Record<
 DeckZone,
 number
 > = {
-main: 30,
-extra: 15,
-side: 15,
+main: DECK_RULES.mainMax,
+extra: DECK_RULES.extraMax,
+side: DECK_RULES.sideMax,
 };
 
 return limits[zone];

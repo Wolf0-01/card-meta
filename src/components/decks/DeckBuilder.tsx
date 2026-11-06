@@ -31,6 +31,8 @@ import {
 detectArchetype,
 } from "@/lib/archetypeClient";
 
+import { DECK_RULES } from "@/lib/decks/rules";
+
 type Zone =
 | "main"
 | "extra"
@@ -963,21 +965,21 @@ de Deck </h1>
           Main:
           {" "}
           {mainCount}
-          /30
+          /{DECK_RULES.mainMax}
         </span>
 
         <span>
           Extra:
           {" "}
           {extraCount}
-          /15
+          /{DECK_RULES.extraMax}
         </span>
 
         <span>
           Side:
           {" "}
           {sideCount}
-          /15
+          /{DECK_RULES.sideMax}
         </span>
       </div>
     </div>
@@ -1164,7 +1166,7 @@ de Deck </h1>
       {renderZone(
         "MAIN DECK",
         deck.main,
-        30,
+        DECK_RULES.mainMax,
         "main"
       )}
 
@@ -1176,7 +1178,7 @@ de Deck </h1>
         {renderZone(
           "EXTRA DECK",
           deck.extra,
-          15,
+          DECK_RULES.extraMax,
           "extra"
         )}
       </div>
@@ -1189,7 +1191,7 @@ de Deck </h1>
         {renderZone(
           "SIDE DECK",
           deck.side,
-          15,
+          DECK_RULES.sideMax,
           "side"
         )}
       </div>
@@ -1269,53 +1271,53 @@ messages.push(
 }
 
 if (
-mainCount < 20
+mainCount < DECK_RULES.mainMin
 ) {
 messages.push(
 `Faltan ${
-        20 - mainCount
+        DECK_RULES.mainMin - mainCount
       } cartas en el Main Deck.`
 );
 }
 
 if (
-mainCount > 30
+mainCount > DECK_RULES.mainMax
 ) {
 messages.push(
 `El Main Deck supera el límite por ${
-        mainCount - 30
+        mainCount - DECK_RULES.mainMax
       } cartas.`
 );
 }
 
 if (
-extraCount > 15
+extraCount > DECK_RULES.extraMax
 ) {
 messages.push(
 `El Extra Deck supera el límite por ${
-        extraCount - 15
+        extraCount - DECK_RULES.extraMax
       } cartas.`
 );
 }
 
 if (
-sideCount > 15
+sideCount > DECK_RULES.sideMax
 ) {
 messages.push(
 `El Side Deck supera el límite por ${
-        sideCount - 15
+        sideCount - DECK_RULES.sideMax
       } cartas.`
 );
 }
 
 const hasLimitError =
-mainCount > 30 ||
-extraCount > 15 ||
-sideCount > 15;
+mainCount > DECK_RULES.mainMax ||
+extraCount > DECK_RULES.extraMax ||
+sideCount > DECK_RULES.sideMax;
 
 const isIncomplete =
 !cleanName ||
-mainCount < 20;
+mainCount < DECK_RULES.mainMin;
 
 let status:
 DeckStatus;

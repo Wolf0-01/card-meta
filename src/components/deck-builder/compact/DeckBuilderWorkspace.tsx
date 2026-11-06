@@ -166,7 +166,10 @@ export default function DeckBuilderWorkspace() {
 
     if (missingForPublish > 0) {
       return {
-        text: `Faltan ${missingForPublish} cartas en el Main Deck para publicar.`,
+        text:
+          missingForPublish === 1
+            ? "Falta 1 carta en el Main Deck para publicar."
+            : `Faltan ${missingForPublish} cartas en el Main Deck para publicar.`,
         className: "text-amber-300",
       };
     }
