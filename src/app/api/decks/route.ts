@@ -1,133 +1,72 @@
 import { NextResponse } from "next/server";
 
-import { createDeck } from "@/lib/createDeck";
+import {
+  requireUser,
+  unauthorized,
+} from "@/lib/auth/requireUser";
 
-const validZones = [
-"main",
-"extra",
-"side",
-] as const;
+import {
+  createUserDeck,
+  listUserDecks,
+} from "@/lib/decks/service";
 
-type DeckZone = (typeof validZones)[number];
+import {
+  deckErrorResponse,
+  invalidJsonResponse,
+} from "@/lib/decks/response";
 
-interface IncomingCard {
-id: number;
-quantity?: number;
-zone?: string;
-}
+export const runtime = "nodejs";
 
-interface CreateDeckBody {
-name: string;
-archetypeId?: string | null;
-cards: IncomingCard[];
-}
+export const dynamic = "force-dynamic";
 
-export async function POST(
-request: Request
-) {
-try {
-const body: CreateDeckBody =
-await request.json();
+export async function GET() {
+  const user = await requireUser();
 
-const {
-  name,
-  archetypeId,
-  cards,
-} = body;
-
-if (
-  typeof name !== "string" ||
-  name.trim() === "" ||
-  !Array.isArray(cards) ||
-  cards.length === 0
-) {
-  return NextResponse.json(
-    {
-      error:
-        "Nombre o cartas faltantes",
-    },
-    {
-      status: 400,
-    }
-  );
-}
-
-const normalizedArchetypeId =
-  typeof archetypeId === "string" &&
-  archetypeId.trim() !== ""
-    ? archetypeId.trim()
-    : undefined;
-
-const normalizedCards =
-  cards.map((card) => {
-    const zone: DeckZone =
-      validZones.includes(
-        card.zone as DeckZone
-      )
-        ? (card.zone as DeckZone)
-        : "main";
-
-    return {
-      id: Number(card.id),
-
-      quantity: Math.max(
-        1,
-        Number(card.quantity ?? 1)
-      ),
-
-      zone,
-    };
-  });
-
-const deck = await createDeck({
-  name: name.trim(),
-  archetypeId:
-    normalizedArchetypeId,
-  cards: normalizedCards,
-});
-
-return NextResponse.json(
-  {
-    id: deck.id,
-
-    name: deck.name,
-
-    slug: deck.slug,
-
-    identifier:
-      deck.identifier,
-
-    deckHash:
-      deck.deckHash,
-
-    archetype:
-  typeof deck.archetype === "string"
-    ? deck.archetype
-    : deck.archetype?.name ?? null,
-  },
-  {
-    status: 201,
+  if (!user) {
+    return unauthorized();
   }
-);
 
+  try {
+    const decks = await listUserDecks(user.id);
 
-} catch (error) {
-console.error(
-"CREATE DECK ERROR:",
-error
-);
-
-
-return NextResponse.json(
-  {
-    error:
-      "Error creando deck",
-  },
-  {
-    status: 500,
+    return NextResponse.json({
+      decks,
+    });
+  } catch (error) {
+    return deckErrorResponse(error);
   }
-);
-
-
 }
+
+export async function POST(request: Request) {
+  const user = await requireUser();
+
+  if (!user) {
+    return unauthorized();
+  }
+
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return invalidJsonResponse();
+  }
+
+  try {
+    const deck = await createUserDeck(
+      user.id,
+      body
+    );
+
+    return NextResponse.json(
+      {
+        deck,
+      },
+      {
+        status: 201,
+      }
+    );
+  } catch (error) {
+    return deckErrorResponse(error);
+  }
 }
