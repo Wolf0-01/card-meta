@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { Plus } from "lucide-react";
+
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
-import MyDecksList from "@/components/deck-builder/compact/MyDecksList";
+import MyDecksGrid from "@/components/decks/MyDecksGrid";
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
 
@@ -19,6 +21,7 @@ export const metadata: Metadata = {
 interface MyDecksPageProps {
   searchParams: Promise<{
     created?: string;
+    updated?: string;
   }>;
 }
 
@@ -40,9 +43,16 @@ export default async function MyDecksPage({
   const showCreatedNotice =
     params.created === "1";
 
+  const showUpdatedNotice =
+    params.updated === "1";
+
+  const publicDeckCount = decks.filter(
+    (deck) => deck.isPublic
+  ).length;
+
   return (
     <main className="min-h-screen py-8">
-      <Container size="lg">
+      <Container size="xl">
         <header
           className="
             mb-6
@@ -88,12 +98,20 @@ export default async function MyDecksPage({
                     decks.length === 1
                       ? ""
                       : "s"
-                  } en tu cuenta.`}
+                  } · ${publicDeckCount} público${
+                    publicDeckCount === 1
+                      ? ""
+                      : "s"
+                  }`}
             </p>
           </div>
 
-          <Button href="/decks/new">
-            + Nuevo mazo
+          <Button
+            href="/decks/new"
+            className="w-full gap-2 sm:w-auto"
+          >
+            <Plus className="h-4 w-4" />
+            Nuevo mazo
           </Button>
         </header>
 
@@ -117,7 +135,27 @@ export default async function MyDecksPage({
           </div>
         )}
 
-        <MyDecksList initialDecks={decks} />
+        {showUpdatedNotice && (
+          <div
+            role="status"
+            className="
+              mb-4
+              rounded-xl
+              border
+              border-emerald-500/40
+              bg-emerald-500/10
+              px-3
+              py-2
+              text-xs
+              font-semibold
+              text-emerald-300
+            "
+          >
+            Cambios guardados correctamente.
+          </div>
+        )}
+
+        <MyDecksGrid initialDecks={decks} />
       </Container>
     </main>
   );

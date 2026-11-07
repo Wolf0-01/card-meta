@@ -11,7 +11,9 @@ import {
 
 import Button from "@/components/ui/Button";
 
-import useDeckDraft from "@/hooks/useDeckDraft";
+import useDeckDraft, {
+  type DeckDraftSeed,
+} from "@/hooks/useDeckDraft";
 
 import { DECK_RULES } from "@/lib/decks/rules";
 
@@ -25,13 +27,22 @@ import CardSearchSidebar from "./CardSearchSidebar";
 
 import DraftZone from "./DraftZone";
 
-interface CreateDeckResponse {
+export interface EditableDeckData
+  extends DeckDraftSeed {
+  id: string;
+}
+
+interface DeckBuilderWorkspaceProps {
+  initialDeck?: EditableDeckData;
+}
+
+interface SaveDeckResponse {
   deck?: {
-    id: string;
+    id?: string;
 
-    slug: string;
+    slug?: string;
 
-    identifier: string;
+    identifier?: string;
   };
 
   error?: string;
@@ -88,10 +99,23 @@ function getStatClasses(
     : "border-border bg-surface text-foreground-muted";
 }
 
-export default function DeckBuilderWorkspace() {
+export default function DeckBuilderWorkspace({
+  initialDeck,
+}: DeckBuilderWorkspaceProps = {}) {
   const router = useRouter();
 
-  const draft = useDeckDraft();
+  const draft = useDeckDraft(
+    initialDeck
+      ? {
+          initialDraft: initialDeck,
+
+          storageKey: null,
+        }
+      : undefined
+  );
+
+  const isEditing =
+    initialDeck !== undefined;
 
   const [savingMode, setSavingMode] =
     useState<SavingMode>(null);
@@ -138,10 +162,20 @@ export default function DeckBuilderWorkspace() {
 
   const isSaving = savingMode !== null;
 
+  /*
+   * Al editar un mazo ya publicado, guardar cambios
+   * mantiene la visibilidad y, por tanto, también
+   * debe cumplir el mínimo del Main Deck.
+   */
+  const saveRequiresPublish =
+    initialDeck?.isPublic ?? false;
+
   const canSave =
     !isSaving &&
     cleanName.length > 0 &&
-    draft.validation.canSave;
+    draft.validation.canSave &&
+    (!saveRequiresPublish ||
+      draft.validation.canPublish);
 
   const canPublish =
     !isSaving &&
@@ -214,8 +248,12 @@ export default function DeckBuilderWorkspace() {
       return;
     }
 
+    const makePublic =
+      publish ||
+      (initialDeck?.isPublic ?? false);
+
     if (
-      publish &&
+      makePublic &&
       !draft.validation.canPublish
     ) {
       setError(
@@ -235,9 +273,13 @@ export default function DeckBuilderWorkspace() {
 
     try {
       const response = await fetch(
-        "/api/decks",
+        initialDeck
+          ? `/api/decks/${initialDeck.id}`
+          : "/api/decks",
         {
-          method: "POST",
+          method: initialDeck
+            ? "PATCH"
+            : "POST",
 
           headers: {
             "Content-Type":
@@ -253,7 +295,7 @@ export default function DeckBuilderWorkspace() {
 
             format: "Advanced",
 
-            isPublic: publish,
+            isPublic: makePublic,
 
             cards: draft.cards.map(
               (card) => ({
@@ -271,7 +313,7 @@ export default function DeckBuilderWorkspace() {
       const data = (await response
         .json()
         .catch(() => null)) as
-        | CreateDeckResponse
+        | SaveDeckResponse
         | null;
 
       if (!response.ok) {
@@ -292,6 +334,14 @@ export default function DeckBuilderWorkspace() {
             .filter(Boolean)
             .join(" ")
         );
+      }
+
+      if (initialDeck) {
+        router.push(
+          "/decks/mine?updated=1"
+        );
+
+        return;
       }
 
       const deck = data?.deck;
@@ -357,7 +407,9 @@ export default function DeckBuilderWorkspace() {
                 sm:text-2xl
               "
             >
-              Nuevo mazo
+              {isEditing
+                ? "Editar mazo"
+                : "Nuevo mazo"}
               <span className="ml-2 text-sm font-semibold text-foreground-muted">
                 Advanced
               </span>
@@ -365,29 +417,73 @@ export default function DeckBuilderWorkspace() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => handleSave(false)}
-              disabled={!canSave}
-            >
-              {savingMode === "draft"
-                ? "Guardando..."
-                : "Guardar borrador"}
-            </Button>
+            {isEditing ? (
+              <>
+                <Button
+                  type="button"
+                  variant={
+                    initialDeck?.isPublic
+                      ? "success"
+                      : "secondary"
+                  }
+                  size="sm"
+                  onClick={() =>
+                    handleSave(false)
+                  }
+                  disabled={!canSave}
+                >
+                  {savingMode === "draft"
+                    ? "Guardando..."
+                    : "Guardar cambios"}
+                </Button>
 
-            <Button
-              type="button"
-              variant="success"
-              size="sm"
-              onClick={() => handleSave(true)}
-              disabled={!canPublish}
-            >
-              {savingMode === "publish"
-                ? "Publicando..."
-                : "Publicar mazo"}
-            </Button>
+                {!initialDeck?.isPublic && (
+                  <Button
+                    type="button"
+                    variant="success"
+                    size="sm"
+                    onClick={() =>
+                      handleSave(true)
+                    }
+                    disabled={!canPublish}
+                  >
+                    {savingMode === "publish"
+                      ? "Publicando..."
+                      : "Publicar mazo"}
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() =>
+                    handleSave(false)
+                  }
+                  disabled={!canSave}
+                >
+                  {savingMode === "draft"
+                    ? "Guardando..."
+                    : "Guardar borrador"}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="success"
+                  size="sm"
+                  onClick={() =>
+                    handleSave(true)
+                  }
+                  disabled={!canPublish}
+                >
+                  {savingMode === "publish"
+                    ? "Publicando..."
+                    : "Publicar mazo"}
+                </Button>
+              </>
+            )}
           </div>
         </div>
 

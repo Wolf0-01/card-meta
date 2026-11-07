@@ -45,7 +45,7 @@ function getServerHydrationSnapshot() {
   return false;
 }
 
-interface StoredDraft {
+export interface DeckDraftSeed {
   cards: DraftCard[];
 
   name: string;
@@ -55,15 +55,34 @@ interface StoredDraft {
   isPublic: boolean;
 }
 
-function readStoredDraft(): StoredDraft | null {
-  if (typeof window === "undefined") {
+interface UseDeckDraftOptions {
+  /**
+   * Datos iniciales para editar un mazo existente.
+   * Cuando se indican, no se lee el borrador local.
+   */
+  initialDraft?: DeckDraftSeed | null;
+
+  /**
+   * Clave de localStorage. Usa `null` para desactivar
+   * la persistencia (por ejemplo, en el editor de un mazo).
+   */
+  storageKey?: string | null;
+}
+
+function readStoredDraft(
+  storageKey: string | null
+): DeckDraftSeed | null {
+  if (
+    !storageKey ||
+    typeof window === "undefined"
+  ) {
     return null;
   }
 
   try {
     const raw =
       window.localStorage.getItem(
-        STORAGE_KEY
+        storageKey
       );
 
     if (!raw) {
@@ -72,7 +91,7 @@ function readStoredDraft(): StoredDraft | null {
 
     const parsed = JSON.parse(
       raw
-    ) as Partial<StoredDraft>;
+    ) as Partial<DeckDraftSeed>;
 
     if (!Array.isArray(parsed.cards)) {
       return null;
@@ -108,10 +127,17 @@ function readStoredDraft(): StoredDraft | null {
  * Mantiene las mismas reglas que el backend y
  * persiste el trabajo sin guardar en localStorage.
  */
-export default function useDeckDraft() {
+export default function useDeckDraft({
+  initialDraft: seed = null,
+  storageKey = STORAGE_KEY,
+}: UseDeckDraftOptions = {}) {
   const [
     initialDraft,
-  ] = useState(readStoredDraft);
+  ] = useState<DeckDraftSeed | null>(
+    () =>
+      seed ??
+      readStoredDraft(storageKey)
+  );
 
   const [cards, setCards] = useState<
     DraftCard[]
@@ -139,14 +165,21 @@ export default function useDeckDraft() {
       getServerHydrationSnapshot
     );
 
+  /*
+   * Un mazo que viene del servidor ya está listo
+   * desde el primer render (SSR y cliente).
+   */
+  const isReady =
+    seed !== null || hasLoadedStorage;
+
   useEffect(() => {
-    if (!hasLoadedStorage) {
+    if (!isReady || !storageKey) {
       return;
     }
 
     try {
       window.localStorage.setItem(
-        STORAGE_KEY,
+        storageKey,
 
         JSON.stringify({
           cards,
@@ -166,7 +199,8 @@ export default function useDeckDraft() {
     name,
     description,
     isPublic,
-    hasLoadedStorage,
+    isReady,
+    storageKey,
   ]);
 
   /*
@@ -174,7 +208,7 @@ export default function useDeckDraft() {
    * guardado para que servidor y cliente rendericen
    * exactamente lo mismo.
    */
-  const visibleCards = hasLoadedStorage
+  const visibleCards = isReady
     ? cards
     : EMPTY_CARDS;
 
@@ -255,10 +289,10 @@ export default function useDeckDraft() {
      * si la navegación ocurre antes del siguiente
      * efecto de persistencia.
      */
-    if (typeof window !== "undefined") {
+    if (storageKey && typeof window !== "undefined") {
       try {
         window.localStorage.removeItem(
-          STORAGE_KEY
+          storageKey
         );
       } catch {
         /* Sin acceso a localStorage. */
@@ -275,17 +309,17 @@ export default function useDeckDraft() {
   return {
     cards: visibleCards,
 
-    name: hasLoadedStorage ? name : "",
+    name: isReady ? name : "",
 
     setName,
 
-    description: hasLoadedStorage
+    description: isReady
       ? description
       : "",
 
     setDescription,
 
-    isPublic: hasLoadedStorage
+    isPublic: isReady
       ? isPublic
       : false,
 
@@ -295,7 +329,7 @@ export default function useDeckDraft() {
 
     validation,
 
-    hasLoadedStorage,
+    hasLoadedStorage: isReady,
 
     addCard,
 
