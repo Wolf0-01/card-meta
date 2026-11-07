@@ -206,7 +206,19 @@ function buildWhere(
   }
 
   if (rarity) {
-    where.rarity = rarity;
+    if (rarity.toUpperCase() === "N") {
+      /*
+       * Las cartas sin rareza oficial se muestran
+       * como "N" en la interfaz. El filtro debe
+       * incluirlas para que coincida con la vista.
+       */
+      where.OR = [
+        { rarity: "N" },
+        { rarity: null },
+      ];
+    } else {
+      where.rarity = rarity;
+    }
   }
 
   if (archetype) {
