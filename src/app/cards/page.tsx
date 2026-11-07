@@ -1,13 +1,36 @@
-import CardPageClient from "@/components/cards/CardPageClient";
-import CardFilters from "@/components/cards/CardFilters";
+import type { Metadata } from "next";
+
+import Link from "next/link";
+
+import {
+  Search,
+} from "lucide-react";
+
+import CardCatalogControls from "@/components/cards/CardCatalogControls";
+
+import CatalogGrid from "@/components/cards/CatalogGrid";
+
+import CatalogHeader from "@/components/cards/CatalogHeader";
+
 import CardsPagination from "@/components/cards/CardsPagination";
+
+import {
+  isCatalogTab,
+  type CatalogTab,
+} from "@/components/cards/catalogTabs";
 
 import { queryCards } from "@/lib/queryCards";
 
-import type { Card } from "@/types/card";
+export const metadata: Metadata = {
+  title: "Catálogo de cartas | Card Meta",
+
+  description:
+    "Explora el catálogo completo de Yu-Gi-Oh! Duel Links con búsqueda, filtros y vista detallada.",
+};
 
 interface CardsPageProps {
   searchParams: Promise<{
+    tab?: string;
     page?: string;
     search?: string;
     type?: string;
@@ -21,6 +44,9 @@ interface CardsPageProps {
     maxAtk?: string;
     minDef?: string;
     maxDef?: string;
+    sort?: string;
+    direction?: string;
+    mode?: string;
   }>;
 }
 
@@ -43,64 +69,251 @@ export default async function CardsPage({
 }: CardsPageProps) {
   const params = await searchParams;
 
+  const activeTab: CatalogTab =
+    isCatalogTab(params.tab)
+      ? params.tab
+      : "cards";
+
   const page = Math.max(
     toNumber(params.page) ?? 1,
     1
   );
 
-  const result = await queryCards({
-    search: params.search,
-    type: params.type,
-    attribute: params.attribute,
-    rarity: params.rarity,
-    monsterType: params.monsterType,
-    archetype: params.archetype,
-    level: toNumber(params.level),
-    scale: toNumber(params.scale),
-    minAttack: toNumber(params.minAtk),
-    maxAttack: toNumber(params.maxAtk),
-    minDefense: toNumber(params.minDef),
-    maxDefense: toNumber(params.maxDef),
-    page,
-  });
+  const direction =
+    params.direction === "desc"
+      ? "desc"
+      : "asc";
 
-  const cards: Card[] = result.cards.map(
-    (card) => ({
-      ...card,
+  const result =
+    activeTab === "cards"
+      ? await queryCards({
+          search: params.search,
 
-      linkMarkers:
-        card.linkMarkers as Card["linkMarkers"],
-    })
-  );
+          type: params.type,
+
+          attribute: params.attribute,
+
+          rarity: params.rarity,
+
+          monsterType: params.monsterType,
+
+          archetype: params.archetype,
+
+          level: toNumber(params.level),
+
+          scale: toNumber(params.scale),
+
+          minAttack: toNumber(params.minAtk),
+
+          maxAttack: toNumber(params.maxAtk),
+
+          minDefense: toNumber(params.minDef),
+
+          maxDefense: toNumber(params.maxDef),
+
+          sort: params.sort,
+
+          direction,
+
+          page,
+
+          limit: 50,
+        })
+      : null;
 
   return (
-    <main
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Catálogo de cartas"
       className="
-        min-h-screen
-        bg-zinc-950
-        px-4
-        py-6
-        text-white
+        fixed
+        inset-0
+        z-[80]
+        flex
+        overflow-hidden
+        bg-[#050914]/85
+        text-slate-100
+        backdrop-blur-md
+        sm:p-5
       "
     >
       <div
+        aria-hidden
         className="
+          pointer-events-none
+          absolute
+          inset-0
+          bg-[radial-gradient(circle_at_50%_-10%,rgba(37,99,235,0.22),transparent_55%),radial-gradient(circle_at_90%_90%,rgba(14,165,233,0.1),transparent_45%)]
+        "
+      />
+
+      <div
+        className="
+          relative
           mx-auto
-          max-w-7xl
-          space-y-6
+          flex
+          w-full
+          max-w-[1500px]
+          items-stretch
+          justify-center
+          sm:items-center
         "
       >
-        <CardFilters />
+        <section
+          className="
+            relative
+            flex
+            h-[100dvh]
+            w-full
+            flex-col
+            overflow-hidden
+            bg-[#0B132B]
+            shadow-[0_30px_90px_-20px_rgba(0,0,0,0.95)]
+            sm:h-[min(94vh,1000px)]
+            sm:rounded-2xl
+            sm:border
+            sm:border-slate-700/70
+            sm:ring-1
+            sm:ring-white/5
+          "
+        >
+          <CatalogHeader
+            activeTab={activeTab}
+          />
 
-        <CardPageClient
-          cards={cards}
-        />
+          {activeTab === "cards" &&
+          result ? (
+            <>
+              <CardCatalogControls />
 
-        <CardsPagination
-          currentPage={result.page}
-          totalPages={result.pages}
-        />
+              <div
+                className="
+                  min-h-0
+                  flex-1
+                  overflow-y-auto
+                  overscroll-contain
+                  px-2.5
+                  py-2.5
+                  sm:px-4
+                "
+              >
+                {result.cards.length === 0 ? (
+                  <div
+                    className="
+                      flex
+                      min-h-[260px]
+                      flex-col
+                      items-center
+                      justify-center
+                      gap-2
+                      rounded-xl
+                      border
+                      border-dashed
+                      border-slate-700
+                      px-6
+                      text-center
+                      text-xs
+                      text-slate-400
+                    "
+                  >
+                    <Search className="h-6 w-6 text-slate-600" />
+
+                    <p>
+                      No se encontraron cartas
+                      con estos filtros.
+                    </p>
+
+                    <Link
+                      href="/cards"
+                      className="
+                        mt-1
+                        text-[10px]
+                        font-bold
+                        uppercase
+                        tracking-[0.14em]
+                        text-blue-300
+                        transition-colors
+                        hover:text-blue-200
+                      "
+                    >
+                      Reiniciar filtros
+                    </Link>
+                  </div>
+                ) : (
+                  <CatalogGrid
+                    cards={result.cards}
+                  />
+                )}
+              </div>
+
+              <footer
+                className="
+                  shrink-0
+                  border-t
+                  border-slate-700/60
+                  bg-[#0B132B]/95
+                  px-3
+                  py-2.5
+                  sm:px-5
+                "
+              >
+                <CardsPagination
+                  currentPage={result.page}
+                  totalPages={result.pages}
+                  total={result.total}
+                />
+              </footer>
+            </>
+          ) : (
+            <div
+              className="
+                flex
+                flex-1
+                flex-col
+                items-center
+                justify-center
+                gap-2
+                px-6
+                text-center
+              "
+            >
+              <p
+                className="
+                  text-sm
+                  font-black
+                  uppercase
+                  tracking-[0.22em]
+                  text-slate-300
+                "
+              >
+                {activeTab}
+              </p>
+
+              <p className="max-w-sm text-xs text-slate-500">
+                Esta sección estará disponible
+                próximamente en el catálogo.
+              </p>
+
+              <Link
+                href="/cards"
+                className="
+                  mt-2
+                  text-[10px]
+                  font-bold
+                  uppercase
+                  tracking-[0.14em]
+                  text-blue-300
+                  transition-colors
+                  hover:text-blue-200
+                "
+              >
+                Volver a Cards
+              </Link>
+            </div>
+          )}
+        </section>
       </div>
-    </main>
+    </div>
   );
 }

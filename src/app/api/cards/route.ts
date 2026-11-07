@@ -55,6 +55,20 @@ export async function GET(
         "monsterType"
       ) ?? undefined;
 
+    const sort =
+      searchParams.get("sort") ??
+      undefined;
+
+    const directionParam =
+      searchParams.get("direction");
+
+    const direction =
+      directionParam === "desc"
+        ? "desc"
+        : directionParam === "asc"
+          ? "asc"
+          : undefined;
+
     function numberParam(
       key: string
     ) {
@@ -102,6 +116,8 @@ export async function GET(
         maxAttack,
         minDefense,
         maxDefense,
+        sort,
+        direction,
         page,
         limit,
       });

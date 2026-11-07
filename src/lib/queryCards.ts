@@ -34,6 +34,9 @@ export interface QueryOptions {
 
   random?: boolean;
 
+  sort?: string;
+  direction?: "asc" | "desc";
+
   limit?: number;
   page?: number;
 }
@@ -60,15 +63,35 @@ function getPagination(
 }
 
 function getOrderBy(
-  random: boolean
+  random: boolean,
+  sort = "popularity",
+  direction: "asc" | "desc" = "asc"
 ): Prisma.CardOrderByWithRelationInput | undefined {
   if (random) {
     return undefined;
   }
 
-  return {
-    name: "asc",
-  };
+  switch (sort) {
+    case "attack":
+      return { attack: direction };
+    case "defense":
+      return { defense: direction };
+    case "level":
+      return { level: direction };
+    case "rarity":
+      return { rarity: direction };
+    case "newest":
+      return { createdAt: "desc" };
+    case "name":
+      return { name: direction };
+    default:
+      /*
+       * "Popularity" aún no existe como métrica en
+       * la base de datos. Hasta que haya datos de uso
+       * de mazos, se ordena alfabéticamente.
+       */
+      return { name: direction };
+  }
 }
 
 function buildWhere(
@@ -260,6 +283,8 @@ export async function queryCards(
     random = false,
     limit = 50,
     page = 1,
+    sort = "popularity",
+    direction = "asc",
   } = options;
 
   const {
@@ -270,7 +295,11 @@ export async function queryCards(
 
   const where = buildWhere(options);
 
-  const orderBy = getOrderBy(random);
+  const orderBy = getOrderBy(
+    random,
+    sort,
+    direction
+  );
 
   const [cards, total] =
     await Promise.all([
