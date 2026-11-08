@@ -288,6 +288,8 @@ export default function CardHoverTooltip({
                 text-[9px]
                 font-black
                 tracking-wide
+                ring-1
+                ring-white/25
                 ${rarityStyle.badge}
               `}
             >

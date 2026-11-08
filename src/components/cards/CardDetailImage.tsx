@@ -46,7 +46,16 @@ export default function CardDetailImage({
     ] ?? "/cards/default.jpg";
 
   return (
-    <div className="relative aspect-[59/86] w-full">
+    <div
+      className="
+        relative
+        aspect-[59/86]
+        w-full
+        overflow-hidden
+        rounded-xl
+        bg-slate-950
+      "
+    >
       <Image
         src={src}
         alt={name}
@@ -63,7 +72,7 @@ export default function CardDetailImage({
             )
           )
         }
-        className="object-contain"
+        className="object-cover"
       />
     </div>
   );

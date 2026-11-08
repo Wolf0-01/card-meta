@@ -42,6 +42,11 @@ export default function CardTooltip({
             h-52
             w-36
             flex-shrink-0
+            overflow-hidden
+            rounded-lg
+            border
+            border-zinc-700
+            bg-zinc-800
           "
         >
           <Image
@@ -51,7 +56,7 @@ export default function CardTooltip({
             }
             alt={card.name}
             fill
-            className="object-cover rounded-lg"
+            className="object-cover"
           />
         </div>
 

@@ -59,7 +59,7 @@ export default function CardHoverPreview({
           alt={card.name}
           width={340}
           height={500}
-          className="w-full rounded-lg"
+          className="w-full object-cover"
         />
 
         <div className="absolute left-3 top-3 flex gap-2">

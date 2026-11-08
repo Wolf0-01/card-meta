@@ -226,7 +226,7 @@ export default function MiniCardTile({
           relative
           aspect-[88/128]
           overflow-hidden
-          rounded-md
+          rounded-lg
           border
           border-border
           bg-surface

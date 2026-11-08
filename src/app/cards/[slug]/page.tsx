@@ -443,11 +443,10 @@ export default async function CardDetailPage({
               <span
                 className={`
                   absolute
-                  left-1/2
+                  left-0
                   top-0
                   z-20
-                  -translate-x-1/2
-                  rounded-md
+                  rounded-br-xl
                   px-2.5
                   py-1
                   text-[11px]
@@ -455,8 +454,7 @@ export default async function CardDetailPage({
                   leading-none
                   tracking-[0.14em]
                   ring-1
-                  ring-white/25
-                  shadow-[0_4px_14px_rgba(0,0,0,0.7)]
+                  ring-white/30
                   ${rarityStyle.badge}
                 `}
               >

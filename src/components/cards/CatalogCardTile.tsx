@@ -218,11 +218,14 @@ export default function CatalogCardTile({
             relative
             aspect-[59/86]
             overflow-hidden
-            rounded-md
+            rounded-lg
             border
             border-slate-700
             bg-slate-800
             shadow-sm
+            ring-1
+            ring-inset
+            ring-white/5
             transition-all
             duration-150
             group-hover:border-blue-400/80
@@ -291,7 +294,7 @@ export default function CatalogCardTile({
               <span
                 className={`
                   absolute
-                  left-1
+                  right-1
                   top-1.5
                   rounded
                   px-1
@@ -313,7 +316,7 @@ export default function CatalogCardTile({
               <span
                 className={`
                   absolute
-                  left-1
+                  right-1
                   top-1.5
                   rounded
                   px-1
@@ -335,7 +338,7 @@ export default function CatalogCardTile({
               className="
                 absolute
                 right-1
-                top-1.5
+                bottom-1.5
                 rounded
                 bg-black/80
                 px-1
@@ -354,20 +357,18 @@ export default function CatalogCardTile({
           <span
             className={`
               absolute
-              left-1/2
+              left-0
               top-0
-              z-10
-              -translate-x-1/2
-              rounded-b-md
+              z-20
+              rounded-br-md
               px-1.5
               py-0.5
               text-[8px]
               font-black
               leading-none
               tracking-[0.08em]
-              shadow-[0_2px_8px_rgba(0,0,0,0.65)]
               ring-1
-              ring-white/20
+              ring-white/25
               ${rarityStyle.badge}
             `}
           >
