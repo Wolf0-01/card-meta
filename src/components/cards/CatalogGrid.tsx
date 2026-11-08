@@ -6,18 +6,24 @@ import CatalogCardTile from "./CatalogCardTile";
 
 interface CatalogGridProps {
   cards: CardPreviewData[];
+
+  /**
+   * Clases opcionales para controlar la densidad de la
+   * cuadrícula. Por defecto replica el catálogo compacto.
+   */
+  gridClassName?: string;
 }
 
 export default function CatalogGrid({
   cards,
+  gridClassName = "grid-cols-5 gap-2",
 }: CatalogGridProps) {
   return (
     <div
-      className="
+      className={`
         grid
-        grid-cols-5
-        gap-2
-      "
+        ${gridClassName}
+      `}
     >
       {cards.map((card, index) => (
         <CatalogCardTile

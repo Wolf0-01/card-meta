@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import {
   ArrowLeft,
+  ArrowUpRight,
   BookOpen,
   CalendarDays,
   CircleDot,
@@ -25,6 +26,11 @@ import {
 } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
+
+import {
+  formatSetType,
+  slugifySetName,
+} from "@/lib/setSlug";
 
 import {
   mapPrismaCard,
@@ -698,42 +704,66 @@ export default async function CardDetailPage({
                     {card.obtain.map((entry) => (
                       <li
                         key={`${entry.type ?? "set"}-${entry.name}`}
-                        className="
-                          inline-flex
-                          max-w-full
-                          items-center
-                          gap-1.5
-                          rounded-md
-                          border
-                          border-slate-700/60
-                          bg-[#0B132B]
-                          px-2
-                          py-1
-                          text-[11px]
-                          font-semibold
-                          text-slate-200
-                        "
+                        className="max-w-full"
                       >
-                        <Package className="h-3 w-3 shrink-0 text-blue-300" />
+                        <Link
+                          href={`/articles/sets/${slugifySetName(entry.name)}`}
+                          title={`Ver las cartas de ${entry.name}`}
+                          className="
+                            group
+                            inline-flex
+                            max-w-full
+                            items-center
+                            gap-1.5
+                            rounded-md
+                            border
+                            border-slate-700/60
+                            bg-[#0B132B]
+                            px-2
+                            py-1
+                            text-[11px]
+                            font-semibold
+                            text-slate-200
+                            transition-colors
+                            hover:border-blue-400/70
+                            hover:bg-blue-500/10
+                            hover:text-white
+                          "
+                        >
+                          <Package className="h-3 w-3 shrink-0 text-blue-300" />
 
-                        <span className="truncate">
-                          {entry.name}
-                        </span>
-
-                        {entry.type && (
-                          <span
-                            className="
-                              shrink-0
-                              text-[8px]
-                              font-black
-                              uppercase
-                              tracking-[0.1em]
-                              text-slate-500
-                            "
-                          >
-                            {entry.type}
+                          <span className="truncate">
+                            {entry.name}
                           </span>
-                        )}
+
+                          {entry.type && (
+                            <span
+                              className="
+                                shrink-0
+                                text-[8px]
+                                font-black
+                                uppercase
+                                tracking-[0.1em]
+                                text-slate-500
+                                transition-colors
+                                group-hover:text-blue-200
+                              "
+                            >
+                              {formatSetType(entry.type)}
+                            </span>
+                          )}
+
+                          <ArrowUpRight
+                            className="
+                              h-3
+                              w-3
+                              shrink-0
+                              text-slate-600
+                              transition-colors
+                              group-hover:text-blue-300
+                            "
+                          />
+                        </Link>
                       </li>
                     ))}
                   </ul>
