@@ -210,7 +210,6 @@ export default function CatalogCardTile({
           relative
           block
           w-full
-          max-w-[104px]
           select-none
         "
       >
@@ -234,7 +233,7 @@ export default function CatalogCardTile({
             src={imageSrc}
             alt={card.name}
             fill
-            sizes="104px"
+            sizes="(max-width: 540px) 20vw, 100px"
             priority={priority}
             unoptimized={failed}
             draggable={false}

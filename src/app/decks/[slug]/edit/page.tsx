@@ -70,6 +70,8 @@ export default async function EditDeckPage({
 
     description: deck.description ?? "",
 
+    skill: deck.skill ?? "",
+
     isPublic: deck.isPublic,
 
     cards,

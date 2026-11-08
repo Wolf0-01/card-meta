@@ -17,6 +17,8 @@ interface CardsPaginationProps {
   totalPages: number;
 
   total: number;
+
+  itemLabel?: string;
 }
 
 type PageItem =
@@ -74,6 +76,7 @@ export default function CardsPagination({
   currentPage,
   totalPages,
   total,
+  itemLabel = "cards",
 }: CardsPaginationProps) {
   const router = useRouter();
 
@@ -130,8 +133,8 @@ export default function CardsPagination({
           disabled={current <= 1}
           className="
             flex
-            h-8
-            w-8
+            h-7
+            w-7
             shrink-0
             items-center
             justify-center
@@ -159,12 +162,12 @@ export default function CardsPagination({
                   aria-hidden
                   className="
                     flex
-                    h-8
+                    h-7
                     w-5
                     shrink-0
                     items-center
                     justify-center
-                    text-[11px]
+                    text-[10px]
                     font-bold
                     text-slate-600
                   "
@@ -187,15 +190,15 @@ export default function CardsPagination({
                 onClick={() => goToPage(item)}
                 className={`
                   flex
-                  h-8
-                  min-w-8
+                  h-7
+                  min-w-7
                   shrink-0
                   items-center
                   justify-center
                   rounded-md
                   border
                   px-2
-                  text-[11px]
+                  text-[10px]
                   font-bold
                   tabular-nums
                   transition-colors
@@ -223,8 +226,8 @@ export default function CardsPagination({
           disabled={current >= pages}
           className="
             flex
-            h-8
-            w-8
+            h-7
+            w-7
             shrink-0
             items-center
             justify-center
@@ -248,7 +251,7 @@ export default function CardsPagination({
         className="
           shrink-0
           text-right
-          text-[11px]
+          text-[10px]
           font-semibold
           tracking-wide
           text-slate-400
@@ -257,7 +260,7 @@ export default function CardsPagination({
         <span className="tabular-nums text-slate-200">
           {total}
         </span>{" "}
-        cards
+        {itemLabel}
       </p>
     </div>
   );

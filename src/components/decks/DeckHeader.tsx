@@ -3,6 +3,8 @@
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 
+import { Zap } from "lucide-react";
+
 import DeckActions from "./DeckActions";
 
 import { MetaDeck } from "@/types/meta";
@@ -101,6 +103,29 @@ export default function DeckHeader({
                 {deck.winRate}% WR
               </Badge>
             </div>
+
+            {deck.skill && (
+              <p
+                className="
+                  mt-3
+                  inline-flex
+                  items-center
+                  gap-1.5
+                  rounded-lg
+                  border
+                  border-amber-500/30
+                  bg-amber-500/10
+                  px-2.5
+                  py-1
+                  text-xs
+                  font-semibold
+                  text-amber-300
+                "
+              >
+                <Zap className="h-3.5 w-3.5" />
+                Skill: {deck.skill}
+              </p>
+            )}
 
             <div className="mt-6">
               <DeckActions deck={deck} />

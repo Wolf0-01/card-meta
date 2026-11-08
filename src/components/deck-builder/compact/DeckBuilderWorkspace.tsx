@@ -9,6 +9,12 @@ import {
   useRouter,
 } from "next/navigation";
 
+import Link from "next/link";
+
+import {
+  Zap,
+} from "lucide-react";
+
 import Button from "@/components/ui/Button";
 
 import useDeckDraft, {
@@ -293,6 +299,9 @@ export default function DeckBuilderWorkspace({
               draft.description.trim() ||
               null,
 
+            skill:
+              draft.skill.trim() || null,
+
             format: "Advanced",
 
             isPublic: makePublic,
@@ -501,7 +510,7 @@ export default function DeckBuilderWorkspace({
             className="
               grid
               gap-2
-              md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]
+              md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,0.9fr)]
             "
           >
             <label className="block">
@@ -576,6 +585,75 @@ export default function DeckBuilderWorkspace({
                 "
               />
             </label>
+
+            <div>
+              <div className="mb-1 flex items-center justify-between gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wide text-foreground-muted">
+                  Skill
+                </span>
+
+                <Link
+                  href="/cards?tab=skills"
+                  className="
+                    text-[10px]
+                    font-bold
+                    uppercase
+                    tracking-wide
+                    text-primary
+                    transition-colors
+                    hover:text-primary/80
+                  "
+                >
+                  Catálogo
+                </Link>
+              </div>
+
+              <div className="relative">
+                <Zap
+                  aria-hidden
+                  className="
+                    pointer-events-none
+                    absolute
+                    left-2.5
+                    top-1/2
+                    h-3.5
+                    w-3.5
+                    -translate-y-1/2
+                    text-amber-400
+                  "
+                />
+
+                <input
+                  value={draft.skill}
+                  onChange={(event) =>
+                    draft.setSkill(
+                      event.target.value
+                    )
+                  }
+                  placeholder="Ej. Destiny Draw"
+                  maxLength={120}
+                  aria-label="Skill asignada al mazo"
+                  className="
+                    w-full
+                    rounded-lg
+                    border
+                    border-border
+                    bg-surface
+                    py-2
+                    pl-8
+                    pr-3
+                    text-sm
+                    text-foreground
+                    outline-none
+                    transition-colors
+                    placeholder:text-foreground-muted
+                    focus:border-primary
+                    focus:ring-2
+                    focus:ring-primary/20
+                  "
+                />
+              </div>
+            </div>
           </div>
 
           <div

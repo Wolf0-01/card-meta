@@ -18,6 +18,7 @@ import {
   Plus,
   Trash2,
   X,
+  Zap,
 } from "lucide-react";
 
 import Button from "@/components/ui/Button";
@@ -578,6 +579,33 @@ export default function MyDecksGrid({
                   {deck.description ??
                     "Sin descripción. Abre el editor para añadir una estrategia."}
                 </p>
+
+                {deck.skill && (
+                  <p
+                    className="
+                      mt-2
+                      inline-flex
+                      max-w-full
+                      items-center
+                      gap-1
+                      rounded-md
+                      border
+                      border-amber-500/30
+                      bg-amber-500/10
+                      px-2
+                      py-0.5
+                      text-[10px]
+                      font-semibold
+                      text-amber-300
+                    "
+                  >
+                    <Zap className="h-3 w-3 shrink-0" />
+
+                    <span className="truncate">
+                      {deck.skill}
+                    </span>
+                  </p>
+                )}
               </div>
 
               <div className="mt-auto space-y-3 px-4 pb-4">

@@ -23,8 +23,10 @@ import {
   validateDraft,
 } from "@/lib/decks/draft";
 
-const STORAGE_KEY =
-  "cardmeta-deck-draft-v1";
+import {
+  DECK_DRAFT_SKILL_EVENT,
+  DECK_DRAFT_STORAGE_KEY,
+} from "@/lib/decks/draftStorage";
 
 const EMPTY_CARDS: DraftCard[] = [];
 
@@ -53,6 +55,8 @@ export interface DeckDraftSeed {
   description: string;
 
   isPublic: boolean;
+
+  skill: string;
 }
 
 interface UseDeckDraftOptions {
@@ -116,6 +120,11 @@ function readStoredDraft(
         "boolean"
           ? parsed.isPublic
           : false,
+
+      skill:
+        typeof parsed.skill === "string"
+          ? parsed.skill
+          : "",
     };
   } catch {
     return null;
@@ -129,7 +138,7 @@ function readStoredDraft(
  */
 export default function useDeckDraft({
   initialDraft: seed = null,
-  storageKey = STORAGE_KEY,
+  storageKey = DECK_DRAFT_STORAGE_KEY,
 }: UseDeckDraftOptions = {}) {
   const [
     initialDraft,
@@ -157,6 +166,10 @@ export default function useDeckDraft({
     useState(
       () => initialDraft?.isPublic ?? false
     );
+
+  const [skill, setSkill] = useState(
+    () => initialDraft?.skill ?? ""
+  );
 
   const hasLoadedStorage =
     useSyncExternalStore(
@@ -186,6 +199,7 @@ export default function useDeckDraft({
           name,
           description,
           isPublic,
+          skill,
         })
       );
     } catch {
@@ -199,9 +213,43 @@ export default function useDeckDraft({
     name,
     description,
     isPublic,
+    skill,
     isReady,
     storageKey,
   ]);
+
+  /*
+   * El catálogo de skills puede escribir en el borrador
+   * mientras el builder sigue montado. Mantenemos el
+   * estado sincronizado sin recargar la página.
+   */
+  useEffect(() => {
+    function handleSkillAssigned(
+      event: Event
+    ) {
+      const detail = (
+        event as CustomEvent<{
+          skill?: unknown;
+        }>
+      ).detail;
+
+      if (typeof detail?.skill === "string") {
+        setSkill(detail.skill);
+      }
+    }
+
+    window.addEventListener(
+      DECK_DRAFT_SKILL_EVENT,
+      handleSkillAssigned
+    );
+
+    return () => {
+      window.removeEventListener(
+        DECK_DRAFT_SKILL_EVENT,
+        handleSkillAssigned
+      );
+    };
+  }, []);
 
   /*
    * Antes de hidratar no mostramos el borrador
@@ -283,6 +331,8 @@ export default function useDeckDraft({
 
     setIsPublic(false);
 
+    setSkill("");
+
     /*
      * Borramos también el almacenamiento de forma
      * inmediata para que el borrador no reaparezca
@@ -324,6 +374,10 @@ export default function useDeckDraft({
       : false,
 
     setIsPublic,
+
+    skill: isReady ? skill : "",
+
+    setSkill,
 
     stats,
 

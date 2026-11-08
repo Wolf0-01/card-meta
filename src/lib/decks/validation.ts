@@ -54,6 +54,16 @@ const deckFields = {
     .nullable()
     .optional(),
 
+  skill: z
+    .string()
+    .trim()
+    .max(
+      120,
+      "La skill no puede superar 120 caracteres"
+    )
+    .nullable()
+    .optional(),
+
   format: z
     .string()
     .trim()

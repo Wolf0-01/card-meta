@@ -78,10 +78,10 @@ export default function CatalogHeader({
         border-slate-700/60
         bg-[#0B132B]/95
         px-3
-        sm:px-5
+        sm:px-4
       "
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-2">
         <nav
           aria-label="Secciones del catálogo"
           className="
@@ -111,14 +111,14 @@ export default function CatalogHeader({
                 className={`
                   relative
                   shrink-0
-                  px-3
-                  py-3.5
-                  text-[11px]
+                  px-2.5
+                  py-2.5
+                  text-[10px]
                   font-black
                   uppercase
-                  tracking-[0.22em]
+                  tracking-[0.18em]
                   transition-colors
-                  sm:px-4
+                  sm:px-3
                   ${
                     active
                       ? "text-white"
@@ -132,7 +132,7 @@ export default function CatalogHeader({
                   <span
                     className="
                       absolute
-                      inset-x-2
+                      inset-x-1
                       bottom-0
                       h-0.5
                       rounded-full
@@ -152,8 +152,8 @@ export default function CatalogHeader({
           onClick={closeCatalog}
           className="
             flex
-            h-8
-            w-8
+            h-7
+            w-7
             shrink-0
             items-center
             justify-center
@@ -168,7 +168,7 @@ export default function CatalogHeader({
             hover:text-red-300
           "
         >
-          <X className="h-4 w-4" />
+          <X className="h-3.5 w-3.5" />
         </button>
       </div>
     </header>

@@ -95,6 +95,8 @@ export interface UserDeckDTO {
 
   description: string | null;
 
+  skill: string | null;
+
   format: string;
 
   isPublic: boolean;
@@ -128,6 +130,8 @@ export interface UserDeckSummary {
   identifier: string;
 
   description: string | null;
+
+  skill: string | null;
 
   format: string;
 
@@ -174,6 +178,8 @@ function mapUserDeck(
     identifier: deck.identifier,
 
     description: deck.description,
+
+    skill: deck.skill,
 
     format: deck.format,
 
@@ -344,6 +350,8 @@ export async function createUserDeck(
 
       description: input.description ?? null,
 
+      skill: input.skill?.trim() || null,
+
       archetypeId,
 
       cards: {
@@ -382,6 +390,8 @@ export async function updateUserDeck(
         name: true,
 
         description: true,
+
+        skill: true,
 
         format: true,
 
@@ -438,6 +448,11 @@ export async function updateUserDeck(
       ? patch.description
       : existing.description;
 
+  const skill =
+    patch.skill !== undefined
+      ? patch.skill?.trim() || null
+      : existing.skill;
+
   const format =
     patch.format ??
     existing.format ??
@@ -467,6 +482,8 @@ export async function updateUserDeck(
           ),
 
           description,
+
+          skill,
 
           format,
 
@@ -594,6 +611,8 @@ export async function listUserDecks(
     identifier: deck.identifier,
 
     description: deck.description,
+
+    skill: deck.skill,
 
     format: deck.format,
 

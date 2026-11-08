@@ -257,6 +257,8 @@ export function mapPrismaDeck(
 
 image: deck.image,
 
+skill: deck.skill,
+
 description:
 deck.description,
 

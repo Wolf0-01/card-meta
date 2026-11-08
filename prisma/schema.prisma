@@ -147,6 +147,8 @@ model Deck {
 
   description String?
 
+  skill String?
+
   image String?
 
   wins Int @default(0)

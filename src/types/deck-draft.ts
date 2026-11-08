@@ -47,6 +47,8 @@ export interface DeckDraftMeta {
   description: string;
 
   isPublic: boolean;
+
+  skill: string;
 }
 
 export type DraftCardZone = DeckZone;

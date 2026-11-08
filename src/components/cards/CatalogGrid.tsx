@@ -15,10 +15,8 @@ export default function CatalogGrid({
     <div
       className="
         grid
-        grid-cols-[repeat(auto-fill,minmax(94px,1fr))]
-        justify-items-center
-        gap-1.5
-        sm:gap-2
+        grid-cols-5
+        gap-2
       "
     >
       {cards.map((card, index) => (

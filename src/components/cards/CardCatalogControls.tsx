@@ -68,13 +68,13 @@ const SORT_OPTIONS = [
 ] as const;
 
 const controlClasses = `
-  h-8
-  rounded-md
+  h-7
+  rounded
   border
   border-slate-700/80
   bg-[#070D1F]
-  px-2
-  text-[11px]
+  px-1.5
+  text-[10px]
   font-bold
   text-slate-300
   outline-none
@@ -321,20 +321,19 @@ export default function CardCatalogControls() {
         border-slate-700/60
         bg-[#0B132B]
         px-3
-        py-2.5
-        sm:px-5
+        py-2
       "
     >
-      <div className="space-y-2">
-        <div className="relative">
+      <div className="flex items-center gap-1.5">
+        <div className="relative min-w-0 flex-1">
           <Search
             className="
               pointer-events-none
               absolute
-              left-3
+              left-2
               top-1/2
-              h-4
-              w-4
+              h-3.5
+              w-3.5
               -translate-y-1/2
               text-slate-500
             "
@@ -351,15 +350,15 @@ export default function CardCatalogControls() {
             maxLength={80}
             aria-label="Buscar cartas por nombre"
             className="
-              h-10
+              h-8
               w-full
-              rounded-lg
+              rounded-md
               border
               border-slate-700/80
               bg-[#070D1F]
-              pl-9
-              pr-9
-              text-sm
+              pl-7
+              pr-7
+              text-[11px]
               text-slate-100
               outline-none
               transition-colors
@@ -377,11 +376,11 @@ export default function CardCatalogControls() {
               onClick={clearSearch}
               className="
                 absolute
-                right-2
+                right-1.5
                 top-1/2
                 flex
-                h-6
-                w-6
+                h-5
+                w-5
                 -translate-y-1/2
                 items-center
                 justify-center
@@ -392,26 +391,28 @@ export default function CardCatalogControls() {
                 hover:text-white
               "
             >
-              <X className="h-3 w-3" />
+              <X className="h-2.5 w-2.5" />
             </button>
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-1.5">
+        <div
+          className="
+            flex
+            shrink-0
+            overflow-hidden
+            rounded-md
+            border
+            border-slate-700/80
+            bg-[#070D1F]
+          "
+        >
           {(
             [
-              {
-                value: "speed",
-                label: "Speed",
-                hint: "Duel Links",
-              },
-              {
-                value: "rush",
-                label: "Rush",
-                hint: "Rush Duel",
-              },
+              { value: "speed", label: "Speed" },
+              { value: "rush", label: "Rush" },
             ] as const
-          ).map((item) => {
+          ).map((item, index) => {
             const active =
               item.value === mode;
 
@@ -430,56 +431,44 @@ export default function CardCatalogControls() {
                 }
                 className={`
                   flex
+                  h-8
                   items-center
-                  justify-center
-                  gap-2
-                  rounded-md
-                  border
-                  px-3
-                  py-1.5
+                  px-2.5
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.14em]
                   transition-colors
                   ${
+                    index > 0
+                      ? "border-l border-slate-700/80"
+                      : ""
+                  }
+                  ${
                     active
-                      ? "border-blue-400/80 bg-blue-500/10 text-blue-200 shadow-[inset_0_1px_0_rgba(59,130,246,0.25)]"
-                      : "border-slate-700/80 bg-[#070D1F] text-slate-500 hover:border-slate-600 hover:text-slate-300"
+                      ? "bg-blue-500/15 text-blue-200"
+                      : "text-slate-500 hover:text-slate-300"
                   }
                 `}
               >
-                <span
-                  className="
-                    text-[11px]
-                    font-black
-                    uppercase
-                    tracking-[0.18em]
-                  "
-                >
-                  {item.label}
-                </span>
-
-                <span
-                  className="
-                    text-[9px]
-                    font-semibold
-                    uppercase
-                    tracking-wide
-                    opacity-60
-                  "
-                >
-                  {item.hint}
-                </span>
+                {item.label}
               </button>
             );
           })}
         </div>
+      </div>
 
-        {mode === "rush" && (
-          <p className="text-[10px] font-semibold text-amber-300/80">
-            Rush Duel: catálogo en preparación.
-            Se muestran las cartas de Speed.
-          </p>
-        )}
-
-        <div className="flex flex-wrap items-center gap-1.5">
+      <div
+        className="
+          mt-1.5
+          flex
+          items-center
+          gap-1
+          border-t
+          border-slate-800/80
+          pt-1.5
+        "
+      >
           <div
             ref={filterRef}
             className="relative"
@@ -497,7 +486,7 @@ export default function CardCatalogControls() {
                 ${controlClasses}
                 inline-flex
                 items-center
-                gap-1.5
+                gap-1
                 ${
                   activeFilters > 0
                     ? "border-blue-500/60 text-blue-200"
@@ -505,7 +494,7 @@ export default function CardCatalogControls() {
                 }
               `}
             >
-              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <SlidersHorizontal className="h-3 w-3" />
 
               Filter by...
 
@@ -541,19 +530,19 @@ export default function CardCatalogControls() {
                   left-0
                   top-full
                   z-30
-                  mt-2
-                  w-[min(22rem,calc(100vw-2rem))]
-                  rounded-xl
+                  mt-1.5
+                  w-[min(20rem,calc(100vw-1.5rem))]
+                  rounded-lg
                   border
                   border-slate-700
                   bg-[#0B132B]
-                  p-3
+                  p-2
                   shadow-2xl
                 "
               >
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className="grid grid-cols-2 gap-1.5">
                   <label className="block">
-                    <span className="mb-1 block text-[9px] font-black uppercase tracking-[0.16em] text-slate-500">
+                    <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
                       Tipo
                     </span>
 
@@ -581,7 +570,7 @@ export default function CardCatalogControls() {
                   </label>
 
                   <label className="block">
-                    <span className="mb-1 block text-[9px] font-black uppercase tracking-[0.16em] text-slate-500">
+                    <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
                       Atributo
                     </span>
 
@@ -609,7 +598,7 @@ export default function CardCatalogControls() {
                   </label>
 
                   <label className="block">
-                    <span className="mb-1 block text-[9px] font-black uppercase tracking-[0.16em] text-slate-500">
+                    <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
                       Rareza
                     </span>
 
@@ -637,7 +626,7 @@ export default function CardCatalogControls() {
                   </label>
 
                   <label className="block">
-                    <span className="mb-1 block text-[9px] font-black uppercase tracking-[0.16em] text-slate-500">
+                    <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
                       Nivel
                     </span>
 
@@ -669,17 +658,17 @@ export default function CardCatalogControls() {
                   type="button"
                   onClick={resetFilters}
                   className="
-                    mt-3
+                    mt-2
                     w-full
-                    rounded-md
+                    rounded
                     border
                     border-slate-700
-                    px-3
-                    py-1.5
-                    text-[10px]
+                    px-2
+                    py-1
+                    text-[9px]
                     font-bold
                     uppercase
-                    tracking-[0.14em]
+                    tracking-[0.12em]
                     text-slate-400
                     transition-colors
                     hover:border-blue-500/60
@@ -697,10 +686,10 @@ export default function CardCatalogControls() {
               className="
                 pointer-events-none
                 absolute
-                left-2
+                left-1.5
                 top-1/2
-                h-3.5
-                w-3.5
+                h-3
+                w-3
                 -translate-y-1/2
                 text-slate-500
               "
@@ -717,8 +706,8 @@ export default function CardCatalogControls() {
               className={`
                 ${controlClasses}
                 appearance-none
-                pl-7
-                pr-7
+                pl-6
+                pr-6
               `}
             >
               {SORT_OPTIONS.map(
@@ -737,7 +726,7 @@ export default function CardCatalogControls() {
               className="
                 pointer-events-none
                 absolute
-                right-2
+                right-1.5
                 top-1/2
                 h-3
                 w-3
@@ -769,15 +758,15 @@ export default function CardCatalogControls() {
             }
             className="
               inline-flex
-              h-8
+              h-7
               items-center
-              gap-1.5
-              rounded-md
+              gap-1
+              rounded
               border
               border-slate-700/80
               bg-[#070D1F]
-              px-2
-              text-[10px]
+              px-1.5
+              text-[9px]
               font-black
               tracking-wide
               text-slate-300
@@ -786,7 +775,7 @@ export default function CardCatalogControls() {
               hover:text-white
             "
           >
-            <ArrowUpDown className="h-3.5 w-3.5" />
+            <ArrowUpDown className="h-3 w-3" />
 
             {direction === "asc"
               ? "ASC"
@@ -801,12 +790,12 @@ export default function CardCatalogControls() {
               title="Reiniciar filtros"
               className="
                 inline-flex
-                h-8
+                h-7
                 items-center
                 gap-1
-                rounded-md
-                px-2
-                text-[10px]
+                rounded
+                px-1.5
+                text-[9px]
                 font-bold
                 uppercase
                 tracking-wide
@@ -823,7 +812,13 @@ export default function CardCatalogControls() {
             </button>
           )}
         </div>
-      </div>
+
+      {mode === "rush" && (
+        <p className="mt-1.5 text-[9px] font-semibold leading-3 text-amber-300/80">
+          Rush Duel: catálogo en preparación.
+          Se muestran las cartas de Speed.
+        </p>
+      )}
     </div>
   );
 }

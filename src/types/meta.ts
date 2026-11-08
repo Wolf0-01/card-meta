@@ -93,6 +93,8 @@ banner?: string | null;
 
 description?: string | null;
 
+skill?: string | null;
+
 guide?: string | null;
 
 combos?: string | null;
