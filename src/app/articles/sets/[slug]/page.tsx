@@ -155,7 +155,6 @@ export default async function CardSetPage({
                   text-blue-200
                 "
               >
-                <Package className="h-3 w-3" />
                 {formatSetType(set.type)}
               </p>
 
@@ -234,6 +233,40 @@ export default async function CardSetPage({
                 </span>
               </span>
             </div>
+          </div>
+
+          {/* Insertar Banner Aquí: reemplazar este bloque por el banner promocional del set */}
+          <div
+            className="
+              relative
+              mx-auto
+              mt-5
+              flex
+              aspect-[3/1]
+              w-full
+              max-w-4xl
+              items-center
+              justify-center
+              overflow-hidden
+              rounded-xl
+              border
+              border-dashed
+              border-slate-600/60
+              bg-slate-800/50
+              md:aspect-[4/1]
+            "
+          >
+            <span
+              className="
+                text-[10px]
+                font-black
+                uppercase
+                tracking-[0.24em]
+                text-slate-500
+              "
+            >
+              Insertar Banner Aquí
+            </span>
           </div>
 
           {groups.length > 0 && (

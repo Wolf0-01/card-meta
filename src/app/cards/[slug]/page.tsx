@@ -7,7 +7,6 @@ import Link from "next/link";
 
 import {
   ArrowLeft,
-  ArrowUpRight,
   BookOpen,
   CalendarDays,
   CircleDot,
@@ -730,8 +729,6 @@ export default async function CardDetailPage({
                             hover:text-white
                           "
                         >
-                          <Package className="h-3 w-3 shrink-0 text-blue-300" />
-
                           <span className="truncate">
                             {entry.name}
                           </span>
@@ -753,16 +750,6 @@ export default async function CardDetailPage({
                             </span>
                           )}
 
-                          <ArrowUpRight
-                            className="
-                              h-3
-                              w-3
-                              shrink-0
-                              text-slate-600
-                              transition-colors
-                              group-hover:text-blue-300
-                            "
-                          />
                         </Link>
                       </li>
                     ))}
