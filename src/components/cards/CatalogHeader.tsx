@@ -1,15 +1,10 @@
 "use client";
 
 import {
-  useCallback,
   useEffect,
 } from "react";
 
 import Link from "next/link";
-
-import {
-  useRouter,
-} from "next/navigation";
 
 import {
   X,
@@ -20,6 +15,8 @@ import {
   type CatalogTab,
 } from "./catalogTabs";
 
+import { useCloseCatalog } from "./useCloseCatalog";
+
 interface CatalogHeaderProps {
   activeTab: CatalogTab;
 }
@@ -27,17 +24,7 @@ interface CatalogHeaderProps {
 export default function CatalogHeader({
   activeTab,
 }: CatalogHeaderProps) {
-  const router = useRouter();
-
-  const closeCatalog = useCallback(() => {
-    if (window.history.length > 1) {
-      router.back();
-
-      return;
-    }
-
-    router.push("/");
-  }, [router]);
+  const closeCatalog = useCloseCatalog();
 
   useEffect(() => {
     const previousOverflow =

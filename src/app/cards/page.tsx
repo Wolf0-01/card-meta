@@ -8,6 +8,8 @@ import {
 
 import CardCatalogControls from "@/components/cards/CardCatalogControls";
 
+import CatalogDialog from "@/components/cards/CatalogDialog";
+
 import CatalogGrid from "@/components/cards/CatalogGrid";
 
 import CatalogHeader from "@/components/cards/CatalogHeader";
@@ -142,35 +144,7 @@ export default async function CardsPage({
       : null;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Catálogo de cartas"
-      className="
-        fixed
-        inset-0
-        z-[80]
-        flex
-        items-center
-        justify-center
-        overflow-hidden
-        bg-[#050914]/80
-        p-3
-        text-slate-100
-        backdrop-blur-md
-        sm:p-6
-      "
-    >
-      <div
-        aria-hidden
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          bg-[radial-gradient(circle_at_50%_-10%,rgba(37,99,235,0.18),transparent_55%),radial-gradient(circle_at_90%_90%,rgba(14,165,233,0.08),transparent_45%)]
-        "
-      />
-
+    <CatalogDialog>
       <section
         className="
           relative
@@ -411,6 +385,6 @@ export default async function CardsPage({
           </div>
         )}
       </section>
-    </div>
+    </CatalogDialog>
   );
 }
