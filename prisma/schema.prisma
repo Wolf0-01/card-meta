@@ -54,6 +54,10 @@ model Card {
 
   name String @unique
 
+  slug String @unique
+
+  obtain Json?
+
   type String
 
   attribute String?

@@ -9,6 +9,8 @@ ygoproId: number | null;
 
 name: string;
 
+slug: string;
+
 image: string | null;
 
 type: string;

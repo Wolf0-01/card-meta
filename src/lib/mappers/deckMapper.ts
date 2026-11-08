@@ -50,6 +50,8 @@ ygoproId: card.ygoproId,
 
 name: card.name,
 
+slug: card.slug,
+
 description: card.description,
 
 image: card.image,
@@ -110,6 +112,8 @@ card: {
   ygoproId: deckCard.card.ygoproId,
 
   name: deckCard.card.name,
+
+  slug: deckCard.card.slug,
 
   description:
     deckCard.card.description,

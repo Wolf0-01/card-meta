@@ -139,6 +139,9 @@ card.id,
     name:
       card.name,
 
+    slug:
+      card.slug,
+
     description:
       card.description ??
       "",

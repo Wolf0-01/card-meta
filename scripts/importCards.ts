@@ -1,5 +1,7 @@
 import { prisma } from "../src/lib/prisma";
 
+import { slugifyCardName } from "../src/lib/cardSlug";
+
 import axios from "axios";
 import fs from "fs";
 import path from "path";
@@ -13,7 +15,6 @@ async function downloadImage(
   url: string,
   fileName: string
 ) {
-
   const folder = path.join(
     process.cwd(),
     "public",
@@ -57,6 +58,50 @@ async function downloadImage(
 }
 
 
+
+/**
+ * Genera un slug único para la carta durante la importación.
+ *
+ * Los nombres de YGOPRODeck suelen ser únicos, pero dos
+ * cartas distintas pueden normalizarse al mismo slug. En ese
+ * caso se añade un sufijo numérico estable.
+ */
+async function resolveImportSlug(
+  name: string,
+  ygoproId: number
+): Promise<string> {
+  const base =
+    slugifyCardName(name) ||
+    `card-${ygoproId}`;
+
+  let candidate = base;
+
+  let suffix = 2;
+
+  for (;;) {
+    const existing =
+      await prisma.card.findUnique({
+        where: {
+          slug: candidate,
+        },
+
+        select: {
+          ygoproId: true,
+        },
+      });
+
+    if (
+      !existing ||
+      existing.ygoproId === ygoproId
+    ) {
+      return candidate;
+    }
+
+    candidate = `${base}-${suffix}`;
+
+    suffix++;
+  }
+}
 
 async function main() {
 
@@ -105,6 +150,14 @@ async function main() {
 
 
 
+      const slug =
+        await resolveImportSlug(
+          card.name,
+          card.id
+        );
+
+
+
       // Descargar imagen local
 
       if (imageUrl) {
@@ -131,6 +184,8 @@ async function main() {
 
           name:
             card.name,
+
+          slug,
 
           type:
             card.type,
@@ -193,6 +248,9 @@ async function main() {
 
           name:
             card.name,
+
+
+          slug,
 
 
           type:

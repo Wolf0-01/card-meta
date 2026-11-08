@@ -1,4 +1,7 @@
-import { notFound } from "next/navigation";
+import {
+  notFound,
+  redirect,
+} from "next/navigation";
 
 import Link from "next/link";
 
@@ -42,7 +45,7 @@ import type {
 
 interface CardPageProps {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
 }
 
@@ -126,20 +129,34 @@ function formatStat(
 export default async function CardDetailPage({
   params,
 }: CardPageProps) {
-  const { id } = await params;
+  const { slug } = await params;
 
-  const cardId = Number(id);
-
-  if (Number.isNaN(cardId)) {
-    notFound();
-  }
-
-  const prismaCard =
+  let prismaCard =
     await prisma.card.findUnique({
       where: {
-        id: cardId,
+        slug,
       },
     });
+
+  /*
+   * Compatibilidad con enlaces antiguos basados en el ID
+   * numérico: se resuelven y se redirigen al slug canónico.
+   */
+  if (
+    !prismaCard &&
+    /^\d+$/.test(slug)
+  ) {
+    prismaCard =
+      await prisma.card.findUnique({
+        where: {
+          id: Number(slug),
+        },
+      });
+
+    if (prismaCard) {
+      redirect(`/cards/${prismaCard.slug}`);
+    }
+  }
 
   if (!prismaCard) {
     notFound();
@@ -167,6 +184,8 @@ export default async function CardDetailPage({
               ygoproId: true,
 
               name: true,
+
+              slug: true,
 
               image: true,
 
@@ -666,23 +685,89 @@ export default async function CardDetailPage({
                   How to Obtain
                 </p>
 
+                {card.obtain &&
+                card.obtain.length > 0 ? (
+                  <ul
+                    className="
+                      mt-2
+                      flex
+                      flex-wrap
+                      gap-1.5
+                    "
+                  >
+                    {card.obtain.map((entry) => (
+                      <li
+                        key={`${entry.type ?? "set"}-${entry.name}`}
+                        className="
+                          inline-flex
+                          max-w-full
+                          items-center
+                          gap-1.5
+                          rounded-md
+                          border
+                          border-slate-700/60
+                          bg-[#0B132B]
+                          px-2
+                          py-1
+                          text-[11px]
+                          font-semibold
+                          text-slate-200
+                        "
+                      >
+                        <Package className="h-3 w-3 shrink-0 text-blue-300" />
+
+                        <span className="truncate">
+                          {entry.name}
+                        </span>
+
+                        {entry.type && (
+                          <span
+                            className="
+                              shrink-0
+                              text-[8px]
+                              font-black
+                              uppercase
+                              tracking-[0.1em]
+                              text-slate-500
+                            "
+                          >
+                            {entry.type}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p
+                    className="
+                      mt-2
+                      inline-flex
+                      items-center
+                      gap-1.5
+                      text-xs
+                      text-slate-300
+                    "
+                  >
+                    <Package className="h-3.5 w-3.5 text-blue-300" />
+                    Yu-Gi-Oh! Duel Links
+                  </p>
+                )}
+
                 <div
                   className="
-                    mt-2
+                    mt-2.5
                     flex
                     flex-wrap
                     items-center
                     gap-x-4
                     gap-y-1.5
-                    text-xs
-                    text-slate-300
+                    border-t
+                    border-slate-700/40
+                    pt-2
+                    text-[11px]
+                    text-slate-400
                   "
                 >
-                  <span className="inline-flex items-center gap-1.5">
-                    <Package className="h-3.5 w-3.5 text-blue-300" />
-                    Yu-Gi-Oh! Duel Links
-                  </span>
-
                   {card.archetype && (
                     <span className="inline-flex items-center gap-1.5">
                       <Sparkles className="h-3.5 w-3.5 text-violet-300" />

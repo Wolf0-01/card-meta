@@ -199,7 +199,7 @@ export default function CatalogCardTile({
     <>
       <Link
         ref={linkRef}
-        href={`/cards/${card.id}`}
+        href={`/cards/${card.slug}`}
         aria-label={card.name}
         onMouseEnter={showTooltip}
         onMouseLeave={hideTooltip}

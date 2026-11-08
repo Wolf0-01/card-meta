@@ -50,7 +50,7 @@ export default function CardItem({
         ${getCardFrameColor(card.type)}
       `}
     >
-      <Link href={`/cards/${card.id}`}>
+      <Link href={`/cards/${card.slug}`}>
 
         <div
           className="

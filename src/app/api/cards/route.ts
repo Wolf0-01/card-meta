@@ -34,6 +34,10 @@ export async function GET(
     const search =
       searchParams.get("search") ?? "";
 
+    const slug =
+      searchParams.get("slug") ??
+      undefined;
+
     const type =
       searchParams.get("type") ??
       undefined;
@@ -104,6 +108,7 @@ export async function GET(
     const result =
       await queryCards({
         search,
+        slug,
         type,
         attribute,
         rarity,

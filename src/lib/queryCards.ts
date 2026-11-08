@@ -8,6 +8,8 @@ import type { Card } from "@/types/card";
 export interface QueryOptions {
   search?: string;
 
+  slug?: string;
+
   type?: string;
   attribute?: string;
   monsterType?: string;
@@ -99,6 +101,7 @@ function buildWhere(
 ): Prisma.CardWhereInput {
   const {
     search,
+    slug,
     type,
     attribute,
     monsterType,
@@ -130,6 +133,10 @@ function buildWhere(
       contains: search,
       mode: "insensitive",
     };
+  }
+
+  if (slug) {
+    where.slug = slug;
   }
 
   if (type) {
@@ -237,6 +244,9 @@ const cardSelect =
     ygoproId: true,
 
     name: true,
+    slug: true,
+
+    obtain: true,
 
     type: true,
     race: true,

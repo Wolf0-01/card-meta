@@ -12,6 +12,20 @@ export type LinkMarker =
   | "Bottom-Right";
 
 /**
+ * Fuente de obtención de una carta en Duel Links.
+ *
+ * Se almacena como JSON en Prisma y proviene del arreglo
+ * `obtain` del catálogo de Duel Links Meta.
+ */
+export interface CardObtainEntry {
+  name: string;
+
+  type: string | null;
+
+  amount: number | null;
+}
+
+/**
  * Modelo principal de una carta.
  *
  * Este tipo representa una carta proveniente de Prisma y
@@ -30,6 +44,10 @@ export interface Card {
   ygoproId: number | null;
 
   name: string;
+
+  slug: string;
+
+  obtain: CardObtainEntry[] | null;
 
   type: string;
 

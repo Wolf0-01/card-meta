@@ -75,6 +75,8 @@ async function main(){
 
         name:"Blue-Eyes White Dragon",
 
+        slug:"Blue-Eyes-White-Dragon",
+
         type:"Monster",
 
         attribute:"LIGHT",
@@ -97,6 +99,8 @@ async function main(){
 
         name:"Dark Magician",
 
+        slug:"Dark-Magician",
+
         type:"Monster",
 
         attribute:"DARK",
@@ -118,6 +122,8 @@ async function main(){
       {
 
         name:"Mystical Space Typhoon",
+
+        slug:"Mystical-Space-Typhoon",
 
         type:"Spell",
 
