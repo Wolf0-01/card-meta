@@ -27,6 +27,14 @@ export type PrismaDeckWithRelations =
   Prisma.DeckGetPayload<{
     include: {
       archetype: true;
+      author: {
+        select: {
+          id: true;
+          username: true;
+          displayName: true;
+          avatar: true;
+        };
+      };
       cards: {
         include: {
           card: true;
@@ -198,6 +206,8 @@ export function mapPrismaDeck(
     deckHash: deck.deckHash,
 
     authorId: deck.authorId,
+
+    author: deck.author,
 
     isPublic: deck.isPublic,
 

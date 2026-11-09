@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { mapPrismaDeck } from "@/lib/mappers/deckMapper";
 
 import type { DeckZone } from "@/types/deck";
-import type { MetaDeck } from "@/types/meta";
 
 import { DECK_RULES } from "./decks/rules";
 
@@ -288,6 +287,15 @@ export async function createDeck(
 
       include: {
         archetype: true,
+
+        author: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatar: true,
+          },
+        },
 
         cards: {
           include: {

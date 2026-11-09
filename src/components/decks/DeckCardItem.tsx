@@ -12,37 +12,46 @@ interface DeckCardItemProps {
   quantity?: number;
 
   onClick?: () => void;
+
+  compact?: boolean;
+
+  className?: string;
 }
 
 export default function DeckCardItem({
   card,
   quantity = 1,
   onClick,
+  compact = false,
+  className = "",
 }: DeckCardItemProps) {
-  const level =
-    card.level ??
-    card.linkRating ??
-    0;
-
   return (
     <button
       type="button"
       onClick={onClick}
-      className="
+      title={`${card.name}${
+        quantity > 1 ? ` · x${quantity}` : ""
+      }`}
+      className={`
         group
         relative
+        block
+        shrink-0
         overflow-hidden
-        rounded-xl
+        rounded-lg
         border
-        border-zinc-800
-        bg-zinc-900
+        border-border
+        bg-surface
         transition-all
         duration-200
+        hover:z-10
         hover:scale-[1.03]
-        hover:border-blue-500
+        hover:border-primary
         hover:shadow-lg
-        hover:shadow-blue-500/20
-      "
+        hover:shadow-primary/20
+        ${compact ? "w-[76px]" : "w-full"}
+        ${className}
+      `}
     >
       <div
         className="
@@ -58,6 +67,11 @@ export default function DeckCardItem({
           }
           alt={card.name}
           fill
+          sizes={
+            compact
+              ? "80px"
+              : "(max-width: 768px) 18vw, 160px"
+          }
           className="
             object-cover
             transition-transform
@@ -66,98 +80,31 @@ export default function DeckCardItem({
           "
         />
 
-        <DeckCardBadges
-          card={card}
-        />
-      </div>
-
-      {quantity > 1 && (
-        <div
-          className="
-            absolute
-            right-2
-            top-2
-            rounded-lg
-            bg-black/80
-            px-2
-            py-1
-            text-sm
-            font-bold
-            text-white
-          "
-        >
-          ×{quantity}
-        </div>
-      )}
-
-      <div
-        className="
-          space-y-2
-          p-3
-        "
-      >
-        <h3
-          className="
-            truncate
-            text-sm
-            font-bold
-            text-white
-          "
-        >
-          {card.name}
-        </h3>
-
-        <div
-          className="
-            flex
-            items-center
-            justify-between
-            text-xs
-            text-zinc-400
-          "
-        >
-          <span>
-            {card.attribute ?? "-"}
-          </span>
-
-          <span>
-            {card.race ?? card.type}
-          </span>
-        </div>
-
-        {level > 0 && (
-          <div
-            className="
-              truncate
-              text-xs
-              text-amber-400
-            "
-          >
-            {"★".repeat(
-              Math.min(level, 12)
-            )}
-          </div>
+        {!compact && (
+          <DeckCardBadges card={card} />
         )}
 
-        {(card.attack !== null ||
-          card.defense !== null) && (
-          <div
-            className="
-              flex
-              justify-between
-              text-xs
-              font-semibold
-              text-zinc-300
-            "
+        {quantity > 1 && (
+          <span
+            className={`
+              absolute
+              right-1
+              top-1
+              rounded-md
+              bg-black/85
+              font-black
+              leading-none
+              text-white
+              shadow
+              ${
+                compact
+                  ? "px-1 py-0.5 text-[9px]"
+                  : "px-1.5 py-1 text-[11px]"
+              }
+            `}
           >
-            <span>
-              ATK {card.attack ?? "-"}
-            </span>
-
-            <span>
-              DEF {card.defense ?? "-"}
-            </span>
-          </div>
+            ×{quantity}
+          </span>
         )}
       </div>
     </button>

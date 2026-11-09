@@ -50,6 +50,56 @@ const ZONE_ACCENTS: Record<
   },
 };
 
+type MainGroupKey =
+  | "monsters"
+  | "spells"
+  | "traps"
+  | "other";
+
+const MAIN_GROUP_ORDER: MainGroupKey[] = [
+  "monsters",
+  "spells",
+  "traps",
+  "other",
+];
+
+const MAIN_GROUP_LABELS: Record<
+  MainGroupKey,
+  string
+> = {
+  monsters: "Monsters",
+  spells: "Spells",
+  traps: "Traps",
+  other: "Other",
+};
+
+function getMainGroupKey(
+  card: DraftCard
+): MainGroupKey {
+  const type = card.card.type.toLowerCase();
+
+  if (type.includes("monster")) {
+    return "monsters";
+  }
+
+  if (type.includes("spell")) {
+    return "spells";
+  }
+
+  if (type.includes("trap")) {
+    return "traps";
+  }
+
+  return "other";
+}
+
+function countCopies(cards: DraftCard[]) {
+  return cards.reduce(
+    (total, card) => total + card.quantity,
+    0
+  );
+}
+
 interface DraftZoneProps {
   zone: DeckZone;
 
@@ -127,6 +177,56 @@ export default function DraftZone({
     (total / limit) * 100,
     100
   );
+
+  const mainGroups = MAIN_GROUP_ORDER.map(
+    (key) => {
+      const groupCards = cards.filter(
+        (card) =>
+          getMainGroupKey(card) === key
+      );
+
+      return {
+        key,
+
+        label: MAIN_GROUP_LABELS[key],
+
+        cards: groupCards,
+
+        total: countCopies(groupCards),
+      };
+    }
+  ).filter((group) => group.cards.length > 0);
+
+  function renderTile(card: DraftCard) {
+    return (
+      <MiniCardTile
+        key={`${zone}-${card.id}`}
+        card={card.card}
+        mode="deck"
+        quantity={card.quantity}
+        draftZone={zone}
+        onRemoveOne={() =>
+          onRemoveOne(card.id, zone)
+        }
+        onRemoveAll={() =>
+          onRemoveAll(card.id, zone)
+        }
+        onContextMenu={(event) => {
+          event.preventDefault();
+
+          onRemoveOne(card.id, zone);
+        }}
+      />
+    );
+  }
+
+  function renderGrid(groupCards: DraftCard[]) {
+    return (
+      <div className="grid grid-cols-5 gap-2">
+        {groupCards.map(renderTile)}
+      </div>
+    );
+  }
 
   function hasAcceptedDrag(
     event: DragEvent<HTMLElement>
@@ -346,45 +446,26 @@ export default function DraftZone({
               buscador.
             </p>
           </div>
-        ) : (
-          <div
-            className="
-              grid
-              grid-cols-[repeat(auto-fill,minmax(88px,1fr))]
-              justify-items-center
-              gap-2
-            "
-          >
-            {cards.map((card) => (
-              <MiniCardTile
-                key={`${zone}-${card.id}`}
-                card={card.card}
-                mode="deck"
-                quantity={card.quantity}
-                draftZone={zone}
-                onRemoveOne={() =>
-                  onRemoveOne(
-                    card.id,
-                    zone
-                  )
-                }
-                onRemoveAll={() =>
-                  onRemoveAll(
-                    card.id,
-                    zone
-                  )
-                }
-                onContextMenu={(event) => {
-                  event.preventDefault();
+        ) : zone === "main" ? (
+          <div className="space-y-3">
+            {mainGroups.map((group) => (
+              <div key={group.key}>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="text-[9px] font-black uppercase tracking-[0.16em] text-foreground-muted">
+                    {group.label}
+                  </span>
 
-                  onRemoveOne(
-                    card.id,
-                    zone
-                  );
-                }}
-              />
+                  <span className="text-[9px] font-bold tabular-nums text-foreground-muted">
+                    {group.total}
+                  </span>
+                </div>
+
+                {renderGrid(group.cards)}
+              </div>
             ))}
           </div>
+        ) : (
+          renderGrid(cards)
         )}
       </div>
     </section>

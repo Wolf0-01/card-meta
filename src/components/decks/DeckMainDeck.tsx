@@ -2,77 +2,99 @@
 
 import DeckCardGrid from "./DeckCardGrid";
 
-import type {
-MetaDeck,
-} from "@/types/meta";
+import type { DeckCard } from "@/types/deck";
+
+import type { MetaDeck } from "@/types/meta";
 
 interface Props {
-deck: MetaDeck;
+  deck: MetaDeck;
+}
+
+function countCopies(cards: DeckCard[]) {
+  return cards.reduce(
+    (total, card) =>
+      total + (card.quantity ?? 1),
+    0
+  );
+}
+
+function hasType(
+  deckCard: DeckCard,
+  type: string
+) {
+  return deckCard.card.type
+    .toLowerCase()
+    .includes(type);
 }
 
 export default function DeckMainDeck({
-deck,
+  deck,
 }: Props) {
-const mainDeck = deck.cards.filter(
-(deckCard) =>
-deckCard.zone === "main"
-);
+  const mainDeck = (deck.cards ?? []).filter(
+    (deckCard) =>
+      deckCard.zone === "main"
+  );
 
-const monsters = mainDeck.filter(
-(deckCard) =>
-deckCard.card.type
-.toLowerCase()
-.includes("monster")
-);
+  const monsters = mainDeck.filter(
+    (deckCard) =>
+      hasType(deckCard, "monster")
+  );
 
-const spells = mainDeck.filter(
-(deckCard) =>
-deckCard.card.type
-.toLowerCase()
-.includes("spell")
-);
+  const spells = mainDeck.filter(
+    (deckCard) =>
+      hasType(deckCard, "spell")
+  );
 
-const traps = mainDeck.filter(
-(deckCard) =>
-deckCard.card.type
-.toLowerCase()
-.includes("trap")
-);
+  const traps = mainDeck.filter(
+    (deckCard) =>
+      hasType(deckCard, "trap")
+  );
 
-return ( <section
-   className="
-     space-y-10
-   "
- >
-{monsters.length > 0 && (
-<DeckCardGrid
-title={`Monsters (${monsters.length})`}
-cards={monsters.map(
-(deckCard) => deckCard.card
-)}
-/>
-)}
+  const others = mainDeck.filter(
+    (deckCard) =>
+      !hasType(deckCard, "monster") &&
+      !hasType(deckCard, "spell") &&
+      !hasType(deckCard, "trap")
+  );
 
+  const groups = [
+    {
+      key: "monsters",
+      label: "Monsters",
+      cards: monsters,
+    },
+    {
+      key: "spells",
+      label: "Spells",
+      cards: spells,
+    },
+    {
+      key: "traps",
+      label: "Traps",
+      cards: traps,
+    },
+    {
+      key: "other",
+      label: "Other",
+      cards: others,
+    },
+  ];
 
-  {spells.length > 0 && (
-    <DeckCardGrid
-      title={`Spells (${spells.length})`}
-      cards={spells.map(
-        (deckCard) => deckCard.card
-      )}
-    />
-  )}
-
-  {traps.length > 0 && (
-    <DeckCardGrid
-      title={`Traps (${traps.length})`}
-      cards={traps.map(
-        (deckCard) => deckCard.card
-      )}
-    />
-  )}
-</section>
-
-
-);
+  return (
+    <section className="space-y-4">
+      {groups
+        .filter(
+          (group) => group.cards.length > 0
+        )
+        .map((group) => (
+          <DeckCardGrid
+            key={group.key}
+            title={`${group.label} (${countCopies(
+              group.cards
+            )})`}
+            cards={group.cards}
+          />
+        ))}
+    </section>
+  );
 }

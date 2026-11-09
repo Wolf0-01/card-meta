@@ -5,11 +5,18 @@ import {
   useState,
 } from "react";
 
+import SkillCardTile from "@/components/cards/skills/SkillCardTile";
+
 import type {
   CardPreviewData,
 } from "@/types/CardPreviewData";
 
 import type { DeckZone } from "@/types/deck";
+
+import type {
+  Skill,
+  SkillSearchResult,
+} from "@/types/skill";
 
 import {
   getDefaultDraftZone,
@@ -17,7 +24,9 @@ import {
 
 import MiniCardTile from "./MiniCardTile";
 
-const PAGE_SIZE = 30;
+const CARD_PAGE_SIZE = 30;
+
+const SKILL_PAGE_SIZE = 8;
 
 const TYPE_OPTIONS = [
   {
@@ -73,6 +82,8 @@ const ATTRIBUTE_OPTIONS = [
   },
 ] as const;
 
+type CatalogTab = "cards" | "skills";
+
 interface CardsApiResponse {
   cards?: CardPreviewData[];
 
@@ -90,6 +101,10 @@ interface CardSearchSidebarProps {
     card: CardPreviewData,
     zone?: DeckZone
   ) => void;
+
+  activeSkill?: string;
+
+  onSelectSkill?: (skillName: string) => void;
 
   className?: string;
 }
@@ -112,11 +127,27 @@ const fieldClasses = `
   focus:ring-primary/20
 `;
 
+const tabButtonClasses = `
+  rounded-md
+  px-3
+  py-1.5
+  text-[11px]
+  font-black
+  uppercase
+  tracking-wide
+  transition-colors
+`;
+
 export default function CardSearchSidebar({
   copiesById,
   onAddCard,
+  activeSkill = "",
+  onSelectSkill,
   className = "",
 }: CardSearchSidebarProps) {
+  const [tab, setTab] =
+    useState<CatalogTab>("cards");
+
   const [search, setSearch] = useState("");
 
   const [
@@ -146,6 +177,43 @@ export default function CardSearchSidebar({
     string | null
   >(null);
 
+  const [skillSearch, setSkillSearch] =
+    useState("");
+
+  const [
+    debouncedSkillSearch,
+    setDebouncedSkillSearch,
+  ] = useState("");
+
+  const [skillCharacter, setSkillCharacter] =
+    useState("");
+
+  const [skillPage, setSkillPage] =
+    useState(1);
+
+  const [skills, setSkills] = useState<
+    Skill[]
+  >([]);
+
+  const [skillTotal, setSkillTotal] =
+    useState(0);
+
+  const [skillPages, setSkillPages] =
+    useState(1);
+
+  const [
+    skillCharacters,
+    setSkillCharacters,
+  ] = useState<string[]>([]);
+
+  const [
+    skillsLoading,
+    setSkillsLoading,
+  ] = useState(false);
+
+  const [skillError, setSkillError] =
+    useState<string | null>(null);
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setDebouncedSearch(search.trim());
@@ -159,6 +227,24 @@ export default function CardSearchSidebar({
   }, [search]);
 
   useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSkillSearch(
+        skillSearch.trim()
+      );
+
+      setSkillPage(1);
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [skillSearch]);
+
+  useEffect(() => {
+    if (tab !== "cards") {
+      return;
+    }
+
     const controller = new AbortController();
 
     async function loadCards() {
@@ -168,7 +254,7 @@ export default function CardSearchSidebar({
 
       try {
         const params = new URLSearchParams({
-          limit: String(PAGE_SIZE),
+          limit: String(CARD_PAGE_SIZE),
 
           page: String(page),
         });
@@ -251,15 +337,167 @@ export default function CardSearchSidebar({
       controller.abort();
     };
   }, [
+    tab,
     debouncedSearch,
     type,
     attribute,
     page,
   ]);
 
-  const canGoBack = page > 1;
+  useEffect(() => {
+    if (tab !== "skills") {
+      return;
+    }
 
-  const canGoForward = page < pages;
+    const controller = new AbortController();
+
+    async function loadSkills() {
+      setSkillsLoading(true);
+
+      setSkillError(null);
+
+      try {
+        const params = new URLSearchParams({
+          limit: String(SKILL_PAGE_SIZE),
+
+          page: String(skillPage),
+        });
+
+        if (debouncedSkillSearch) {
+          params.set(
+            "search",
+            debouncedSkillSearch
+          );
+        }
+
+        if (skillCharacter) {
+          params.set(
+            "character",
+            skillCharacter
+          );
+        }
+
+        const response = await fetch(
+          `/api/skills?${params.toString()}`,
+          {
+            signal: controller.signal,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "No se pudieron cargar las habilidades."
+          );
+        }
+
+        const data =
+          (await response.json()) as SkillSearchResult;
+
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setSkills(
+          Array.isArray(data.skills)
+            ? data.skills
+            : []
+        );
+
+        setSkillTotal(data.total ?? 0);
+
+        setSkillPages(
+          Math.max(data.pages ?? 1, 1)
+        );
+
+        setSkillCharacters(
+          Array.isArray(data.characters)
+            ? data.characters
+            : []
+        );
+      } catch (loadError) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setSkills([]);
+
+        setSkillTotal(0);
+
+        setSkillPages(1);
+
+        setSkillError(
+          loadError instanceof Error
+            ? loadError.message
+            : "No se pudieron cargar las habilidades."
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setSkillsLoading(false);
+        }
+      }
+    }
+
+    loadSkills();
+
+    return () => {
+      controller.abort();
+    };
+  }, [
+    tab,
+    debouncedSkillSearch,
+    skillCharacter,
+    skillPage,
+  ]);
+
+  const isCardsTab = tab === "cards";
+
+  const currentPage = isCardsTab
+    ? page
+    : skillPage;
+
+  const currentPages = isCardsTab
+    ? pages
+    : skillPages;
+
+  const currentLoading = isCardsTab
+    ? loading
+    : skillsLoading;
+
+  const canGoBack = currentPage > 1;
+
+  const canGoForward =
+    currentPage < currentPages;
+
+  const assignedSkillName =
+    activeSkill.trim().toLowerCase();
+
+  function goToPreviousPage() {
+    if (isCardsTab) {
+      setPage((current) =>
+        Math.max(current - 1, 1)
+      );
+
+      return;
+    }
+
+    setSkillPage((current) =>
+      Math.max(current - 1, 1)
+    );
+  }
+
+  function goToNextPage() {
+    if (isCardsTab) {
+      setPage((current) =>
+        Math.min(current + 1, pages)
+      );
+
+      return;
+    }
+
+    setSkillPage((current) =>
+      Math.min(current + 1, skillPages)
+    );
+  }
 
   return (
     <aside
@@ -278,130 +516,268 @@ export default function CardSearchSidebar({
       <header className="space-y-2 border-b border-border p-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm font-black text-foreground">
-            Buscar cartas
+            Catálogo
           </h2>
 
           <span className="text-[10px] font-semibold text-foreground-muted">
-            Clic para añadir
+            {isCardsTab
+              ? "Clic para añadir"
+              : "Clic para asignar"}
           </span>
         </div>
 
-        <div className="relative">
-          <input
-            value={search}
-            onChange={(event) =>
-              setSearch(event.target.value)
-            }
-            placeholder="Nombre de la carta..."
-            className={`${fieldClasses} pr-8`}
-            maxLength={80}
-            aria-label="Buscar cartas por nombre"
-          />
-
-          {search && (
-            <button
-              type="button"
-              aria-label="Limpiar búsqueda"
-              onClick={() => setSearch("")}
-              className="
-                absolute
-                right-1.5
-                top-1/2
-                flex
-                h-5
-                w-5
-                -translate-y-1/2
-                items-center
-                justify-center
-                rounded-full
-                bg-surface-hover
-                text-[11px]
-                text-foreground-muted
-                transition-colors
-                hover:text-foreground
-              "
-            >
-              ×
-            </button>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <select
-            value={type}
-            onChange={(event) => {
-              setType(event.target.value);
-
-              setPage(1);
-            }}
-            className={fieldClasses}
-            aria-label="Filtrar por tipo de carta"
+        <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-surface p-1">
+          <button
+            type="button"
+            onClick={() => setTab("cards")}
+            className={`
+              ${tabButtonClasses}
+              ${
+                isCardsTab
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-foreground-muted hover:text-foreground"
+              }
+            `}
           >
-            {TYPE_OPTIONS.map((option) => (
-              <option
-                key={option.value}
-                value={option.value}
-              >
-                {option.label}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={attribute}
-            onChange={(event) => {
-              setAttribute(
-                event.target.value
-              );
-
-              setPage(1);
-            }}
-            className={fieldClasses}
-            aria-label="Filtrar por atributo"
-          >
-            {ATTRIBUTE_OPTIONS.map(
-              (option) => (
-                <option
-                  key={option.value}
-                  value={option.value}
-                >
-                  {option.label}
-                </option>
-              )
-            )}
-          </select>
-        </div>
-
-        <div className="flex items-center justify-between text-[10px] text-foreground-muted">
-          <span>
-            {loading
-              ? "Buscando..."
-              : `${total.toLocaleString(
-                  "es-ES"
-                )} cartas`}
-          </span>
+            Cartas
+          </button>
 
           <button
             type="button"
-            onClick={() => {
-              setSearch("");
-
-              setType("");
-
-              setAttribute("");
-
-              setPage(1);
-            }}
-            className="
-              font-semibold
-              text-foreground-muted
-              transition-colors
-              hover:text-primary
-            "
+            onClick={() => setTab("skills")}
+            className={`
+              ${tabButtonClasses}
+              ${
+                !isCardsTab
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-foreground-muted hover:text-foreground"
+              }
+            `}
           >
-            Reiniciar filtros
+            Skills
           </button>
         </div>
+
+        {isCardsTab ? (
+          <>
+            <div className="relative">
+              <input
+                value={search}
+                onChange={(event) =>
+                  setSearch(
+                    event.target.value
+                  )
+                }
+                placeholder="Nombre de la carta..."
+                className={`${fieldClasses} pr-8`}
+                maxLength={80}
+                aria-label="Buscar cartas por nombre"
+              />
+
+              {search && (
+                <button
+                  type="button"
+                  aria-label="Limpiar búsqueda"
+                  onClick={() => setSearch("")}
+                  className="
+                    absolute
+                    right-1.5
+                    top-1/2
+                    flex
+                    h-5
+                    w-5
+                    -translate-y-1/2
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-surface-hover
+                    text-[11px]
+                    text-foreground-muted
+                    transition-colors
+                    hover:text-foreground
+                  "
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <select
+                value={type}
+                onChange={(event) => {
+                  setType(event.target.value);
+
+                  setPage(1);
+                }}
+                className={fieldClasses}
+                aria-label="Filtrar por tipo de carta"
+              >
+                {TYPE_OPTIONS.map((option) => (
+                  <option
+                    key={option.value}
+                    value={option.value}
+                  >
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={attribute}
+                onChange={(event) => {
+                  setAttribute(
+                    event.target.value
+                  );
+
+                  setPage(1);
+                }}
+                className={fieldClasses}
+                aria-label="Filtrar por atributo"
+              >
+                {ATTRIBUTE_OPTIONS.map(
+                  (option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
+            <div className="flex items-center justify-between text-[10px] text-foreground-muted">
+              <span>
+                {loading
+                  ? "Buscando..."
+                  : `${total.toLocaleString(
+                      "es-ES"
+                    )} cartas`}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+
+                  setType("");
+
+                  setAttribute("");
+
+                  setPage(1);
+                }}
+                className="
+                  font-semibold
+                  text-foreground-muted
+                  transition-colors
+                  hover:text-primary
+                "
+              >
+                Reiniciar filtros
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="relative">
+              <input
+                value={skillSearch}
+                onChange={(event) =>
+                  setSkillSearch(
+                    event.target.value
+                  )
+                }
+                placeholder="Buscar skill..."
+                className={`${fieldClasses} pr-8`}
+                maxLength={80}
+                aria-label="Buscar habilidades por nombre o efecto"
+              />
+
+              {skillSearch && (
+                <button
+                  type="button"
+                  aria-label="Limpiar búsqueda de habilidades"
+                  onClick={() =>
+                    setSkillSearch("")
+                  }
+                  className="
+                    absolute
+                    right-1.5
+                    top-1/2
+                    flex
+                    h-5
+                    w-5
+                    -translate-y-1/2
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-surface-hover
+                    text-[11px]
+                    text-foreground-muted
+                    transition-colors
+                    hover:text-foreground
+                  "
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <select
+              value={skillCharacter}
+              onChange={(event) => {
+                setSkillCharacter(
+                  event.target.value
+                );
+
+                setSkillPage(1);
+              }}
+              className={fieldClasses}
+              aria-label="Filtrar habilidades por personaje"
+            >
+              <option value="">
+                Todos los personajes
+              </option>
+
+              {skillCharacters.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+
+            <div className="flex items-center justify-between text-[10px] text-foreground-muted">
+              <span>
+                {skillsLoading
+                  ? "Buscando..."
+                  : `${skillTotal.toLocaleString(
+                      "es-ES"
+                    )} habilidades`}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setSkillSearch("");
+
+                  setSkillCharacter("");
+
+                  setSkillPage(1);
+                }}
+                className="
+                  font-semibold
+                  text-foreground-muted
+                  transition-colors
+                  hover:text-primary
+                "
+              >
+                Reiniciar filtros
+              </button>
+            </div>
+          </>
+        )}
       </header>
 
       <div
@@ -412,95 +788,184 @@ export default function CardSearchSidebar({
           p-2.5
         "
       >
-        {error && (
-          <p
-            role="alert"
-            className="
-              rounded-lg
-              border
-              border-red-500/40
-              bg-red-500/10
-              p-2
-              text-[11px]
-              text-red-200
-            "
-          >
-            {error}
-          </p>
-        )}
+        {isCardsTab ? (
+          <>
+            {error && (
+              <p
+                role="alert"
+                className="
+                  rounded-lg
+                  border
+                  border-red-500/40
+                  bg-red-500/10
+                  p-2
+                  text-[11px]
+                  text-red-200
+                "
+              >
+                {error}
+              </p>
+            )}
 
-        {!error && cards.length === 0 && !loading && (
-          <div
-            className="
-              flex
-              h-full
-              min-h-[140px]
-              flex-col
-              items-center
-              justify-center
-              gap-1
-              rounded-lg
-              border
-              border-dashed
-              border-border
-              p-4
-              text-center
-              text-[11px]
-              text-foreground-muted
-            "
-          >
-            <span className="text-2xl">
-              🔎
-            </span>
+            {!error &&
+              cards.length === 0 &&
+              !loading && (
+                <div
+                  className="
+                    flex
+                    h-full
+                    min-h-[140px]
+                    flex-col
+                    items-center
+                    justify-center
+                    gap-1
+                    rounded-lg
+                    border
+                    border-dashed
+                    border-border
+                    p-4
+                    text-center
+                    text-[11px]
+                    text-foreground-muted
+                  "
+                >
+                  <span className="text-2xl">
+                    🔎
+                  </span>
 
-            <p>
-              No se encontraron cartas con
-              estos filtros.
-            </p>
-          </div>
-        )}
+                  <p>
+                    No se encontraron cartas
+                    con estos filtros.
+                  </p>
+                </div>
+              )}
 
-        {cards.length > 0 && (
-          <div
-            className="
-              grid
-              grid-cols-[repeat(auto-fill,minmax(88px,1fr))]
-              justify-items-center
-              gap-2
-            "
-          >
-            {cards.map((card) => (
-              <MiniCardTile
-                key={card.id}
-                card={card}
-                quantity={copiesById[card.id]}
-                onClick={() =>
-                  onAddCard(
-                    card,
-                    getDefaultDraftZone(card)
-                  )
-                }
-              />
-            ))}
-          </div>
-        )}
+            {cards.length > 0 && (
+              <div
+                className="
+                  grid
+                  grid-cols-[repeat(auto-fill,minmax(88px,1fr))]
+                  gap-2
+                "
+              >
+                {cards.map((card) => (
+                  <MiniCardTile
+                    key={card.id}
+                    card={card}
+                    quantity={
+                      copiesById[card.id]
+                    }
+                    onClick={() =>
+                      onAddCard(
+                        card,
+                        getDefaultDraftZone(
+                          card
+                        )
+                      )
+                    }
+                  />
+                ))}
+              </div>
+            )}
 
-        {loading && cards.length > 0 && (
-          <p className="py-2 text-center text-[10px] text-foreground-muted">
-            Actualizando resultados...
-          </p>
+            {loading && cards.length > 0 && (
+              <p className="py-2 text-center text-[10px] text-foreground-muted">
+                Actualizando resultados...
+              </p>
+            )}
+          </>
+        ) : (
+          <>
+            {skillError && (
+              <p
+                role="alert"
+                className="
+                  rounded-lg
+                  border
+                  border-red-500/40
+                  bg-red-500/10
+                  p-2
+                  text-[11px]
+                  text-red-200
+                "
+              >
+                {skillError}
+              </p>
+            )}
+
+            {!skillError &&
+              skills.length === 0 &&
+              !skillsLoading && (
+                <div
+                  className="
+                    flex
+                    h-full
+                    min-h-[140px]
+                    flex-col
+                    items-center
+                    justify-center
+                    gap-1
+                    rounded-lg
+                    border
+                    border-dashed
+                    border-border
+                    p-4
+                    text-center
+                    text-[11px]
+                    text-foreground-muted
+                  "
+                >
+                  <span className="text-2xl">
+                    ⚡
+                  </span>
+
+                  <p>
+                    No se encontraron
+                    habilidades con estos
+                    filtros.
+                  </p>
+                </div>
+              )}
+
+            {skills.length > 0 && (
+              <div className="grid grid-cols-1 gap-2">
+                {skills.map((skill) => (
+                  <SkillCardTile
+                    key={skill.id}
+                    skill={skill}
+                    assigned={
+                      assignedSkillName.length >
+                        0 &&
+                      assignedSkillName ===
+                        skill.name
+                          .trim()
+                          .toLowerCase()
+                    }
+                    onAssign={(selected) =>
+                      onSelectSkill?.(
+                        selected.name
+                      )
+                    }
+                  />
+                ))}
+              </div>
+            )}
+
+            {skillsLoading &&
+              skills.length > 0 && (
+                <p className="py-2 text-center text-[10px] text-foreground-muted">
+                  Actualizando habilidades...
+                </p>
+              )}
+          </>
         )}
       </div>
 
       <footer className="flex items-center justify-between gap-2 border-t border-border p-2.5">
         <button
           type="button"
-          onClick={() =>
-            setPage((current) =>
-              Math.max(current - 1, 1)
-            )
-          }
-          disabled={!canGoBack || loading}
+          onClick={goToPreviousPage}
+          disabled={!canGoBack || currentLoading}
           className="
             rounded-md
             border
@@ -521,17 +986,16 @@ export default function CardSearchSidebar({
         </button>
 
         <span className="text-[10px] font-semibold text-foreground-muted">
-          Página {page} de {pages}
+          Página {currentPage} de{" "}
+          {currentPages}
         </span>
 
         <button
           type="button"
-          onClick={() =>
-            setPage((current) =>
-              Math.min(current + 1, pages)
-            )
+          onClick={goToNextPage}
+          disabled={
+            !canGoForward || currentLoading
           }
-          disabled={!canGoForward || loading}
           className="
             rounded-md
             border

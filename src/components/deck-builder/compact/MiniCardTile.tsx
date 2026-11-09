@@ -198,8 +198,7 @@ export default function MiniCardTile({
       className={`
         group
         relative
-        w-[88px]
-        shrink-0
+        w-full
         select-none
         ${draggable ? "cursor-grab active:cursor-grabbing" : ""}
         ${className}
@@ -241,7 +240,7 @@ export default function MiniCardTile({
           src={imageSrc}
           alt={card.name}
           fill
-          sizes="88px"
+          sizes="(max-width: 1024px) 18vw, 140px"
           unoptimized={failed}
           onError={() => setFailed(true)}
           draggable={false}

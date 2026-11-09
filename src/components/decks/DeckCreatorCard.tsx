@@ -1,0 +1,168 @@
+"use client";
+
+import { formatGemCost } from "@/lib/decks/gemCost";
+
+import type { MetaDeck } from "@/types/meta";
+
+interface Props {
+  deck: MetaDeck;
+
+  gemCost: number;
+}
+
+function formatDeckDate(iso: string) {
+  const date = new Date(iso);
+
+  if (Number.isNaN(date.getTime())) {
+    return "-";
+  }
+
+  const day = String(
+    date.getDate()
+  ).padStart(2, "0");
+
+  const month = String(
+    date.getMonth() + 1
+  ).padStart(2, "0");
+
+  return `${day}/${month}/${date.getFullYear()}`;
+}
+
+export default function DeckCreatorCard({
+  deck,
+  gemCost,
+}: Props) {
+  const author = deck.author ?? null;
+
+  const displayName =
+    author?.displayName?.trim() ||
+    author?.username ||
+    "Creador anónimo";
+
+  const handle = author?.username
+    ? `@${author.username}`
+    : "Comunidad";
+
+  const initials = displayName
+    .slice(0, 2)
+    .toUpperCase();
+
+  return (
+    <div
+      className="
+        rounded-2xl
+        border
+        border-border
+        bg-background-secondary
+        p-4
+      "
+    >
+      <p
+        className="
+          text-[9px]
+          font-black
+          uppercase
+          tracking-[0.2em]
+          text-foreground-muted
+        "
+      >
+        Ficha técnica
+      </p>
+
+      <div className="mt-3 flex items-center gap-3">
+        <div
+          className="
+            flex
+            h-10
+            w-10
+            shrink-0
+            items-center
+            justify-center
+            overflow-hidden
+            rounded-full
+            border
+            border-border
+            bg-surface
+            text-xs
+            font-black
+            text-foreground-secondary
+          "
+        >
+          {author?.avatar ? (
+            // El avatar puede ser una URL externa del proveedor de auth.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={author.avatar}
+              alt={displayName}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            initials
+          )}
+        </div>
+
+        <div className="min-w-0">
+          <p className="truncate text-sm font-black text-foreground">
+            {displayName}
+          </p>
+
+          <p className="truncate text-[11px] text-foreground-muted">
+            {handle}
+          </p>
+        </div>
+      </div>
+
+      <dl
+        className="
+          mt-4
+          space-y-2
+          border-t
+          border-border
+          pt-3
+          text-xs
+        "
+      >
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-foreground-muted">
+            Fecha
+          </dt>
+
+          <dd className="font-semibold text-foreground">
+            {formatDeckDate(deck.createdAt)}
+          </dd>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-foreground-muted">
+            Costo en gemas
+          </dt>
+
+          <dd className="font-black text-amber-300">
+            ≈ {formatGemCost(gemCost)}
+          </dd>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-foreground-muted">
+            Skill
+          </dt>
+
+          <dd className="max-w-[60%] truncate text-right font-semibold text-foreground">
+            {deck.skill?.trim() || "Sin skill"}
+          </dd>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-foreground-muted">
+            Cartas
+          </dt>
+
+          <dd className="font-semibold text-foreground">
+            {deck.mainCards ?? 0} main ·{" "}
+            {deck.extraCards ?? 0} extra
+          </dd>
+        </div>
+      </dl>
+    </div>
+  );
+}

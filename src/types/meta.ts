@@ -30,6 +30,16 @@ export interface ArchetypeData {
   description?: string | null;
 }
 
+export interface DeckAuthor {
+  id: string;
+
+  username: string;
+
+  displayName: string | null;
+
+  avatar: string | null;
+}
+
 // =================================
 // META DECK
 // =================================
@@ -46,6 +56,8 @@ identifier: string;
 deckHash?: string;
 
 authorId?: string | null;
+
+author?: DeckAuthor | null;
 
 isPublic?: boolean;
 

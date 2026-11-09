@@ -6,6 +6,15 @@ import { mapPrismaDeck } from "@/lib/mappers/deckMapper";
 const deckInclude = Prisma.validator<Prisma.DeckInclude>()({
   archetype: true,
 
+  author: {
+    select: {
+      id: true,
+      username: true,
+      displayName: true,
+      avatar: true,
+    },
+  },
+
   cards: {
     include: {
       card: true,

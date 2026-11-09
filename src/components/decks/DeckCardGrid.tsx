@@ -2,12 +2,12 @@
 
 import DeckCardItem from "./DeckCardItem";
 
-import { DeckCardInfo } from "@/types/deck";
+import type { DeckCard } from "@/types/deck";
 
 interface DeckCardGridProps {
   title: string;
 
-  cards: DeckCardInfo[];
+  cards: DeckCard[];
 }
 
 export default function DeckCardGrid({
@@ -19,57 +19,27 @@ export default function DeckCardGrid({
   }
 
   return (
-    <section
-      className="
-        space-y-5
-      "
-    >
-      <div
-        className="
-          flex
-          items-center
-          justify-between
-        "
-      >
+    <section className="space-y-2">
+      <div className="flex items-center justify-between">
         <h2
           className="
-            text-2xl
-            font-bold
-            text-white
+            text-[11px]
+            font-black
+            uppercase
+            tracking-[0.16em]
+            text-foreground-muted
           "
         >
           {title}
         </h2>
-
-        <span
-          className="
-            rounded-lg
-            bg-zinc-900
-            px-3
-            py-1
-            text-sm
-            text-zinc-400
-          "
-        >
-          {cards.length} cards
-        </span>
       </div>
 
-      <div
-        className="
-          grid
-          grid-cols-2
-          gap-4
-          sm:grid-cols-3
-          md:grid-cols-4
-          lg:grid-cols-5
-          xl:grid-cols-6
-        "
-      >
-        {cards.map((card) => (
+      <div className="grid grid-cols-5 gap-2">
+        {cards.map((deckCard) => (
           <DeckCardItem
-            key={card.id}
-            card={card}
+            key={deckCard.id}
+            card={deckCard.card}
+            quantity={deckCard.quantity}
           />
         ))}
       </div>
