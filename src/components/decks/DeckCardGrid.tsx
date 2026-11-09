@@ -34,7 +34,14 @@ export default function DeckCardGrid({
         </h2>
       </div>
 
-      <div className="grid grid-cols-5 gap-2">
+      <div
+        className="
+          grid
+          grid-cols-[repeat(5,minmax(0,104px))]
+          justify-center
+          gap-1.5
+        "
+      >
         {cards.map((deckCard) => (
           <DeckCardItem
             key={deckCard.id}

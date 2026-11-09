@@ -2,6 +2,8 @@
 
 import DeckCardGrid from "./DeckCardGrid";
 
+import { sortCardsByRarity } from "@/lib/decks/rarityOrder";
+
 import type { DeckCard } from "@/types/deck";
 
 import type { MetaDeck } from "@/types/meta";
@@ -61,22 +63,22 @@ export default function DeckMainDeck({
     {
       key: "monsters",
       label: "Monsters",
-      cards: monsters,
+      cards: sortCardsByRarity(monsters),
     },
     {
       key: "spells",
       label: "Spells",
-      cards: spells,
+      cards: sortCardsByRarity(spells),
     },
     {
       key: "traps",
       label: "Traps",
-      cards: traps,
+      cards: sortCardsByRarity(traps),
     },
     {
       key: "other",
       label: "Other",
-      cards: others,
+      cards: sortCardsByRarity(others),
     },
   ];
 

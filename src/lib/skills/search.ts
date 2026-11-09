@@ -23,6 +23,23 @@ export function getSkillCharacters(): string[] {
   );
 }
 
+/** Busca una Skill registrada por su nombre, ignorando tildes y mayúsculas. */
+export function findSkillByName(
+  name: string
+): Skill | null {
+  const term = normalize(name);
+
+  if (!term) {
+    return null;
+  }
+
+  return (
+    SKILLS.find(
+      (skill) => normalize(skill.name) === term
+    ) ?? null
+  );
+}
+
 interface QuerySkillsOptions {
   search?: string;
 

@@ -2,6 +2,8 @@
 
 import DeckCardItem from "./DeckCardItem";
 
+import { sortCardsByRarity } from "@/lib/decks/rarityOrder";
+
 import type { MetaDeck } from "@/types/meta";
 
 interface Props {
@@ -43,14 +45,16 @@ export default function DeckExtraDeck({
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-1">
-        {extraDeck.map((deckCard) => (
-          <DeckCardItem
-            key={deckCard.id}
-            card={deckCard.card}
-            quantity={deckCard.quantity}
-            compact
-          />
-        ))}
+        {sortCardsByRarity(extraDeck).map(
+          (deckCard) => (
+            <DeckCardItem
+              key={deckCard.id}
+              card={deckCard.card}
+              quantity={deckCard.quantity}
+              compact
+            />
+          )
+        )}
       </div>
     </section>
   );

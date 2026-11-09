@@ -10,12 +10,15 @@ import DeckGuide from "./DeckGuide";
 import DeckMainDeck from "./DeckMainDeck";
 import DeckMatchups from "./DeckMatchups";
 import RelatedDecks from "./RelatedDecks";
+import SkillHoverCard from "./SkillHoverCard";
 
 import {
   estimateDeckGemCost,
 } from "@/lib/decks/gemCost";
 
 import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
+
+import { sortCardsByRarity } from "@/lib/decks/rarityOrder";
 
 import type { MetaDeck } from "@/types/meta";
 
@@ -143,7 +146,9 @@ export default function DeckViewer({
             sm:p-4
           "
         >
-          <div
+          <SkillHoverCard
+            skillName={deck.skill ?? ""}
+            cards={mainDeck}
             className="
               mb-3
               flex
@@ -199,7 +204,7 @@ export default function DeckViewer({
             >
               {mainCount} cards
             </span>
-          </div>
+          </SkillHoverCard>
 
           <DeckMainDeck deck={deck} />
 
@@ -224,16 +229,18 @@ export default function DeckViewer({
               </div>
 
               <div className="flex gap-2 overflow-x-auto pb-1">
-                {sideDeck.map((deckCard) => (
-                  <DeckCardItem
-                    key={deckCard.id}
-                    card={deckCard.card}
-                    quantity={
-                      deckCard.quantity
-                    }
-                    compact
-                  />
-                ))}
+                {sortCardsByRarity(sideDeck).map(
+                  (deckCard) => (
+                    <DeckCardItem
+                      key={deckCard.id}
+                      card={deckCard.card}
+                      quantity={
+                        deckCard.quantity
+                      }
+                      compact
+                    />
+                  )
+                )}
               </div>
             </div>
           )}

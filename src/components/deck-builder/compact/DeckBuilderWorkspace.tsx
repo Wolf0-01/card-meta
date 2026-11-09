@@ -11,6 +11,8 @@ import {
 
 import Button from "@/components/ui/Button";
 
+import SkillHoverCard from "@/components/decks/SkillHoverCard";
+
 import useDeckDraft, {
   type DeckDraftSeed,
 } from "@/hooks/useDeckDraft";
@@ -568,7 +570,9 @@ export default function DeckBuilderWorkspace({
               </label>
             </div>
 
-            <div
+            <SkillHoverCard
+              skillName={draft.skill}
+              cards={cardsByZone.main}
               className="
                 flex
                 items-center
@@ -644,7 +648,7 @@ export default function DeckBuilderWorkspace({
               >
                 {draft.stats.main} cards
               </span>
-            </div>
+            </SkillHoverCard>
 
             <DraftZone
               zone="main"

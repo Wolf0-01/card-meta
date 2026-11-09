@@ -18,6 +18,8 @@ import type {
   DraftCard,
 } from "@/types/deck-draft";
 
+import { sortCardsByRarity } from "@/lib/decks/rarityOrder";
+
 import MiniCardTile from "./MiniCardTile";
 
 import {
@@ -180,9 +182,11 @@ export default function DraftZone({
 
   const mainGroups = MAIN_GROUP_ORDER.map(
     (key) => {
-      const groupCards = cards.filter(
-        (card) =>
-          getMainGroupKey(card) === key
+      const groupCards = sortCardsByRarity(
+        cards.filter(
+          (card) =>
+            getMainGroupKey(card) === key
+        )
       );
 
       return {
@@ -222,8 +226,17 @@ export default function DraftZone({
 
   function renderGrid(groupCards: DraftCard[]) {
     return (
-      <div className="grid grid-cols-5 gap-2">
-        {groupCards.map(renderTile)}
+      <div
+        className="
+          grid
+          grid-cols-[repeat(5,minmax(0,104px))]
+          justify-center
+          gap-1.5
+        "
+      >
+        {sortCardsByRarity(groupCards).map(
+          renderTile
+        )}
       </div>
     );
   }

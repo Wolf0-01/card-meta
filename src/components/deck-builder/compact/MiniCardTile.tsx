@@ -2,13 +2,21 @@
 
 import Image from "next/image";
 
-import { useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import type {
   DragEvent,
   KeyboardEvent,
   MouseEvent,
 } from "react";
+
+import CardHoverTooltip, {
+  type TooltipAnchor,
+} from "@/components/cards/CardHoverTooltip";
 
 import type { CardPreviewData } from "@/types/CardPreviewData";
 
@@ -126,12 +134,78 @@ export default function MiniCardTile({
   const [failed, setFailed] =
     useState(false);
 
+  const [anchor, setAnchor] =
+    useState<TooltipAnchor | null>(null);
+
+  const tileRef =
+    useRef<HTMLDivElement>(null);
+
   const imageSrc =
     failed || !card.image
       ? "/cards/default.jpg"
       : card.image;
 
   const isDeck = mode === "deck";
+
+  function showTooltip() {
+    if (!isDeck) {
+      return;
+    }
+
+    const rect =
+      tileRef.current?.getBoundingClientRect();
+
+    if (!rect) {
+      return;
+    }
+
+    setAnchor({
+      top: rect.top,
+      left: rect.left,
+      right: rect.right,
+      bottom: rect.bottom,
+      width: rect.width,
+      height: rect.height,
+    });
+  }
+
+  function hideTooltip() {
+    setAnchor(null);
+  }
+
+  useEffect(() => {
+    if (!anchor) {
+      return;
+    }
+
+    function handleViewportChange() {
+      setAnchor(null);
+    }
+
+    window.addEventListener(
+      "scroll",
+      handleViewportChange,
+      true
+    );
+
+    window.addEventListener(
+      "resize",
+      handleViewportChange
+    );
+
+    return () => {
+      window.removeEventListener(
+        "scroll",
+        handleViewportChange,
+        true
+      );
+
+      window.removeEventListener(
+        "resize",
+        handleViewportChange
+      );
+    };
+  }, [anchor]);
 
   const levelLabel = getLevelLabel(card);
 
@@ -152,6 +226,8 @@ export default function MiniCardTile({
   function handleDragStart(
     event: DragEvent<HTMLDivElement>
   ) {
+    setAnchor(null);
+
     if (draftZone) {
       const payload: DraftDragPayload = {
         cardId: card.id,
@@ -195,6 +271,7 @@ export default function MiniCardTile({
 
   return (
     <div
+      ref={tileRef}
       className={`
         group
         relative
@@ -207,6 +284,8 @@ export default function MiniCardTile({
       tabIndex={onClick ? 0 : undefined}
       draggable={draggable}
       onDragStart={handleDragStart}
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
       onClick={onClick}
       onKeyDown={
         onClick ? handleKeyDown : undefined
@@ -485,6 +564,13 @@ export default function MiniCardTile({
         >
           {card.name}
         </p>
+      )}
+
+      {anchor && isDeck && (
+        <CardHoverTooltip
+          card={card}
+          anchor={anchor}
+        />
       )}
     </div>
   );
