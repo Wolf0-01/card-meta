@@ -30,6 +30,26 @@ const CACHE_FILE = path.join(
 
 const UPSERT_CHUNK_SIZE = 100;
 
+/**
+ * Dominio del que proceden los banners automáticos de
+ * Duel Links Meta. Cualquier otra URL se considera una
+ * edición manual y nunca se sobrescribe.
+ */
+const MANAGED_BANNER_HOST = "s3.duellinksmeta.com";
+
+/**
+ * Marca opcional para proteger manualmente una URL que
+ * sí pertenece al dominio de S3 (por ejemplo, un banner
+ * alternativo de DLM elegido a mano desde Prisma Studio).
+ *
+ * Ejemplo:
+ *   https://s3.duellinksmeta.com/img/.../banner.jpg#manual
+ *
+ * El fragmento no se envía al servidor, así que la imagen
+ * sigue cargando con normalidad.
+ */
+const MANUAL_BANNER_MARKER = "#manual";
+
 interface DlmSet {
   name?: unknown;
 
@@ -142,6 +162,10 @@ function logOptions() {
     `   Fuente: ${options.input ?? SETS_API}`
   );
 
+  console.log(
+    "   Banners manuales: se conservan (fuera de s3.duellinksmeta.com o con #manual)"
+  );
+
   if (options.limit) {
     console.log(
       `   Límite de escritura: ${options.limit} sets`
@@ -178,6 +202,45 @@ function resolveBannerUrl(
     ).toString();
   } catch {
     return null;
+  }
+}
+
+/**
+ * Indica si el banner actual lo gestiona el script.
+ *
+ * Se conserva (devuelve false) cuando:
+ * - la URL no apunta a s3.duellinksmeta.com, o
+ * - la URL incluye la marca `#manual`, o
+ * - la URL no es válida.
+ *
+ * Un banner vacío se puede rellenar sin problema.
+ */
+function isManagedBannerUrl(
+  value: string | null
+): boolean {
+  if (!value || !value.trim()) {
+    return true;
+  }
+
+  if (
+    value
+      .toLowerCase()
+      .includes(MANUAL_BANNER_MARKER)
+  ) {
+    return false;
+  }
+
+  try {
+    const { hostname } = new URL(value);
+
+    return (
+      hostname === MANAGED_BANNER_HOST ||
+      hostname.endsWith(
+        `.${MANAGED_BANNER_HOST}`
+      )
+    );
+  } catch {
+    return false;
   }
 }
 
@@ -540,6 +603,9 @@ async function main() {
 
   const updates: DesiredSet[] = [];
 
+  /* Banners editados a mano que el script debe respetar. */
+  const protectedBanners: string[] = [];
+
   for (const item of desired) {
     const current = existing.get(item.slug);
 
@@ -549,12 +615,32 @@ async function main() {
       continue;
     }
 
+    const keepManualBanner =
+      !isManagedBannerUrl(current.bannerUrl);
+
+    const nextBannerUrl = keepManualBanner
+      ? current.bannerUrl
+      : item.bannerUrl;
+
     if (
-      current.name !== item.name ||
+      keepManualBanner &&
       current.bannerUrl !== item.bannerUrl
     ) {
-      updates.push(item);
+      protectedBanners.push(item.slug);
     }
+
+    if (
+      current.name === item.name &&
+      current.bannerUrl === nextBannerUrl
+    ) {
+      continue;
+    }
+
+    updates.push({
+      ...item,
+
+      bannerUrl: nextBannerUrl,
+    });
   }
 
   const unchanged =
@@ -582,6 +668,9 @@ async function main() {
     unchanged,
 
     withBanner,
+
+    protectedBanners:
+      protectedBanners.length,
   });
 
   const pending = options.limit
@@ -696,6 +785,8 @@ function printSummary(stats: {
   unchanged: number;
 
   withBanner: number;
+
+  protectedBanners: number;
 }) {
   console.log("\n====== Resumen ======");
 
@@ -729,6 +820,10 @@ function printSummary(stats: {
 
   console.log(
     `Sin cambios: ${stats.unchanged}`
+  );
+
+  console.log(
+    `Banners manuales protegidos: ${stats.protectedBanners}`
   );
 }
 
