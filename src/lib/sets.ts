@@ -178,6 +178,43 @@ export const getCardSetBySlug = cache(
   }
 );
 
+export interface CardSetMeta {
+  slug: string;
+
+  name: string;
+
+  bannerUrl: string | null;
+}
+
+/**
+ * Metadatos editoriales del set (banner promocional,
+ * nombre canónico, etc.). Se rellena desde Duel Links
+ * Meta con scripts/syncSetMeta.ts.
+ */
+export const getSetMetaBySlug = cache(
+  async (
+    slug: string
+  ): Promise<CardSetMeta | null> => {
+    const normalized = slug
+      .trim()
+      .toLowerCase();
+
+    return prisma.setMeta.findUnique({
+      where: {
+        slug: normalized,
+      },
+
+      select: {
+        slug: true,
+
+        name: true,
+
+        bannerUrl: true,
+      },
+    });
+  }
+);
+
 /**
  * Devuelve todas las cartas que contienen la caja
  * indicada dentro de su arreglo JSON `obtain`.

@@ -18,6 +18,7 @@ import {
 import {
   getCardSetBySlug,
   getCardsForSet,
+  getSetMetaBySlug,
   groupCardsByRarity,
 } from "@/lib/sets";
 
@@ -60,7 +61,14 @@ export default async function CardSetPage({
     notFound();
   }
 
-  const cards = await getCardsForSet(set.name);
+  const [meta, cards] = await Promise.all([
+    getSetMetaBySlug(set.slug),
+
+    getCardsForSet(set.name),
+  ]);
+
+  const bannerUrl =
+    meta?.bannerUrl?.trim() || null;
 
   const groups = groupCardsByRarity(cards);
 
@@ -235,39 +243,82 @@ export default async function CardSetPage({
             </div>
           </div>
 
-          {/* Insertar Banner Aquí: reemplazar este bloque por el banner promocional del set */}
-          <div
-            className="
-              relative
-              mx-auto
-              mt-5
-              flex
-              aspect-[3/1]
-              w-full
-              max-w-4xl
-              items-center
-              justify-center
-              overflow-hidden
-              rounded-xl
-              border
-              border-dashed
-              border-slate-600/60
-              bg-slate-800/50
-              md:aspect-[4/1]
-            "
-          >
-            <span
+          {bannerUrl ? (
+            <div
               className="
-                text-[10px]
-                font-black
-                uppercase
-                tracking-[0.24em]
-                text-slate-500
+                relative
+                mx-auto
+                mt-5
+                aspect-[3/1]
+                w-full
+                max-w-4xl
+                overflow-hidden
+                rounded-xl
+                border
+                border-slate-600/60
+                bg-slate-800/50
+                shadow-[0_18px_45px_-20px_rgba(0,0,0,0.9)]
+                md:aspect-[4/1]
               "
             >
-              Insertar Banner Aquí
-            </span>
-          </div>
+              {/* Banner real servido desde SetMeta.bannerUrl */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={bannerUrl}
+                alt={`Banner de ${set.name}`}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ) : (
+            <div
+              className="
+                relative
+                mx-auto
+                mt-5
+                flex
+                aspect-[3/1]
+                w-full
+                max-w-4xl
+                items-center
+                justify-center
+                overflow-hidden
+                rounded-xl
+                border
+                border-dashed
+                border-slate-600/60
+                bg-slate-800/50
+                bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.14),transparent_70%)]
+                md:aspect-[4/1]
+              "
+            >
+              <div className="text-center">
+                <p
+                  className="
+                    text-[10px]
+                    font-black
+                    uppercase
+                    tracking-[0.24em]
+                    text-slate-500
+                  "
+                >
+                  Banner del set
+                </p>
+
+                <p
+                  className="
+                    mt-1
+                    text-xs
+                    font-semibold
+                    text-slate-500
+                  "
+                >
+                  {set.name}
+                </p>
+              </div>
+            </div>
+          )}
 
           {groups.length > 0 && (
             <div

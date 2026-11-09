@@ -96,6 +96,16 @@ model Card {
   @@index([type])
 }
 
+model SetMeta {
+  slug String @id
+
+  name String
+
+  bannerUrl String?
+
+  @@index([name])
+}
+
 model Archetype {
   id String @id @default(cuid())
 
