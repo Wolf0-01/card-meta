@@ -1,7 +1,6 @@
 export interface ImportedDeck {
   main: number[];
   extra: number[];
-  side: number[];
 }
 
 export function parseYdk(
@@ -10,13 +9,11 @@ export function parseYdk(
   const deck: ImportedDeck = {
     main: [],
     extra: [],
-    side: [],
   };
 
   let currentSection:
     | "main"
     | "extra"
-    | "side"
     | null = null;
 
   const lines = content
@@ -34,8 +31,12 @@ export function parseYdk(
         currentSection = "extra";
         continue;
 
+      /*
+       * El Side Deck no existe en Duel Links,
+       * así que sus cartas se ignoran al importar.
+       */
       case "!side":
-        currentSection = "side";
+        currentSection = null;
         continue;
     }
 

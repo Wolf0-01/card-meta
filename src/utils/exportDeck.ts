@@ -1,6 +1,6 @@
 interface DeckCard {
   quantity?: number;
-  zone: "main" | "extra" | "side";
+  zone: "main" | "extra";
 
   card: {
     ygoproId: number | null;
@@ -12,7 +12,6 @@ export function buildYdk(
 ) {
   const main: number[] = [];
   const extra: number[] = [];
-  const side: number[] = [];
 
   for (const item of cards) {
     const ygoproId =
@@ -38,10 +37,6 @@ export function buildYdk(
         case "extra":
           extra.push(ygoproId);
           break;
-
-        case "side":
-          side.push(ygoproId);
-          break;
       }
     }
   }
@@ -52,8 +47,5 @@ export function buildYdk(
 
     "#extra",
     ...extra.map(String),
-
-    "!side",
-    ...side.map(String),
   ].join("\n");
 }

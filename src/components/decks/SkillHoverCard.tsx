@@ -4,6 +4,7 @@ import Image from "next/image";
 
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -48,13 +49,28 @@ interface SkillCardLike {
   };
 }
 
+interface RelatedCardView {
+  id: string | number;
+
+  name: string;
+
+  image: string | null;
+
+  quantity?: number;
+}
+
+const remoteSkillCache = new Map<
+  string,
+  Skill | null
+>();
+
 const PANEL_WIDTH = 400;
 
 const PANEL_HEIGHT = 380;
 
 const GAP = 10;
 
-const MAX_CARDS = 6;
+const MAX_CARDS = 8;
 
 const CATEGORY_ACCENTS: Record<
   SkillCategory,
@@ -132,6 +148,65 @@ function getInitials(name: string) {
   );
 }
 
+function normalizeCardName(name: string) {
+  return name
+    .trim()
+    .toLowerCase();
+}
+
+function toRelatedCardViews(
+  cards: readonly SkillCardLike[]
+): RelatedCardView[] {
+  return cards.map((entry) => ({
+    id: entry.card.id,
+
+    name: entry.card.name,
+
+    image: entry.card.image,
+
+    quantity: entry.quantity,
+  }));
+}
+
+/*
+ * Recupera la ficha de una skill desde Duel Links Meta
+ * (a través de /api/skills), guardando el resultado en
+ * la caché en memoria del módulo.
+ */
+async function loadRemoteSkill(
+  name: string
+): Promise<Skill | null> {
+  const cacheKey = name.toLowerCase();
+
+  const cached = remoteSkillCache.get(cacheKey);
+
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  try {
+    const response = await fetch(
+      `/api/skills?name=${encodeURIComponent(
+        name
+      )}`
+    );
+
+    const data = response.ok
+      ? ((await response.json()) as {
+          skill?: Skill | null;
+        } | null)
+      : null;
+
+    const skill = data?.skill ?? null;
+
+    remoteSkillCache.set(cacheKey, skill);
+
+    return skill;
+  } catch {
+    return null;
+  }
+}
+
 function splitDescription(description: string) {
   const sentences = description
     .trim()
@@ -152,14 +227,18 @@ function splitDescription(description: string) {
 function RelatedCardThumb({
   card,
 }: {
-  card: SkillCardLike;
+  card: RelatedCardView;
 }) {
   const [failed, setFailed] = useState(false);
 
   const imageSrc =
-    failed || !card.card.image
+    failed || !card.image
       ? "/cards/default.jpg"
-      : card.card.image;
+      : card.image;
+
+  const isRemote = imageSrc.startsWith(
+    "http"
+  );
 
   return (
     <div
@@ -174,16 +253,17 @@ function RelatedCardThumb({
         bg-slate-800
         shadow-sm
       "
+      title={card.name}
       style={{ aspectRatio: "59 / 86" }}
     >
       <Image
         src={imageSrc}
-        alt={card.card.name}
+        alt={card.name}
         fill
         sizes="40px"
-        unoptimized={failed}
+        unoptimized={failed || isRemote}
         onError={() => setFailed(true)}
-        className="object-cover"
+        className="object-contain"
       />
 
       {typeof card.quantity === "number" &&
@@ -212,12 +292,12 @@ function RelatedCardThumb({
 function SkillTooltip({
   skill,
   fallbackName,
-  cards,
+  relatedCards,
   anchor,
 }: {
   skill: Skill | null;
   fallbackName: string;
-  cards: readonly SkillCardLike[];
+  relatedCards: readonly RelatedCardView[];
   anchor: TooltipAnchor;
 }) {
   if (typeof window === "undefined") {
@@ -270,11 +350,6 @@ function SkillTooltip({
 
   const { effects, requirements } =
     splitDescription(description);
-
-  const relatedCards = cards.slice(
-    0,
-    MAX_CARDS
-  );
 
   return createPortal(
     <div
@@ -453,19 +528,6 @@ function SkillTooltip({
               </p>
             </div>
           )}
-
-          {description.length === 0 && (
-            <p
-              className="
-                text-[10px]
-                leading-4
-                text-slate-400
-              "
-            >
-              Esta habilidad todavía no tiene una
-              ficha registrada en el catálogo.
-            </p>
-          )}
         </div>
 
         {relatedCards.length > 0 && (
@@ -489,7 +551,7 @@ function SkillTooltip({
               Cartas asociadas
             </p>
 
-            <div className="mt-1.5 flex gap-1.5">
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
               {relatedCards.map((card) => (
                 <RelatedCardThumb
                   key={card.id}
@@ -514,9 +576,94 @@ export default function SkillHoverCard({
   const [anchor, setAnchor] =
     useState<TooltipAnchor | null>(null);
 
+  const [remoteState, setRemoteState] =
+    useState<{
+      key: string;
+      skill: Skill | null;
+    } | null>(null);
+
   const zoneRef = useRef<HTMLDivElement>(null);
 
   const trimmedName = skillName.trim();
+
+  const localSkill = trimmedName
+    ? findSkillByName(trimmedName)
+    : null;
+
+  const cacheKey = trimmedName.toLowerCase();
+
+  /*
+   * Cuando la skill no existe en el catálogo local,
+   * se consulta la API pública de Duel Links Meta a
+   * través de /api/skills. El resultado se guarda con
+   * la clave del nombre para ignorar respuestas
+   * atrasadas si el usuario pasa el cursor por otra
+   * habilidad antes de que termine la consulta.
+   */
+  useEffect(() => {
+    if (!trimmedName || localSkill) {
+      return;
+    }
+
+    let cancelled = false;
+
+    loadRemoteSkill(trimmedName).then(
+      (skill) => {
+        if (cancelled) {
+          return;
+        }
+
+        setRemoteState({
+          key: trimmedName.toLowerCase(),
+          skill,
+        });
+      }
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [trimmedName, localSkill]);
+
+  const remoteSkill =
+    remoteState?.key === cacheKey
+      ? remoteState.skill
+      : null;
+
+  const skill = localSkill ?? remoteSkill;
+
+  /*
+   * Se muestran primero las cartas asociadas de la
+   * skill (Duel Links Meta) y después las del mazo,
+   * evitando duplicados por nombre.
+   */
+  const relatedCards = useMemo(() => {
+    const views: RelatedCardView[] =
+      toRelatedCardViews(cards);
+
+    const seen = new Set(
+      views.map((view) =>
+        normalizeCardName(view.name)
+      )
+    );
+
+    for (const related of skill?.relatedCards ??
+      []) {
+      const name = normalizeCardName(
+        related.name
+      );
+
+      if (seen.has(name)) {
+        continue;
+      }
+
+      seen.add(name);
+
+      views.push(related);
+    }
+
+    return views.slice(0, MAX_CARDS);
+  }, [cards, skill]);
 
   function showTooltip() {
     if (!trimmedName) {
@@ -578,10 +725,6 @@ export default function SkillHoverCard({
     };
   }, [anchor]);
 
-  const skill = trimmedName
-    ? findSkillByName(trimmedName)
-    : null;
-
   return (
     <>
       <div
@@ -597,7 +740,7 @@ export default function SkillHoverCard({
         <SkillTooltip
           skill={skill}
           fallbackName={trimmedName}
-          cards={cards}
+          relatedCards={relatedCards}
           anchor={anchor}
         />
       )}

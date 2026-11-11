@@ -27,7 +27,6 @@ number
 > = {
 main: DECK_RULES.mainMax,
 extra: DECK_RULES.extraMax,
-side: DECK_RULES.sideMax,
 };
 
 const MAX_COPIES: Record<
@@ -37,7 +36,6 @@ number
 > = {
 main: 3,
 extra: 1,
-side: 1,
 };
 
 function readStoredCards(
@@ -553,34 +551,14 @@ card.quantity,
         0
       );
 
-  const side =
-    cards
-      .filter(
-        (card) =>
-          card.zone ===
-          "side"
-      )
-      .reduce(
-        (
-          total,
-          card
-        ) =>
-          total +
-          card.quantity,
-        0
-      );
-
   return {
     main,
 
     extra,
 
-    side,
-
     total:
       main +
-      extra +
-      side,
+      extra,
   };
 }, [
   cards,

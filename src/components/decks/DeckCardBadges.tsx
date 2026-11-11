@@ -18,22 +18,24 @@ export default function DeckCardBadges({
     <div
       className="
         absolute
-        left-2
-        top-2
+        left-1
+        top-1
         flex
         flex-col
-        gap-2
+        gap-1
       "
     >
       {card.rarity && (
         <span
           className={`
-            rounded-md
-            px-2
-            py-1
-            text-[10px]
+            rounded
+            px-1
+            py-0.5
+            text-[8px]
             font-bold
-            shadow-lg
+            leading-none
+            tracking-wide
+            shadow
             ${getRarityColor(card.rarity)}
           `}
         >
@@ -44,12 +46,14 @@ export default function DeckCardBadges({
       {card.attribute && (
         <span
           className={`
-            rounded-md
-            px-2
-            py-1
-            text-[10px]
+            rounded
+            px-1
+            py-0.5
+            text-[8px]
             font-semibold
-            shadow-lg
+            leading-none
+            tracking-wide
+            shadow
             ${getAttributeColor(card.attribute)}
           `}
         >

@@ -11,6 +11,15 @@ export const SKILL_CATEGORIES = [
 export type SkillCategory =
   (typeof SKILL_CATEGORIES)[number];
 
+export interface SkillRelatedCard {
+  /** Identificador de la carta en Duel Links Meta. */
+  id: string;
+
+  name: string;
+
+  image: string | null;
+}
+
 export interface Skill {
   /** Identificador estable para claves y URLs. */
   id: string;
@@ -24,6 +33,9 @@ export interface Skill {
 
   /** Efecto y requisito oficial de la habilidad. */
   description: string;
+
+  /** Cartas asociadas devueltas por Duel Links Meta. */
+  relatedCards?: SkillRelatedCard[];
 }
 
 export interface SkillSearchResult {

@@ -302,7 +302,7 @@ export default function MiniCardTile({
       <div
         className="
           relative
-          aspect-[88/128]
+          aspect-[59/86]
           overflow-hidden
           rounded-lg
           border
@@ -319,7 +319,7 @@ export default function MiniCardTile({
           src={imageSrc}
           alt={card.name}
           fill
-          sizes="(max-width: 1024px) 18vw, 140px"
+          sizes="(max-width: 1024px) 14vw, 88px"
           unoptimized={failed}
           onError={() => setFailed(true)}
           draggable={false}

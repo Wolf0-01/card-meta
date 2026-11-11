@@ -90,10 +90,6 @@ export default function DeckBuilderWorkspace({
       extra: draft.cards.filter(
         (card) => card.zone === "extra"
       ),
-
-      side: draft.cards.filter(
-        (card) => card.zone === "side"
-      ),
     }),
     [draft.cards]
   );
@@ -672,47 +668,25 @@ export default function DeckBuilderWorkspace({
               scrollable
             />
 
-            <div className="grid gap-3 xl:grid-cols-2">
-              <DraftZone
-                zone="extra"
-                cards={cardsByZone.extra}
-                total={draft.stats.extra}
-                limit={DECK_RULES.extraMax}
-                onAddCard={handleAddCard}
-                onMoveCard={draft.moveCard}
-                onRemoveOne={draft.removeCard}
-                onRemoveAll={(
+            <DraftZone
+              zone="extra"
+              cards={cardsByZone.extra}
+              total={draft.stats.extra}
+              limit={DECK_RULES.extraMax}
+              onAddCard={handleAddCard}
+              onMoveCard={draft.moveCard}
+              onRemoveOne={draft.removeCard}
+              onRemoveAll={(
+                cardId,
+                zone
+              ) =>
+                draft.setQuantity(
                   cardId,
-                  zone
-                ) =>
-                  draft.setQuantity(
-                    cardId,
-                    zone,
-                    0
-                  )
-                }
-              />
-
-              <DraftZone
-                zone="side"
-                cards={cardsByZone.side}
-                total={draft.stats.side}
-                limit={DECK_RULES.sideMax}
-                onAddCard={handleAddCard}
-                onMoveCard={draft.moveCard}
-                onRemoveOne={draft.removeCard}
-                onRemoveAll={(
-                  cardId,
-                  zone
-                ) =>
-                  draft.setQuantity(
-                    cardId,
-                    zone,
-                    0
-                  )
-                }
-              />
-            </div>
+                  zone,
+                  0
+                )
+              }
+            />
 
             <div
               className="

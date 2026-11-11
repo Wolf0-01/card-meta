@@ -18,5 +18,4 @@ export const DECK_ZONE_LABELS: Record<
 > = {
   main: "Main Deck",
   extra: "Extra Deck",
-  side: "Side Deck",
 };

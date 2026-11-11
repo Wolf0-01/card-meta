@@ -30,7 +30,7 @@ function groupIds(
 
 async function loadCards(
   ids: number[],
-  zone: "main" | "extra" | "side"
+  zone: "main" | "extra"
 ): Promise<ImportedDeckCard[]> {
   const grouped = groupIds(ids);
 
@@ -82,7 +82,6 @@ export async function importDeckFromYdk(
   const [
     main,
     extra,
-    side,
   ] = await Promise.all([
     loadCards(
       deck.main,
@@ -93,16 +92,10 @@ export async function importDeckFromYdk(
       deck.extra,
       "extra"
     ),
-
-    loadCards(
-      deck.side,
-      "side"
-    ),
   ]);
 
   return {
     main,
     extra,
-    side,
   };
 }

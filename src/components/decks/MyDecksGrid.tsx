@@ -609,7 +609,7 @@ export default function MyDecksGrid({
               </div>
 
               <div className="mt-auto space-y-3 px-4 pb-4">
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   <Counter
                     label="Main"
                     value={deck.counts.main}
@@ -628,17 +628,6 @@ export default function MyDecksGrid({
                     max={DECK_RULES.extraMax}
                     highlight={
                       deck.counts.extra > 0
-                        ? "success"
-                        : "neutral"
-                    }
-                  />
-
-                  <Counter
-                    label="Side"
-                    value={deck.counts.side}
-                    max={DECK_RULES.sideMax}
-                    highlight={
-                      deck.counts.side > 0
                         ? "success"
                         : "neutral"
                     }

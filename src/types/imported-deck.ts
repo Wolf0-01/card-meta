@@ -1,7 +1,7 @@
 export interface ImportedDeckCard {
   quantity: number;
 
-  zone: "main" | "extra" | "side";
+  zone: "main" | "extra";
 
   card: {
     id: number;
@@ -30,6 +30,4 @@ export interface ImportedDeckResult {
   main: ImportedDeckCard[];
 
   extra: ImportedDeckCard[];
-
-  side: ImportedDeckCard[];
 }

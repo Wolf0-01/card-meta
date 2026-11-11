@@ -2,8 +2,7 @@ import type { Card } from "./card";
 
 export type DeckZone =
 | "main"
-| "extra"
-| "side";
+| "extra";
 
 // =================================
 // CARD

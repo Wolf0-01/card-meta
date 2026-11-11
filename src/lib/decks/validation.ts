@@ -15,7 +15,6 @@ export { DECK_RULES };
 export const deckZoneSchema = z.enum([
   "main",
   "extra",
-  "side",
 ]);
 
 export const deckCardInputSchema = z.object({
@@ -116,7 +115,6 @@ export interface NormalizedDeckCard {
 export interface DeckCounts {
   main: number;
   extra: number;
-  side: number;
   total: number;
 }
 
@@ -198,7 +196,6 @@ export function countDeckCards(
   const counts: DeckCounts = {
     main: 0,
     extra: 0,
-    side: 0,
     total: 0,
   };
 
@@ -258,14 +255,6 @@ export function validateDeckCards(
       path: "cards",
 
       message: `El Extra Deck no puede superar ${DECK_RULES.extraMax} cartas (actual: ${counts.extra})`,
-    });
-  }
-
-  if (counts.side > DECK_RULES.sideMax) {
-    issues.push({
-      path: "cards",
-
-      message: `El Side Deck no puede superar ${DECK_RULES.sideMax} cartas (actual: ${counts.side})`,
     });
   }
 

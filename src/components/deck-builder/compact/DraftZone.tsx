@@ -45,11 +45,6 @@ const ZONE_ACCENTS: Record<
     dot: "bg-violet-400",
     bar: "bg-violet-400",
   },
-
-  side: {
-    dot: "bg-amber-400",
-    bar: "bg-amber-400",
-  },
 };
 
 type MainGroupKey =
@@ -224,16 +219,28 @@ export default function DraftZone({
     );
   }
 
+  /*
+   * El Main Deck mantiene 5 columnas compactas y
+   * verticales; el Extra Deck se expande horizontalmente
+   * aprovechando todo el ancho disponible.
+   */
   function renderGrid(groupCards: DraftCard[]) {
-    return (
-      <div
-        className="
+    const gridClasses =
+      zone === "main"
+        ? `
           grid
-          grid-cols-[repeat(5,minmax(0,104px))]
+          grid-cols-[repeat(5,minmax(0,72px))]
           justify-center
           gap-1.5
-        "
-      >
+        `
+        : `
+          grid
+          grid-cols-[repeat(auto-fill,minmax(72px,1fr))]
+          gap-1.5
+        `;
+
+    return (
+      <div className={gridClasses}>
         {sortCardsByRarity(groupCards).map(
           renderTile
         )}

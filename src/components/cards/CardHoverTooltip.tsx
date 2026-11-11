@@ -142,15 +142,16 @@ export default function CardHoverTooltip({
         <div
           className="
             relative
+            aspect-[813/1185]
             w-[124px]
             shrink-0
+            self-start
             overflow-hidden
             rounded-lg
             border
             border-slate-600/70
             bg-slate-800
           "
-          style={{ aspectRatio: "59 / 86" }}
         >
           <Image
             src={imageSrc}
@@ -159,7 +160,7 @@ export default function CardHoverTooltip({
             sizes="124px"
             unoptimized={failed}
             onError={() => setFailed(true)}
-            className="object-cover"
+            className="object-contain"
           />
         </div>
 

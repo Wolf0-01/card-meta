@@ -37,7 +37,7 @@ export default function DeckCardGrid({
       <div
         className="
           grid
-          grid-cols-[repeat(5,minmax(0,104px))]
+          grid-cols-[repeat(5,minmax(0,72px))]
           justify-center
           gap-1.5
         "

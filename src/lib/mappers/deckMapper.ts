@@ -261,12 +261,6 @@ export function mapPrismaDeck(
         "extra"
       ),
 
-    sideCards:
-      countCardsByZone(
-        cards,
-        "side"
-      ),
-
     cards,
 
 image: deck.image,

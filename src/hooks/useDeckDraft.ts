@@ -101,8 +101,22 @@ function readStoredDraft(
       return null;
     }
 
+    /*
+     * Se descartan las cartas de zonas retiradas:
+     * el Side Deck ya no existe en Duel Links.
+     */
+    const cards = parsed.cards.filter(
+      (card): card is DraftCard =>
+        card !== null &&
+        typeof card === "object" &&
+        ((card as DraftCard).zone ===
+          "main" ||
+          (card as DraftCard).zone ===
+            "extra")
+    );
+
     return {
-      cards: parsed.cards,
+      cards,
 
       name:
         typeof parsed.name === "string"

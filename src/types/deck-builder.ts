@@ -42,7 +42,5 @@ main: number;
 
 extra: number;
 
-side: number;
-
 total: number;
 }

@@ -44,14 +44,19 @@ export default function DeckExtraDeck({
         </h2>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div
+        className="
+          grid
+          grid-cols-[repeat(auto-fill,minmax(72px,1fr))]
+          gap-1.5
+        "
+      >
         {sortCardsByRarity(extraDeck).map(
           (deckCard) => (
             <DeckCardItem
               key={deckCard.id}
               card={deckCard.card}
               quantity={deckCard.quantity}
-              compact
             />
           )
         )}

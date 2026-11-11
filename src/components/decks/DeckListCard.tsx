@@ -89,7 +89,7 @@ export default function DeckListCard({
         <div
           className="
             grid
-            grid-cols-3
+            grid-cols-2
             gap-3
             text-center
           "
@@ -111,16 +111,6 @@ export default function DeckListCard({
 
             <p className="font-bold">
               {deck.extraCards ?? 0}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs text-foreground-muted">
-              Side
-            </p>
-
-            <p className="font-bold">
-              {deck.sideCards ?? 0}
             </p>
           </div>
         </div>

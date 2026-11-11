@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { querySkills } from "@/lib/skills/search";
+import { fetchDlmSkillByName } from "@/lib/skills/dlm";
+
+import {
+  findSkillByName,
+  querySkills,
+} from "@/lib/skills/search";
 
 export const runtime = "nodejs";
 
@@ -24,6 +29,18 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(
     request.url
   );
+
+  const name = searchParams.get("name");
+
+  if (name) {
+    const skill =
+      findSkillByName(name) ??
+      (await fetchDlmSkillByName(name));
+
+    return NextResponse.json({
+      skill,
+    });
+  }
 
   const result = querySkills({
     search: searchParams.get("search") ?? undefined,

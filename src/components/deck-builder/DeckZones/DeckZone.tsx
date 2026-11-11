@@ -277,10 +277,6 @@ export default function DeckZone({
                 <option value="extra">
                   Extra Deck
                 </option>
-
-                <option value="side">
-                  Side Deck
-                </option>
               </select>
             </div>
           ))}

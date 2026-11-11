@@ -18,8 +18,6 @@ export interface DraftStats {
 
   extra: number;
 
-  side: number;
-
   total: number;
 }
 

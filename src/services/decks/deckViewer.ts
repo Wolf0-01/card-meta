@@ -6,7 +6,6 @@ export function splitDeckCards(deck: MetaDeck) {
   return {
     mainDeck: cards.filter((card) => card.zone === "main"),
     extraDeck: cards.filter((card) => card.zone === "extra"),
-    sideDeck: cards.filter((card) => card.zone === "side"),
   };
 }
 

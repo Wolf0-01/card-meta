@@ -33,7 +33,6 @@ quantity: number
 const DECK_LIMITS = {
 main: 30,
 extra: 9,
-side: 10,
 } as const;
 
 export default function DeckZones({
@@ -45,10 +44,8 @@ onSetQuantity,
 const {
 mainDeck,
 extraDeck,
-sideDeck,
 mainCount,
 extraCount,
-sideCount,
 } = useMemo(() => {
 const mainDeck = cards.filter(
 (card) => card.zone === "main"
@@ -59,14 +56,9 @@ const extraDeck = cards.filter(
   (card) => card.zone === "extra"
 );
 
-const sideDeck = cards.filter(
-  (card) => card.zone === "side"
-);
-
 return {
   mainDeck,
   extraDeck,
-  sideDeck,
 
   mainCount: mainDeck.reduce(
     (sum, card) =>
@@ -75,12 +67,6 @@ return {
   ),
 
   extraCount: extraDeck.reduce(
-    (sum, card) =>
-      sum + card.quantity,
-    0
-  ),
-
-  sideCount: sideDeck.reduce(
     (sum, card) =>
       sum + card.quantity,
     0
@@ -110,18 +96,6 @@ onSetQuantity={onSetQuantity}
     cards={extraDeck}
     maxCards={DECK_LIMITS.extra}
     zone="extra"
-    onRemoveCard={onRemoveCard}
-    onMoveCard={onMoveCard}
-    onSetQuantity={onSetQuantity}
-  />
-
-  <DeckZone
-    title={
-      `Side Deck (${sideCount}/${DECK_LIMITS.side})`
-    }
-    cards={sideDeck}
-    maxCards={DECK_LIMITS.side}
-    zone="side"
     onRemoveCard={onRemoveCard}
     onMoveCard={onMoveCard}
     onSetQuantity={onSetQuantity}

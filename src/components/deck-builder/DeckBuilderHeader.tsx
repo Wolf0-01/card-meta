@@ -206,13 +206,6 @@ export default function DeckBuilderHeader({
             </span>
 
             <span>
-              Side:{" "}
-              <strong>
-                {stats.side}/10
-              </strong>
-            </span>
-
-            <span>
               Total:{" "}
               <strong>
                 {stats.total}

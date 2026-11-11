@@ -53,16 +53,10 @@ export function getDraftStats(
     "extra"
   );
 
-  const side = getDraftZoneTotal(
-    cards,
-    "side"
-  );
-
   return {
     main,
     extra,
-    side,
-    total: main + extra + side,
+    total: main + extra,
   };
 }
 
@@ -354,14 +348,6 @@ export function validateDraft(
       path: "extra",
 
       message: `El Extra Deck no puede superar ${DECK_RULES.extraMax} cartas`,
-    });
-  }
-
-  if (stats.side > DECK_RULES.sideMax) {
-    issues.push({
-      path: "side",
-
-      message: `El Side Deck no puede superar ${DECK_RULES.sideMax} cartas`,
     });
   }
 

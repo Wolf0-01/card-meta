@@ -127,14 +127,14 @@ export default function DeckCardItem({
           hover:border-primary
           hover:shadow-lg
           hover:shadow-primary/20
-          ${compact ? "w-[76px]" : "w-full"}
+          ${compact ? "w-[72px]" : "w-full"}
           ${className}
         `}
       >
         <div
           className="
             relative
-            aspect-[421/614]
+            aspect-[59/86]
             w-full
           "
         >
@@ -147,8 +147,8 @@ export default function DeckCardItem({
             fill
             sizes={
               compact
-                ? "80px"
-                : "(max-width: 768px) 18vw, 160px"
+                ? "72px"
+                : "(max-width: 768px) 18vw, 72px"
             }
             className="
               object-cover

@@ -8,7 +8,7 @@ import DeckCard from "./DeckCard";
 
 import { DECK_RULES } from "@/lib/decks/rules";
 
-type DeckZone = "main" | "extra" | "side";
+type DeckZone = "main" | "extra";
 
 interface DeckCardData {
   id: string;
@@ -41,15 +41,11 @@ export default function DeckSection({
 
   const maxCards = titleUpper.includes("MAIN")
     ? DECK_RULES.mainMax
-    : titleUpper.includes("EXTRA")
-    ? DECK_RULES.extraMax
-    : DECK_RULES.sideMax;
+    : DECK_RULES.extraMax;
 
   const emptyMessage = titleUpper.includes("MAIN")
     ? "No hay cartas en el Main Deck."
-    : titleUpper.includes("EXTRA")
-      ? "No hay cartas en el Extra Deck."
-      : "No hay cartas en el Side Deck.";
+    : "No hay cartas en el Extra Deck.";
 
   return (
     <Card className="p-6">

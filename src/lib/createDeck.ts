@@ -68,13 +68,11 @@ function validateDeck(
   const limits = {
     main: DECK_RULES.mainMax,
     extra: DECK_RULES.extraMax,
-    side: DECK_RULES.sideMax,
   };
 
   const zones = {
     main: 0,
     extra: 0,
-    side: 0,
   };
 
   for (const card of cards) {
@@ -100,8 +98,7 @@ function validateDeck(
 
   if (
     zones.main > limits.main ||
-    zones.extra > limits.extra ||
-    zones.side > limits.side
+    zones.extra > limits.extra
   ) {
     throw new Error(
       "El deck supera los límites permitidos"

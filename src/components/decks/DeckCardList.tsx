@@ -7,8 +7,7 @@ import Image from "next/image";
 
 type DeckZone =
   | "main"
-  | "extra"
-  | "side";
+  | "extra";
 
 
 

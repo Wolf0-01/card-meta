@@ -9,6 +9,7 @@ import { validateDraft } from "./draft";
 import { DeckError } from "./errors";
 import { DECK_RULES } from "./rules";
 import {
+  deckZoneSchema,
   validateDeckCards,
   type NormalizedDeckCard,
 } from "./validation";
@@ -61,9 +62,22 @@ describe("DECK_RULES (Duel Links)", () => {
       mainMin: 20,
       mainMax: 30,
       extraMax: 9,
-      sideMax: 6,
       maxCopies: 3,
     });
+  });
+
+  it("no acepta la zona side (retirada de Duel Links)", () => {
+    assert.equal(
+      deckZoneSchema.safeParse("side")
+        .success,
+      false
+    );
+
+    assert.equal(
+      deckZoneSchema.safeParse("main")
+        .success,
+      true
+    );
   });
 });
 
@@ -125,32 +139,13 @@ describe("validateDraft", () => {
     );
   });
 
-  it("acepta 6 cartas en el Side Deck y rechaza 7", () => {
-    assert.equal(
-      validateDraft(draftCards("side", 6))
-        .canSave,
-      true
-    );
-
-    const result = validateDraft(
-      draftCards("side", 7)
-    );
-
-    assert.equal(result.canSave, false);
-    assert.ok(
-      result.issues.some((issue) =>
-        issue.message.includes("6")
-      )
-    );
-  });
-
   it("cuenta las copias entre zonas", () => {
     const cards: DraftCard[] = [
       ...draftCards("main", 1, 900).map((card) => ({
         ...card,
         quantity: 3,
       })),
-      ...draftCards("side", 1, 900),
+      ...draftCards("extra", 1, 900),
     ];
 
     const result = validateDraft(cards);
@@ -165,11 +160,10 @@ describe("validateDraft", () => {
 });
 
 describe("validateDeckCards", () => {
-  it("acepta un mazo público de 20 Main, 9 Extra y 6 Side", () => {
+  it("acepta un mazo público de 20 Main y 9 Extra", () => {
     const cards = [
       ...normalizedCards("main", 20),
       ...normalizedCards("extra", 9, 1000),
-      ...normalizedCards("side", 6, 2000),
     ];
 
     const counts = validateDeckCards(
@@ -180,8 +174,7 @@ describe("validateDeckCards", () => {
     assert.deepEqual(counts, {
       main: 20,
       extra: 9,
-      side: 6,
-      total: 35,
+      total: 29,
     });
   });
 
@@ -227,17 +220,6 @@ describe("validateDeckCards", () => {
     );
   });
 
-  it("rechaza 7 cartas en el Side Deck", () => {
-    expectDeckError(
-      () =>
-        validateDeckCards(
-          normalizedCards("side", 7),
-          false
-        ),
-      "6"
-    );
-  });
-
   it("rechaza más de 3 copias entre zonas", () => {
     const cards: NormalizedDeckCard[] = [
       {
@@ -248,7 +230,7 @@ describe("validateDeckCards", () => {
       {
         cardId: 900,
         quantity: 1,
-        zone: "side",
+        zone: "extra",
       },
     ];
 

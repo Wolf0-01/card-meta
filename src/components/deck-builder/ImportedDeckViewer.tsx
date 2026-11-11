@@ -49,11 +49,6 @@ return ( <section className="space-y-6"> <DeckSection
     title="EXTRA DECK"
     cards={createSectionCards(deck.extra)}
   />
-
-  <DeckSection
-    title="SIDE DECK"
-    cards={createSectionCards(deck.side)}
-  />
 </section>
 
 

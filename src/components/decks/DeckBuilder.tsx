@@ -35,8 +35,7 @@ import { DECK_RULES } from "@/lib/decks/rules";
 
 type Zone =
 | "main"
-| "extra"
-| "side";
+| "extra";
 
 type DeckStatus =
 | "ready"
@@ -57,14 +56,11 @@ deckName: string;
 mainCount: number;
 
 extraCount: number;
-
-sideCount: number;
 };
 
 const EMPTY_DECK: DeckData = {
 main: [],
 extra: [],
-side: [],
 };
 
 export default function DeckBuilder() {
@@ -134,30 +130,19 @@ deck.extra
 [deck.extra]
 );
 
-const sideCount = useMemo(
-() =>
-countCards(
-deck.side
-),
-[deck.side]
-);
-
 const totalDeckCards =
 mainCount +
-extraCount +
-sideCount;
+extraCount;
 
 const detected = useMemo(
 () =>
 detectArchetype([
 ...deck.main,
 ...deck.extra,
-...deck.side,
 ]),
 [
 deck.main,
 deck.extra,
-deck.side,
 ]
 );
 
@@ -173,13 +158,11 @@ getDeckValidation({
 deckName,
 mainCount,
 extraCount,
-sideCount,
 }),
 [
 deckName,
 mainCount,
 extraCount,
-sideCount,
 ]
 );
 
@@ -489,21 +472,6 @@ try {
 
         zone:
           "extra" as const,
-      })
-    ),
-
-    ...deck.side.map(
-      (card) => ({
-        id:
-          Number(
-            card.id
-          ),
-
-        quantity:
-          card.quantity,
-
-        zone:
-          "side" as const,
       })
     ),
   ];
@@ -974,13 +942,6 @@ de Deck </h1>
           {extraCount}
           /{DECK_RULES.extraMax}
         </span>
-
-        <span>
-          Side:
-          {" "}
-          {sideCount}
-          /{DECK_RULES.sideMax}
-        </span>
       </div>
     </div>
 
@@ -1182,19 +1143,6 @@ de Deck </h1>
           "extra"
         )}
       </div>
-
-      <div
-        className="
-          mt-5
-        "
-      >
-        {renderZone(
-          "SIDE DECK",
-          deck.side,
-          DECK_RULES.sideMax,
-          "side"
-        )}
-      </div>
     </section>
   </div>
 
@@ -1254,7 +1202,6 @@ function getDeckValidation({
 deckName,
 mainCount,
 extraCount,
-sideCount,
 }: DeckValidationInput): DeckValidation {
 const messages:
 string[] = [];
@@ -1300,20 +1247,9 @@ messages.push(
 );
 }
 
-if (
-sideCount > DECK_RULES.sideMax
-) {
-messages.push(
-`El Side Deck supera el límite por ${
-        sideCount - DECK_RULES.sideMax
-      } cartas.`
-);
-}
-
 const hasLimitError =
 mainCount > DECK_RULES.mainMax ||
-extraCount > DECK_RULES.extraMax ||
-sideCount > DECK_RULES.sideMax;
+extraCount > DECK_RULES.extraMax;
 
 const isIncomplete =
 !cleanName ||

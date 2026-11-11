@@ -31,9 +31,6 @@ useState<DeckCardItem[]>([]);
 const [extraDeck] =
 useState<DeckCardItem[]>([]);
 
-const [sideDeck] =
-useState<DeckCardItem[]>([]);
-
 function addCard(
 card: CardSearchResult
 ) {
@@ -91,7 +88,7 @@ return ( <div
     className="
       grid
       gap-5
-      lg:grid-cols-3
+      lg:grid-cols-2
     "
   >
     <div>
@@ -142,28 +139,6 @@ return ( <div
         )}
       />
     </div>
-
-    <div>
-      <DeckSection
-        title={`SIDE DECK (${sideDeck.length})`}
-        cards={sideDeck.map(
-          (card) => ({
-            id:
-              String(
-                card.id
-              ),
-
-            quantity:
-              card.quantity,
-
-            zone:
-              "side",
-
-            card,
-          })
-        )}
-      />
-    </div>
   </div>
 
   <div
@@ -201,12 +176,6 @@ return ( <div
       Extra:{" "}
 
       {extraDeck.length}
-    </p>
-
-    <p>
-      Side:{" "}
-
-      {sideDeck.length}
     </p>
   </div>
 </div>

@@ -2,7 +2,6 @@
 
 import DeckActions from "./DeckActions";
 import DeckArchetypeBanner from "./DeckArchetypeBanner";
-import DeckCardItem from "./DeckCardItem";
 import DeckCombos from "./DeckCombos";
 import DeckCreatorCard from "./DeckCreatorCard";
 import DeckExtraDeck from "./DeckExtraDeck";
@@ -17,8 +16,6 @@ import {
 } from "@/lib/decks/gemCost";
 
 import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
-
-import { sortCardsByRarity } from "@/lib/decks/rarityOrder";
 
 import type { MetaDeck } from "@/types/meta";
 
@@ -54,19 +51,11 @@ export default function DeckViewer({
       deckCard.zone === "extra"
   );
 
-  const sideDeck = cards.filter(
-    (deckCard) =>
-      deckCard.zone === "side"
-  );
-
   const mainCount =
     deck.mainCards ?? countQuantity(mainDeck);
 
   const extraCount =
     deck.extraCards ?? countQuantity(extraDeck);
-
-  const sideCount =
-    deck.sideCards ?? countQuantity(sideDeck);
 
   const totalCards =
     deck.totalCards ?? countQuantity(cards);
@@ -212,39 +201,6 @@ export default function DeckViewer({
             <DeckExtraDeck deck={deck} />
           </div>
 
-          {sideDeck.length > 0 && (
-            <div className="mt-5">
-              <div className="mb-2 flex items-center justify-between">
-                <h2
-                  className="
-                    text-[11px]
-                    font-black
-                    uppercase
-                    tracking-[0.16em]
-                    text-foreground-muted
-                  "
-                >
-                  Side Deck ({sideCount})
-                </h2>
-              </div>
-
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {sortCardsByRarity(sideDeck).map(
-                  (deckCard) => (
-                    <DeckCardItem
-                      key={deckCard.id}
-                      card={deckCard.card}
-                      quantity={
-                        deckCard.quantity
-                      }
-                      compact
-                    />
-                  )
-                )}
-              </div>
-            </div>
-          )}
-
           <footer
             className="
               mt-4
@@ -265,9 +221,6 @@ export default function DeckViewer({
           >
             <span>
               {mainCount} main · {extraCount} extra
-              {sideCount > 0
-                ? ` · ${sideCount} side`
-                : ""}
             </span>
 
             <span>{totalCards} total</span>

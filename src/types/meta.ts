@@ -95,8 +95,6 @@ mainCards?: number;
 
 extraCards?: number;
 
-sideCards?: number;
-
 cards: DeckCard[];
 
 image?: string | null;

@@ -4,8 +4,7 @@ import { DECK_RULES } from "@/lib/decks/rules";
 
 export type DeckZone =
 | "main"
-| "extra"
-| "side";
+| "extra";
 
 export interface DeckCard {
 id: string;
@@ -21,8 +20,6 @@ export interface DeckData {
 main: DeckCard[];
 
 extra: DeckCard[];
-
-side: DeckCard[];
 }
 
 const STORAGE_KEY =
@@ -39,7 +36,6 @@ function emptyDeck(): DeckData {
 return {
 main: [],
 extra: [],
-side: [],
 };
 }
 
@@ -63,7 +59,6 @@ number
 > = {
 main: DECK_RULES.mainMax,
 extra: DECK_RULES.extraMax,
-side: DECK_RULES.sideMax,
 };
 
 return limits[zone];
@@ -221,12 +216,6 @@ extra:
     "extra"
   ),
 
-side:
-  normalizeCards(
-    deck.side,
-    "side"
-  ),
-
 
 };
 }
@@ -245,13 +234,6 @@ deck.main.map(
 
 extra:
   deck.extra.map(
-    (card) => ({
-      ...card,
-    })
-  ),
-
-side:
-  deck.side.map(
     (card) => ({
       ...card,
     })
@@ -300,8 +282,6 @@ const storedDeck =
     main?: unknown;
 
     extra?: unknown;
-
-    side?: unknown;
   };
 
 return {
@@ -315,12 +295,6 @@ return {
     normalizeCards(
       storedDeck.extra,
       "extra"
-    ),
-
-  side:
-    normalizeCards(
-      storedDeck.side,
-      "side"
     ),
 };
 

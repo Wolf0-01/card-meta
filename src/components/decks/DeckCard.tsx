@@ -4,8 +4,7 @@ import Image from "next/image";
 
 type DeckZone =
   | "main"
-  | "extra"
-  | "side";
+  | "extra";
 
 interface CardData {
   id: string | number;
@@ -259,26 +258,6 @@ export default function DeckCard({
           >
             EXTRA
           </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              onAddToZone("side")
-            }
-            className="
-              rounded-md
-              bg-amber-600
-              px-1
-              py-1.5
-              text-[9px]
-              font-bold
-              text-white
-              transition
-              hover:bg-amber-500
-            "
-          >
-            SIDE
-          </button>
         </div>
       )}
 
@@ -360,7 +339,7 @@ export default function DeckCard({
             <div
               className="
                 grid
-                grid-cols-3
+                grid-cols-2
                 gap-1
               "
             >
@@ -368,7 +347,6 @@ export default function DeckCard({
                 [
                   "main",
                   "extra",
-                  "side",
                 ] as DeckZone[]
               ).map((zone) => (
                 <button
