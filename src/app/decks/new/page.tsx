@@ -5,6 +5,12 @@ import DeckBuilderWorkspace from "@/components/deck-builder/compact/DeckBuilderW
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
 
+import {
+  findDeckByIdentifier,
+} from "@/services/decks";
+
+import type { DeckDraftSeed } from "@/hooks/useDeckDraft";
+
 export const metadata: Metadata = {
   title: "Nuevo mazo | Card Meta",
 
@@ -12,12 +18,67 @@ export const metadata: Metadata = {
     "Construye tu mazo competitivo de Yu-Gi-Oh! con el editor compacto de Card Meta.",
 };
 
-export default async function NewDeckPage() {
+interface NewDeckPageProps {
+  /*
+   * Identificador de un mazo publicado desde el que
+   * partir (botón "Build in Deck Builder").
+   */
+  searchParams: Promise<{
+    clone?: string;
+  }>;
+}
+
+export default async function NewDeckPage({
+  searchParams,
+}: NewDeckPageProps) {
   const user = await getCurrentUser();
 
   if (!user) {
     redirect("/login?next=/decks/new");
   }
 
-  return <DeckBuilderWorkspace />;
+  const { clone } = await searchParams;
+
+  let templateDeck:
+    | DeckDraftSeed
+    | undefined;
+
+  if (clone) {
+    const deck = await findDeckByIdentifier(
+      clone,
+      user.id
+    ).catch(() => null);
+
+    if (deck) {
+      templateDeck = {
+        name: deck.name,
+
+        description:
+          deck.description ?? "",
+
+        skill: deck.skill ?? "",
+
+        isPublic: false,
+
+        cards: deck.cards.map(
+          (deckCard) => ({
+            id: deckCard.card.id,
+
+            quantity:
+              deckCard.quantity,
+
+            zone: deckCard.zone,
+
+            card: deckCard.card,
+          })
+        ),
+      };
+    }
+  }
+
+  return (
+    <DeckBuilderWorkspace
+      templateDeck={templateDeck}
+    />
+  );
 }

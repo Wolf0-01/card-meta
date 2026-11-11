@@ -3,7 +3,9 @@
 import DeckActions from "./DeckActions";
 import DeckArchetypeBanner from "./DeckArchetypeBanner";
 import DeckCombos from "./DeckCombos";
-import DeckCreatorCard from "./DeckCreatorCard";
+import DeckCreatorCard, {
+  formatDeckDate,
+} from "./DeckCreatorCard";
 import DeckExtraDeck from "./DeckExtraDeck";
 import DeckGuide from "./DeckGuide";
 import DeckMainDeck from "./DeckMainDeck";
@@ -62,59 +64,74 @@ export default function DeckViewer({
 
   const gemCost = estimateDeckGemCost(deck);
 
+  const author = deck.author ?? null;
+
+  const authorName =
+    author?.displayName?.trim() ||
+    author?.username ||
+    "Creador anónimo";
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <header
         className="
           flex
           flex-col
-          gap-3
+          items-center
+          gap-1
           border-b
           border-border
-          pb-4
-          sm:flex-row
-          sm:items-end
-          sm:justify-between
+          pb-5
+          text-center
         "
       >
-        <div className="min-w-0">
-          <p
-            className="
-              text-[10px]
-              font-bold
-              uppercase
-              tracking-[0.22em]
-              text-primary
-            "
-          >
-            Mazo publicado
-          </p>
+        <p
+          className="
+            text-[10px]
+            font-bold
+            uppercase
+            tracking-[0.22em]
+            text-primary
+          "
+        >
+          Mazo publicado
+        </p>
 
-          <h1
-            className="
-              truncate
-              text-2xl
-              font-black
-              text-foreground
-              sm:text-3xl
-            "
-          >
-            {deck.name}
-          </h1>
+        <h1
+          className="
+            text-2xl
+            font-black
+            uppercase
+            tracking-wide
+            text-foreground
+            sm:text-3xl
+          "
+        >
+          {deck.name}
+        </h1>
 
-          <p
-            className="
-              mt-1
-              text-sm
-              text-foreground-muted
-            "
-          >
-            {getDeckArchetypeLabel(deck)}{" "}
-            · {deck.format ?? "Advanced"}
-          </p>
-        </div>
+        <p
+          className="
+            text-sm
+            text-foreground-muted
+          "
+        >
+          {getDeckArchetypeLabel(deck)}{" "}
+          · {deck.format ?? "Advanced"}
+        </p>
 
-        <DeckActions deck={deck} />
+        <p
+          className="
+            text-xs
+            text-foreground-muted
+          "
+        >
+          from{" "}
+          <span className="font-semibold text-foreground-secondary">
+            {authorName}
+          </span>{" "}
+          on {formatDeckDate(deck.createdAt)}
+        </p>
       </header>
 
       <div
@@ -203,6 +220,10 @@ export default function DeckViewer({
 
           <div className="mt-5">
             <DeckExtraDeck deck={deck} />
+          </div>
+
+          <div className="mt-4">
+            <DeckActions deck={deck} />
           </div>
 
           <footer

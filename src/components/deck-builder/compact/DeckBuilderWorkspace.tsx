@@ -36,6 +36,13 @@ export interface EditableDeckData
 
 interface DeckBuilderWorkspaceProps {
   initialDeck?: EditableDeckData;
+
+  /*
+   * Mazo de partida clonado de uno publicado
+   * (botón "Build in Deck Builder"). Precarga
+   * las cartas pero guarda como mazo nuevo.
+   */
+  templateDeck?: DeckDraftSeed;
 }
 
 interface SaveDeckResponse {
@@ -58,13 +65,15 @@ type SavingMode = "draft" | "publish" | null;
 
 export default function DeckBuilderWorkspace({
   initialDeck,
+  templateDeck,
 }: DeckBuilderWorkspaceProps = {}) {
   const router = useRouter();
 
   const draft = useDeckDraft(
-    initialDeck
+    initialDeck || templateDeck
       ? {
-          initialDraft: initialDeck,
+          initialDraft:
+            initialDeck ?? templateDeck,
 
           storageKey: null,
         }

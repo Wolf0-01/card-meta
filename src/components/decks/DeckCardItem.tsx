@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 
+import Link from "next/link";
+
 import {
   useEffect,
   useRef,
@@ -38,12 +40,12 @@ export default function DeckCardItem({
   const [anchor, setAnchor] =
     useState<TooltipAnchor | null>(null);
 
-  const buttonRef =
-    useRef<HTMLButtonElement>(null);
+  const cardRef =
+    useRef<HTMLAnchorElement>(null);
 
   function showTooltip() {
     const rect =
-      buttonRef.current?.getBoundingClientRect();
+      cardRef.current?.getBoundingClientRect();
 
     if (!rect) {
       return;
@@ -99,9 +101,10 @@ export default function DeckCardItem({
 
   return (
     <>
-      <button
-        ref={buttonRef}
-        type="button"
+      <Link
+        ref={cardRef}
+        href={`/cards/${card.slug}`}
+        prefetch={false}
         onClick={onClick}
         onMouseEnter={showTooltip}
         onMouseLeave={hideTooltip}
@@ -185,7 +188,7 @@ export default function DeckCardItem({
             </span>
           )}
         </div>
-      </button>
+      </Link>
 
       {anchor && (
         <CardHoverTooltip

@@ -10,7 +10,7 @@ interface Props {
   gemCost: number;
 }
 
-function formatDeckDate(iso: string) {
+export function formatDeckDate(iso: string) {
   const date = new Date(iso);
 
   if (Number.isNaN(date.getTime())) {
