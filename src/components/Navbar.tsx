@@ -1,7 +1,8 @@
 import Link from "next/link";
 
+import GlobalCardSearch from "@/components/search/GlobalCardSearch";
+
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
 
 const navigation = [
   { href: "/cards", label: "Cards" },
@@ -14,12 +15,13 @@ const navigation = [
 export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
 
         {/* Logo */}
         <Link
           href="/"
           className="
+            shrink-0
             text-2xl
             font-extrabold
             tracking-wide
@@ -53,17 +55,15 @@ export default function Navbar() {
         </div>
 
         {/* Right Side */}
-        <div className="hidden items-center gap-4 lg:flex">
+        <div className="flex items-center gap-2 sm:gap-3">
 
-          <Input
-            type="search"
-            placeholder="Search cards..."
-            className="w-64"
-          />
+          <GlobalCardSearch />
 
-          <Button href="/login">
-            Login
-          </Button>
+          <div className="hidden lg:block">
+            <Button href="/login">
+              Login
+            </Button>
+          </div>
 
         </div>
 

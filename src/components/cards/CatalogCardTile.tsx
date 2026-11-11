@@ -26,6 +26,19 @@ interface CatalogCardTileProps {
   card: CardPreviewData;
 
   priority?: boolean;
+
+  /**
+   * Permite desactivar el prefetch de la ruta de detalle.
+   * El buscador global lo usa para no lanzar decenas de
+   * peticiones al abrir el modal.
+   */
+  prefetch?: boolean;
+
+  /**
+   * Se ejecuta antes de navegar al detalle de la carta.
+   * El buscador global lo usa para cerrar el modal.
+   */
+  onNavigate?: () => void;
 }
 
 function getLevelLabel(
@@ -45,6 +58,8 @@ function getLevelLabel(
 export default function CatalogCardTile({
   card,
   priority = false,
+  prefetch,
+  onNavigate,
 }: CatalogCardTileProps) {
   const [failed, setFailed] =
     useState(false);
@@ -127,6 +142,8 @@ export default function CatalogCardTile({
       <Link
         ref={linkRef}
         href={`/cards/${card.slug}`}
+        prefetch={prefetch}
+        onNavigate={onNavigate}
         aria-label={card.name}
         onMouseEnter={showTooltip}
         onMouseLeave={hideTooltip}

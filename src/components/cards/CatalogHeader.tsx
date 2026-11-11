@@ -19,14 +19,46 @@ import { useCloseCatalog } from "./useCloseCatalog";
 
 interface CatalogHeaderProps {
   activeTab: CatalogTab;
+
+  /**
+   * Pestañas visibles. Por defecto muestra todas las del
+   * catálogo de `/cards`; el buscador global pasa solo
+   * Cards y Skills.
+   */
+  tabs?: ReadonlyArray<{
+    value: CatalogTab;
+    label: string;
+  }>;
+
+  /**
+   * Cierre controlado. Cuando se proporciona, el header no
+   * gestiona el scroll del body ni el atajo Escape: el
+   * contenedor global se encarga de ambos.
+   */
+  onClose?: () => void;
+
+  /**
+   * Cambio de pestaña controlado. Si existe, las pestañas
+   * se renderizan como botones en lugar de enlaces.
+   */
+  onTabChange?: (tab: CatalogTab) => void;
 }
 
 export default function CatalogHeader({
   activeTab,
+  tabs = CATALOG_TABS,
+  onClose,
+  onTabChange,
 }: CatalogHeaderProps) {
   const closeCatalog = useCloseCatalog();
 
+  const handleClose = onClose ?? closeCatalog;
+
   useEffect(() => {
+    if (onClose) {
+      return;
+    }
+
     const previousOverflow =
       document.body.style.overflow;
 
@@ -36,9 +68,23 @@ export default function CatalogHeader({
     function handleKeyDown(
       event: KeyboardEvent
     ) {
-      if (event.key === "Escape") {
-        closeCatalog();
+      if (event.key !== "Escape") {
+        return;
       }
+
+      /*
+       * Si el buscador global está abierto encima del
+       * catálogo, Escape debe cerrar solo el buscador.
+       */
+      if (
+        document.querySelector(
+          "[data-global-search-modal='true']"
+        )
+      ) {
+        return;
+      }
+
+      closeCatalog();
     }
 
     window.addEventListener(
@@ -55,7 +101,7 @@ export default function CatalogHeader({
         handleKeyDown
       );
     };
-  }, [closeCatalog]);
+  }, [closeCatalog, onClose]);
 
   return (
     <header
@@ -78,41 +124,30 @@ export default function CatalogHeader({
             overflow-x-auto
           "
         >
-          {CATALOG_TABS.map((tab) => {
+          {tabs.map((tab) => {
             const active =
               tab.value === activeTab;
 
-            const href =
-              tab.value === "cards"
-                ? "/cards"
-                : `/cards?tab=${tab.value}`;
+            const tabClassName = `
+              relative
+              shrink-0
+              px-2.5
+              py-2.5
+              text-[10px]
+              font-black
+              uppercase
+              tracking-[0.18em]
+              transition-colors
+              sm:px-3
+              ${
+                active
+                  ? "text-white"
+                  : "text-slate-500 hover:text-slate-200"
+              }
+            `;
 
-            return (
-              <Link
-                key={tab.value}
-                href={href}
-                scroll={false}
-                aria-current={
-                  active ? "page" : undefined
-                }
-                className={`
-                  relative
-                  shrink-0
-                  px-2.5
-                  py-2.5
-                  text-[10px]
-                  font-black
-                  uppercase
-                  tracking-[0.18em]
-                  transition-colors
-                  sm:px-3
-                  ${
-                    active
-                      ? "text-white"
-                      : "text-slate-500 hover:text-slate-200"
-                  }
-                `}
-              >
+            const content = (
+              <>
                 {tab.label}
 
                 {active && (
@@ -128,6 +163,43 @@ export default function CatalogHeader({
                     "
                   />
                 )}
+              </>
+            );
+
+            if (onTabChange) {
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() =>
+                    onTabChange(tab.value)
+                  }
+                  aria-current={
+                    active ? "page" : undefined
+                  }
+                  className={tabClassName}
+                >
+                  {content}
+                </button>
+              );
+            }
+
+            const href =
+              tab.value === "cards"
+                ? "/cards"
+                : `/cards?tab=${tab.value}`;
+
+            return (
+              <Link
+                key={tab.value}
+                href={href}
+                scroll={false}
+                aria-current={
+                  active ? "page" : undefined
+                }
+                className={tabClassName}
+              >
+                {content}
               </Link>
             );
           })}
@@ -135,8 +207,12 @@ export default function CatalogHeader({
 
         <button
           type="button"
-          aria-label="Cerrar catálogo"
-          onClick={closeCatalog}
+          aria-label={
+            onClose
+              ? "Cerrar buscador"
+              : "Cerrar catálogo"
+          }
+          onClick={handleClose}
           className="
             flex
             h-7
