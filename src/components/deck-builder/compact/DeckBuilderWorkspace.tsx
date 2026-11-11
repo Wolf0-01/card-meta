@@ -334,7 +334,9 @@ export default function DeckBuilderWorkspace({
         <div
           className="
             mb-4
+            mx-auto
             flex
+            max-w-[1000px]
             flex-col
             gap-3
             sm:flex-row
@@ -448,6 +450,8 @@ export default function DeckBuilderWorkspace({
             role="alert"
             className="
               mb-4
+              mx-auto
+              max-w-[1000px]
               rounded-xl
               border
               border-red-500/40
@@ -464,11 +468,14 @@ export default function DeckBuilderWorkspace({
 
         <div
           className="
+            mx-auto
             flex
+            max-w-[1000px]
             flex-col
+            items-start
+            justify-center
             gap-4
             lg:flex-row
-            lg:items-start
           "
         >
           <CardSearchSidebar
@@ -487,7 +494,7 @@ export default function DeckBuilderWorkspace({
             "
           />
 
-          <div className="mx-auto min-w-0 flex-1 space-y-3 max-w-[440px]">
+          <div className="min-w-0 flex-1 space-y-3 max-w-[440px]">
             <div
               className="
                 grid
