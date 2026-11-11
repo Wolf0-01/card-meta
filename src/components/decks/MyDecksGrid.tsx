@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import {
+  Eye,
   Globe,
   Layers,
   Lock,
@@ -18,7 +19,6 @@ import {
   Plus,
   Trash2,
   X,
-  Zap,
 } from "lucide-react";
 
 import Button from "@/components/ui/Button";
@@ -48,6 +48,24 @@ interface DeckMutationResponse {
     message?: string;
   }>;
 }
+
+type DeckFilter = "all" | "public" | "draft";
+
+const ACTION_BASE = `
+  inline-flex
+  items-center
+  justify-center
+  gap-1.5
+  rounded-lg
+  border
+  px-2
+  py-1.5
+  text-[11px]
+  font-semibold
+  transition-colors
+  focus:outline-none
+  focus:ring-2
+`;
 
 function formatDate(value: string) {
   const [year, month, day] =
@@ -113,8 +131,8 @@ function Counter({
       className={`
         rounded-lg
         border
-        px-2.5
-        py-2
+        px-2
+        py-1.5
         ${classes}
       `}
     >
@@ -122,10 +140,10 @@ function Counter({
         {label}
       </p>
 
-      <p className="mt-0.5 text-sm font-black tabular-nums">
+      <p className="mt-0.5 text-xs font-black tabular-nums">
         {value}
 
-        <span className="text-[10px] font-semibold opacity-70">
+        <span className="text-[9px] font-semibold opacity-70">
           /{max}
         </span>
       </p>
@@ -142,6 +160,9 @@ export default function MyDecksGrid({
     useState<UserDeckSummary[]>(
       initialDecks
     );
+
+  const [filter, setFilter] =
+    useState<DeckFilter>("all");
 
   const [
     visibilityBusyId,
@@ -410,6 +431,43 @@ export default function MyDecksGrid({
     );
   }
 
+  const publicCount = decks.filter(
+    (deck) => deck.isPublic
+  ).length;
+
+  const draftCount =
+    decks.length - publicCount;
+
+  const visibleDecks = decks.filter(
+    (deck) =>
+      filter === "all" ||
+      (filter === "public"
+        ? deck.isPublic
+        : !deck.isPublic)
+  );
+
+  const filterTabs: Array<{
+    key: DeckFilter;
+    label: string;
+    count: number;
+  }> = [
+    {
+      key: "all",
+      label: "Todos",
+      count: decks.length,
+    },
+    {
+      key: "public",
+      label: "Públicos",
+      count: publicCount,
+    },
+    {
+      key: "draft",
+      label: "Borradores",
+      count: draftCount,
+    },
+  ];
+
   return (
     <div className="space-y-4">
       {error && (
@@ -453,227 +511,438 @@ export default function MyDecksGrid({
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {decks.map((deck) => {
-          const isUpdating =
-            visibilityBusyId === deck.id;
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div
+          role="group"
+          aria-label="Filtrar mazos"
+          className="flex flex-wrap items-center gap-1.5"
+        >
+          {filterTabs.map((tab) => {
+            const active =
+              filter === tab.key;
 
-          const cannotPublish =
-            !deck.isPublic &&
-            deck.counts.main <
-              DECK_RULES.mainMin;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                aria-pressed={active}
+                onClick={() =>
+                  setFilter(tab.key)
+                }
+                className={`
+                  inline-flex
+                  items-center
+                  gap-1.5
+                  rounded-full
+                  border
+                  px-2.5
+                  py-1
+                  text-[11px]
+                  font-semibold
+                  transition-colors
+                  ${
+                    active
+                      ? "border-primary/50 bg-primary/15 text-primary"
+                      : "border-border bg-surface text-foreground-muted hover:border-primary/30 hover:text-foreground"
+                  }
+                `}
+              >
+                {tab.label}
 
-          return (
-            <article
-              key={deck.id}
-              className="
-                group
-                flex
-                h-full
-                flex-col
-                overflow-hidden
-                rounded-2xl
-                border
-                border-border
-                bg-background-secondary
-                transition-all
-                duration-200
-                hover:border-primary/50
-                hover:shadow-xl
-                hover:shadow-primary/5
-              "
-            >
-              <div className="p-4 pb-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p
-                      className="
-                        truncate
+                <span
+                  className={`
+                    rounded-full
+                    px-1.5
+                    py-0.5
+                    text-[9px]
+                    font-black
+                    tabular-nums
+                    ${
+                      active
+                        ? "bg-primary/20 text-primary"
+                        : "bg-background-secondary text-foreground-muted"
+                    }
+                  `}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-foreground-muted">
+          Ordenados por actualización
+        </p>
+      </div>
+
+      {visibleDecks.length === 0 ? (
+        <div
+          className="
+            rounded-xl
+            border
+            border-dashed
+            border-border
+            bg-background-secondary
+            px-4
+            py-10
+            text-center
+          "
+        >
+          <p className="text-sm font-bold text-foreground">
+            No hay mazos en este filtro
+          </p>
+
+          <p className="mt-1 text-xs text-foreground-muted">
+            {filter === "public"
+              ? "Publica un mazo para verlo aquí."
+              : "Crea un borrador desde el builder para verlo aquí."}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setFilter("all")}
+            className="mt-3 text-xs font-semibold text-primary hover:underline"
+          >
+            Ver todos los mazos
+          </button>
+        </div>
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {visibleDecks.map((deck) => {
+            const isUpdating =
+              visibilityBusyId === deck.id;
+
+            const cannotPublish =
+              !deck.isPublic &&
+              deck.counts.main <
+                DECK_RULES.mainMin;
+
+            return (
+              <article
+                key={deck.id}
+                className="
+                  group
+                  flex
+                  h-full
+                  flex-col
+                  overflow-hidden
+                  rounded-xl
+                  border
+                  border-border
+                  bg-background-secondary
+                  transition-all
+                  duration-200
+                  hover:border-primary/50
+                  hover:shadow-lg
+                  hover:shadow-primary/5
+                "
+              >
+                <div className="space-y-2 p-3.5 pb-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p
+                        className="
+                          flex
+                          items-center
+                          gap-1.5
+                          truncate
+                          text-[10px]
+                          font-bold
+                          uppercase
+                          tracking-[0.16em]
+                          text-primary
+                        "
+                      >
+                        <span
+                          aria-hidden
+                          className="
+                            h-1.5
+                            w-1.5
+                            shrink-0
+                            rotate-45
+                            rounded-[1px]
+                            bg-primary
+                          "
+                        />
+
+                        <span className="truncate">
+                          {deck.archetype?.name ??
+                            "Mazo personal"}
+                        </span>
+                      </p>
+
+                      <h2 className="mt-1 line-clamp-2 text-base font-black leading-tight text-foreground">
+                        {deck.name}
+                      </h2>
+                    </div>
+
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={deck.isPublic}
+                      aria-busy={isUpdating}
+                      aria-label={
+                        deck.isPublic
+                          ? `${deck.name}: público. Cambiar a privado.`
+                          : `${deck.name}: privado. Cambiar a público.`
+                      }
+                      title={
+                        isUpdating
+                          ? "Actualizando visibilidad..."
+                          : deck.isPublic
+                            ? "Hacer privado"
+                            : cannotPublish
+                              ? `Necesita ${DECK_RULES.mainMin} cartas en el Main Deck para publicarse`
+                              : "Hacer público"
+                      }
+                      onClick={() =>
+                        handleVisibilityToggle(
+                          deck
+                        )
+                      }
+                      disabled={isUpdating}
+                      className={`
+                        inline-flex
+                        shrink-0
+                        items-center
+                        gap-1.5
+                        rounded-full
+                        border
+                        px-2
+                        py-1
                         text-[10px]
                         font-bold
-                        uppercase
-                        tracking-[0.16em]
-                        text-primary
-                      "
+                        transition-colors
+                        disabled:cursor-wait
+                        disabled:opacity-70
+                        ${
+                          deck.isPublic
+                            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15"
+                            : "border-slate-600 bg-slate-800/80 text-slate-400 hover:border-slate-500 hover:text-slate-200"
+                        }
+                      `}
                     >
-                      {deck.archetype?.name ??
-                        "Mazo personal"}
-                    </p>
+                      {isUpdating ? (
+                        <span
+                          aria-hidden
+                          className="
+                            h-2.5
+                            w-2.5
+                            animate-spin
+                            rounded-full
+                            border
+                            border-current
+                            border-t-transparent
+                          "
+                        />
+                      ) : (
+                        <span
+                          aria-hidden
+                          className={`
+                            relative
+                            h-3.5
+                            w-6
+                            rounded-full
+                            transition-colors
+                            ${
+                              deck.isPublic
+                                ? "bg-emerald-500/80"
+                                : "bg-slate-600"
+                            }
+                          `}
+                        >
+                          <span
+                            className={`
+                              absolute
+                              top-0.5
+                              h-2.5
+                              w-2.5
+                              rounded-full
+                              bg-white
+                              shadow
+                              transition-transform
+                              ${
+                                deck.isPublic
+                                  ? "translate-x-3"
+                                  : "translate-x-0.5"
+                              }
+                            `}
+                          />
+                        </span>
+                      )}
 
-                    <h2 className="mt-1 line-clamp-2 text-lg font-black leading-tight text-foreground">
-                      {deck.name}
-                    </h2>
+                      {deck.isPublic
+                        ? "Público"
+                        : "Privado"}
+                    </button>
                   </div>
 
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={deck.isPublic}
-                    aria-label={
-                      deck.isPublic
-                        ? `${deck.name}: público. Cambiar a privado.`
-                        : `${deck.name}: privado. Cambiar a público.`
-                    }
-                    title={
-                      isUpdating
-                        ? "Actualizando visibilidad..."
-                        : deck.isPublic
-                          ? "Hacer privado"
-                          : cannotPublish
-                            ? `Necesita ${DECK_RULES.mainMin} cartas en el Main Deck para publicarse`
-                            : "Hacer público"
-                    }
-                    onClick={() =>
-                      handleVisibilityToggle(
-                        deck
-                      )
-                    }
-                    disabled={isUpdating}
-                    className={`
-                      inline-flex
-                      shrink-0
+                  <div
+                    className="
+                      flex
                       items-center
                       gap-1.5
-                      rounded-full
+                      rounded-md
                       border
-                      px-2.5
+                      border-amber-500/20
+                      bg-amber-500/5
+                      px-2
                       py-1
-                      text-[10px]
-                      font-bold
-                      transition-colors
-                      disabled:cursor-wait
-                      disabled:opacity-70
+                    "
+                  >
+                    <span
+                      aria-hidden
+                      className="
+                        h-2
+                        w-2
+                        shrink-0
+                        rotate-45
+                        rounded-[2px]
+                        bg-amber-400
+                        shadow-[0_0_8px_rgba(251,191,36,0.6)]
+                      "
+                    />
+
+                    <span
+                      className="
+                        shrink-0
+                        text-[9px]
+                        font-black
+                        uppercase
+                        tracking-[0.14em]
+                        text-foreground-muted
+                      "
+                    >
+                      Skill
+                    </span>
+
+                    <span className="truncate text-[11px] font-semibold text-amber-200">
+                      {deck.skill?.trim() ||
+                        "Sin skill"}
+                    </span>
+                  </div>
+
+                  {deck.description && (
+                    <p className="line-clamp-2 text-[11px] leading-4 text-foreground-muted">
+                      {deck.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-auto space-y-2.5 px-3.5 pb-3.5">
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <Counter
+                      label="Main"
+                      value={deck.counts.main}
+                      max={DECK_RULES.mainMax}
+                      highlight={
+                        deck.counts.main >=
+                        DECK_RULES.mainMin
+                          ? "success"
+                          : "warning"
+                      }
+                    />
+
+                    <Counter
+                      label="Extra"
+                      value={deck.counts.extra}
+                      max={DECK_RULES.extraMax}
+                      highlight={
+                        deck.counts.extra > 0
+                          ? "success"
+                          : "neutral"
+                      }
+                    />
+                  </div>
+
+                  <div
+                    className="
+                      flex
+                      items-center
+                      justify-between
+                      gap-2
+                      border-t
+                      border-border/70
+                      pt-2.5
+                    "
+                  >
+                    <p className="text-[10px] text-foreground-muted">
+                      Actualizado el{" "}
+                      {formatDate(deck.updatedAt)}
+                    </p>
+
+                    <span
+                      className={`
+                        inline-flex
+                        shrink-0
+                        items-center
+                        gap-1
+                        rounded-md
+                        px-1.5
+                        py-0.5
+                        text-[9px]
+                        font-bold
+                        uppercase
+                        tracking-wide
+                        ${
+                          deck.isPublic
+                            ? "bg-emerald-500/10 text-emerald-300"
+                            : "bg-slate-700/40 text-slate-300"
+                        }
+                      `}
+                    >
+                      {deck.isPublic ? (
+                        <Globe className="h-2.5 w-2.5" />
+                      ) : (
+                        <Lock className="h-2.5 w-2.5" />
+                      )}
+
+                      {deck.isPublic
+                        ? "Publicado"
+                        : "Borrador"}
+                    </span>
+                  </div>
+
+                  <div
+                    className={`
+                      grid
+                      gap-1.5
                       ${
                         deck.isPublic
-                          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/15"
-                          : "border-slate-600 bg-slate-800/80 text-slate-400 hover:border-slate-500 hover:text-slate-200"
+                          ? "grid-cols-3"
+                          : "grid-cols-2"
                       }
                     `}
                   >
-                    {isUpdating ? (
-                      <span
-                        aria-hidden
-                        className="
-                          h-2.5
-                          w-2.5
-                          animate-spin
-                          rounded-full
-                          border
-                          border-current
-                          border-t-transparent
-                        "
-                      />
-                    ) : deck.isPublic ? (
-                      <Globe className="h-3 w-3" />
-                    ) : (
-                      <Lock className="h-3 w-3" />
+                    {deck.isPublic && (
+                      <Link
+                        href={`/decks/${deck.slug}/${deck.identifier}`}
+                        className={`
+                          ${ACTION_BASE}
+                          border-primary/40
+                          bg-primary/10
+                          text-primary
+                          hover:bg-primary/20
+                          focus:ring-primary/30
+                        `}
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        Ver ficha
+                      </Link>
                     )}
 
-                    {deck.isPublic
-                      ? "Público"
-                      : "Privado"}
-                  </button>
-                </div>
-
-                <p className="mt-2 line-clamp-2 min-h-8 text-xs leading-4 text-foreground-muted">
-                  {deck.description ??
-                    "Sin descripción. Abre el editor para añadir una estrategia."}
-                </p>
-
-                {deck.skill && (
-                  <p
-                    className="
-                      mt-2
-                      inline-flex
-                      max-w-full
-                      items-center
-                      gap-1
-                      rounded-md
-                      border
-                      border-amber-500/30
-                      bg-amber-500/10
-                      px-2
-                      py-0.5
-                      text-[10px]
-                      font-semibold
-                      text-amber-300
-                    "
-                  >
-                    <Zap className="h-3 w-3 shrink-0" />
-
-                    <span className="truncate">
-                      {deck.skill}
-                    </span>
-                  </p>
-                )}
-              </div>
-
-              <div className="mt-auto space-y-3 px-4 pb-4">
-                <div className="grid grid-cols-2 gap-2">
-                  <Counter
-                    label="Main"
-                    value={deck.counts.main}
-                    max={DECK_RULES.mainMax}
-                    highlight={
-                      deck.counts.main >=
-                      DECK_RULES.mainMin
-                        ? "success"
-                        : "warning"
-                    }
-                  />
-
-                  <Counter
-                    label="Extra"
-                    value={deck.counts.extra}
-                    max={DECK_RULES.extraMax}
-                    highlight={
-                      deck.counts.extra > 0
-                        ? "success"
-                        : "neutral"
-                    }
-                  />
-                </div>
-
-                <div
-                  className="
-                    flex
-                    flex-col
-                    gap-2
-                    border-t
-                    border-border/70
-                    pt-3
-                    sm:flex-row
-                    sm:items-center
-                    sm:justify-between
-                  "
-                >
-                  <p className="text-[10px] text-foreground-muted">
-                    Actualizado el{" "}
-                    {formatDate(deck.updatedAt)}
-                  </p>
-
-                  <div className="flex items-center gap-1.5">
                     <Link
                       href={`/decks/${deck.id}/edit`}
-                      className="
-                        inline-flex
-                        items-center
-                        gap-1.5
-                        rounded-lg
-                        border
-                        border-primary/40
-                        bg-primary/10
-                        px-2.5
-                        py-1.5
-                        text-[11px]
-                        font-semibold
-                        text-primary
-                        transition-colors
-                        hover:bg-primary/20
-                        focus:outline-none
-                        focus:ring-2
+                      className={`
+                        ${ACTION_BASE}
+                        border-border
+                        bg-surface
+                        text-foreground
+                        hover:border-primary/50
+                        hover:text-primary
                         focus:ring-primary/30
-                      "
+                      `}
                     >
                       <Pencil className="h-3.5 w-3.5" />
                       Editar
@@ -684,37 +953,26 @@ export default function MyDecksGrid({
                       onClick={() =>
                         openDeleteDialog(deck)
                       }
-                      className="
-                        inline-flex
-                        items-center
-                        gap-1.5
-                        rounded-lg
-                        border
+                      className={`
+                        ${ACTION_BASE}
                         border-transparent
-                        px-2.5
-                        py-1.5
-                        text-[11px]
-                        font-semibold
                         text-red-300/80
-                        transition-colors
                         hover:border-red-500/30
                         hover:bg-red-500/10
                         hover:text-red-200
-                        focus:outline-none
-                        focus:ring-2
                         focus:ring-red-500/30
-                      "
+                      `}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                       Eliminar
                     </button>
                   </div>
                 </div>
-              </div>
-            </article>
-          );
-        })}
-      </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
 
       {deckToDelete && (
         <DeleteDeckDialog

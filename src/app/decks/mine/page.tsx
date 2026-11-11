@@ -50,6 +50,9 @@ export default async function MyDecksPage({
     (deck) => deck.isPublic
   ).length;
 
+  const draftDeckCount =
+    decks.length - publicDeckCount;
+
   return (
     <main className="min-h-screen py-8">
       <Container size="xl">
@@ -94,14 +97,14 @@ export default async function MyDecksPage({
                     decks.length === 1
                       ? ""
                       : "s"
-                  } guardado${
-                    decks.length === 1
-                      ? ""
-                      : "s"
                   } · ${publicDeckCount} público${
                     publicDeckCount === 1
                       ? ""
                       : "s"
+                  } · ${draftDeckCount} borrador${
+                    draftDeckCount === 1
+                      ? ""
+                      : "es"
                   }`}
             </p>
           </div>
