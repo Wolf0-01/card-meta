@@ -121,12 +121,16 @@ export default function DeckViewer({
         className="
           grid
           gap-5
-          lg:grid-cols-[minmax(0,1fr)_320px]
+          lg:grid-cols-[418px_320px]
           lg:items-start
+          lg:justify-center
         "
       >
         <section
           className="
+            mx-auto
+            w-full
+            max-w-[418px]
             rounded-2xl
             border
             border-border

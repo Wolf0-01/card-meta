@@ -487,7 +487,7 @@ export default function DeckBuilderWorkspace({
             "
           />
 
-          <div className="min-w-0 flex-1 space-y-3">
+          <div className="mx-auto min-w-0 flex-1 space-y-3 max-w-[440px]">
             <div
               className="
                 grid
