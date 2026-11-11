@@ -22,44 +22,6 @@ import {
   RARITY_STYLES,
 } from "./cardRarity";
 
-const ATTRIBUTE_STYLES: Record<
-  string,
-  string
-> = {
-  DARK: "bg-violet-600 text-white",
-
-  LIGHT: "bg-yellow-300 text-yellow-950",
-
-  EARTH: "bg-amber-700 text-white",
-
-  WATER: "bg-sky-600 text-white",
-
-  FIRE: "bg-red-600 text-white",
-
-  WIND: "bg-emerald-600 text-white",
-
-  DIVINE: "bg-orange-500 text-white",
-};
-
-const ATTRIBUTE_LABELS: Record<
-  string,
-  string
-> = {
-  DARK: "DRK",
-
-  LIGHT: "LGT",
-
-  EARTH: "ERT",
-
-  WATER: "WTR",
-
-  FIRE: "FIR",
-
-  WIND: "WND",
-
-  DIVINE: "DIV",
-};
-
 interface CatalogCardTileProps {
   card: CardPreviewData;
 
@@ -75,29 +37,6 @@ function getLevelLabel(
 
   if (card.level) {
     return `★${card.level}`;
-  }
-
-  return null;
-}
-
-function getKindBadge(
-  card: CardPreviewData
-) {
-  const type = card.type.toLowerCase();
-
-  if (type.includes("spell")) {
-    return {
-      label: "SPL",
-      className: "bg-blue-600 text-white",
-    };
-  }
-
-  if (type.includes("trap")) {
-    return {
-      label: "TRP",
-      className:
-        "bg-fuchsia-700 text-white",
-    };
   }
 
   return null;
@@ -121,18 +60,6 @@ export default function CatalogCardTile({
   const rarityStyle = RARITY_STYLES[rarity];
 
   const levelLabel = getLevelLabel(card);
-
-  const kindBadge = getKindBadge(card);
-
-  const attributeStyle = card.attribute
-    ? ATTRIBUTE_STYLES[card.attribute] ??
-      "bg-slate-600 text-white"
-    : null;
-
-  const attributeLabel = card.attribute
-    ? ATTRIBUTE_LABELS[card.attribute] ??
-      card.attribute.slice(0, 3)
-    : null;
 
   const imageSrc =
     failed || !card.image
@@ -289,50 +216,6 @@ export default function CatalogCardTile({
             `}
           />
 
-          {attributeStyle &&
-            attributeLabel && (
-              <span
-                className={`
-                  absolute
-                  right-1
-                  top-1.5
-                  rounded
-                  px-1
-                  py-0.5
-                  text-[8px]
-                  font-black
-                  leading-none
-                  tracking-wide
-                  shadow
-                  ${attributeStyle}
-                `}
-              >
-                {attributeLabel}
-              </span>
-            )}
-
-          {!attributeStyle &&
-            kindBadge && (
-              <span
-                className={`
-                  absolute
-                  right-1
-                  top-1.5
-                  rounded
-                  px-1
-                  py-0.5
-                  text-[8px]
-                  font-black
-                  leading-none
-                  tracking-wide
-                  shadow
-                  ${kindBadge.className}
-                `}
-              >
-                {kindBadge.label}
-              </span>
-            )}
-
           {levelLabel && (
             <span
               className="
@@ -353,28 +236,28 @@ export default function CatalogCardTile({
               {levelLabel}
             </span>
           )}
-
-          <span
-            className={`
-              absolute
-              left-0
-              top-0
-              z-20
-              rounded-br-md
-              px-1.5
-              py-0.5
-              text-[8px]
-              font-black
-              leading-none
-              tracking-[0.08em]
-              ring-1
-              ring-white/25
-              ${rarityStyle.badge}
-            `}
-          >
-            {rarity}
-          </span>
         </div>
+
+        <span
+          className={`
+            absolute
+            -top-2.5
+            right-0
+            z-20
+            rounded-t-md
+            px-1.5
+            py-0.5
+            text-[8px]
+            font-black
+            leading-none
+            tracking-[0.08em]
+            ring-1
+            ring-white/25
+            ${rarityStyle.badge}
+          `}
+        >
+          {rarity}
+        </span>
       </Link>
 
       {anchor && (

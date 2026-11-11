@@ -14,7 +14,10 @@ import CardHoverTooltip, {
   type TooltipAnchor,
 } from "@/components/cards/CardHoverTooltip";
 
-import DeckCardBadges from "./DeckCardBadges";
+import {
+  normalizeRarity,
+  RARITY_STYLES,
+} from "@/components/cards/cardRarity";
 
 import { DeckCardInfo } from "@/types/deck";
 
@@ -42,6 +45,10 @@ export default function DeckCardItem({
 
   const cardRef =
     useRef<HTMLAnchorElement>(null);
+
+  const rarity = normalizeRarity(card.rarity);
+
+  const rarityStyle = RARITY_STYLES[rarity];
 
   function showTooltip() {
     const rect =
@@ -118,7 +125,6 @@ export default function DeckCardItem({
           relative
           block
           shrink-0
-          overflow-hidden
           rounded-lg
           border
           border-border
@@ -139,6 +145,8 @@ export default function DeckCardItem({
             relative
             aspect-[59/86]
             w-full
+            overflow-hidden
+            rounded-lg
           "
         >
           <Image
@@ -161,16 +169,12 @@ export default function DeckCardItem({
             "
           />
 
-          {!compact && (
-            <DeckCardBadges card={card} />
-          )}
-
           {quantity > 1 && (
             <span
               className={`
                 absolute
+                bottom-1
                 right-1
-                top-1
                 rounded-md
                 bg-black/85
                 font-black
@@ -188,6 +192,29 @@ export default function DeckCardItem({
             </span>
           )}
         </div>
+
+        {!compact && card.rarity && (
+          <span
+            className={`
+              absolute
+              -top-2.5
+              right-0
+              z-10
+              rounded-t-md
+              px-1.5
+              py-0.5
+              text-[8px]
+              font-black
+              leading-none
+              tracking-wide
+              ring-1
+              ring-white/25
+              ${rarityStyle.badge}
+            `}
+          >
+            {rarity}
+          </span>
+        )}
       </Link>
 
       {anchor && (

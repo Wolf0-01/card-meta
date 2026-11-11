@@ -143,114 +143,118 @@ export default function DeckViewer({
           lg:justify-center
         "
       >
-        <section
+        <div
           className="
             mx-auto
             w-full
             max-w-[418px]
-            rounded-2xl
-            border
-            border-border
-            bg-background-secondary
-            p-3
-            sm:p-4
+            space-y-3
           "
         >
-          <SkillHoverCard
-            skillName={deck.skill ?? ""}
-            cards={mainDeck}
+          <section
             className="
-              mb-3
-              flex
-              items-center
-              justify-between
-              gap-3
-              border-b
+              rounded-2xl
+              border
               border-border
-              pb-3
+              bg-background-secondary
+              p-3
+              sm:p-4
             "
           >
-            <div className="flex min-w-0 items-center gap-2">
-              <span
-                aria-hidden
-                className="
-                  h-2.5
-                  w-2.5
-                  shrink-0
-                  rotate-45
-                  rounded-[2px]
-                  bg-amber-400
-                  shadow-[0_0_10px_rgba(251,191,36,0.6)]
-                "
-              />
-
-              <span
-                className="
-                  shrink-0
-                  text-[9px]
-                  font-black
-                  uppercase
-                  tracking-[0.16em]
-                  text-foreground-muted
-                "
-              >
-                Skill
-              </span>
-
-              <span className="truncate text-xs font-semibold text-foreground">
-                {deck.skill?.trim() ||
-                  "Sin skill"}
-              </span>
-            </div>
-
-            <span
+            <SkillHoverCard
+              skillName={deck.skill ?? ""}
+              cards={mainDeck}
               className="
-                shrink-0
-                text-xs
-                font-black
-                tabular-nums
-                text-foreground
+                mb-3
+                flex
+                items-center
+                justify-between
+                gap-3
+                border-b
+                border-border
+                pb-3
               "
             >
-              {mainCount} cards
-            </span>
-          </SkillHoverCard>
+              <div className="flex min-w-0 items-center gap-2">
+                <span
+                  aria-hidden
+                  className="
+                    h-2.5
+                    w-2.5
+                    shrink-0
+                    rotate-45
+                    rounded-[2px]
+                    bg-amber-400
+                    shadow-[0_0_10px_rgba(251,191,36,0.6)]
+                  "
+                />
 
-          <DeckMainDeck deck={deck} />
+                <span
+                  className="
+                    shrink-0
+                    text-[9px]
+                    font-black
+                    uppercase
+                    tracking-[0.16em]
+                    text-foreground-muted
+                  "
+                >
+                  Skill
+                </span>
 
-          <div className="mt-5">
-            <DeckExtraDeck deck={deck} />
-          </div>
+                <span className="truncate text-xs font-semibold text-foreground">
+                  {deck.skill?.trim() ||
+                    "Sin skill"}
+                </span>
+              </div>
 
-          <div className="mt-4">
-            <DeckActions deck={deck} />
-          </div>
+              <span
+                className="
+                  shrink-0
+                  text-xs
+                  font-black
+                  tabular-nums
+                  text-foreground
+                "
+              >
+                {mainCount} cards
+              </span>
+            </SkillHoverCard>
 
-          <footer
-            className="
-              mt-4
-              flex
-              flex-wrap
-              items-center
-              justify-between
-              gap-2
-              border-t
-              border-border
-              pt-3
-              text-[10px]
-              font-semibold
-              uppercase
-              tracking-wide
-              text-foreground-muted
-            "
-          >
-            <span>
-              {mainCount} main · {extraCount} extra
-            </span>
+            <DeckMainDeck deck={deck} />
 
-            <span>{totalCards} total</span>
-          </footer>
-        </section>
+            <div className="mt-5">
+              <DeckExtraDeck deck={deck} />
+            </div>
+
+            <footer
+              className="
+                mt-4
+                flex
+                flex-wrap
+                items-center
+                justify-between
+                gap-2
+                border-t
+                border-border
+                pt-3
+                text-[10px]
+                font-semibold
+                uppercase
+                tracking-wide
+                text-foreground-muted
+              "
+            >
+              <span>
+                {mainCount} main · {extraCount} extra
+              </span>
+
+              <span>{totalCards} total</span>
+            </footer>
+          </section>
+
+          <DeckActions deck={deck} />
+        </div>
 
         <aside className="space-y-4 lg:sticky lg:top-6">
           <DeckArchetypeBanner deck={deck} />

@@ -28,39 +28,6 @@ import {
   type DraftDragPayload,
 } from "./dnd";
 
-const ATTRIBUTE_STYLES: Record<
-  string,
-  string
-> = {
-  DARK: "bg-violet-600 text-white",
-
-  LIGHT:
-    "bg-yellow-300 text-yellow-950",
-
-  EARTH: "bg-amber-700 text-white",
-
-  WATER: "bg-sky-600 text-white",
-
-  FIRE: "bg-red-600 text-white",
-
-  WIND: "bg-emerald-600 text-white",
-
-  DIVINE: "bg-orange-500 text-white",
-};
-
-const ATTRIBUTE_LABELS: Record<
-  string,
-  string
-> = {
-  DARK: "DRK",
-  LIGHT: "LGT",
-  EARTH: "ERT",
-  WATER: "WTR",
-  FIRE: "FIR",
-  WIND: "WND",
-  DIVINE: "DIV",
-};
-
 interface MiniCardTileProps {
   card: CardPreviewData;
 
@@ -92,28 +59,6 @@ function getLevelLabel(card: CardPreviewData) {
 
   if (card.level) {
     return `★${card.level}`;
-  }
-
-  return null;
-}
-
-function getKindBadge(card: CardPreviewData) {
-  const type = card.type.toLowerCase();
-
-  if (type.includes("spell")) {
-    return {
-      label: "SPL",
-      className:
-        "bg-blue-600 text-white",
-    };
-  }
-
-  if (type.includes("trap")) {
-    return {
-      label: "TRP",
-      className:
-        "bg-fuchsia-700 text-white",
-    };
   }
 
   return null;
@@ -208,20 +153,6 @@ export default function MiniCardTile({
   }, [anchor]);
 
   const levelLabel = getLevelLabel(card);
-
-  const kindBadge = getKindBadge(card);
-
-  const attributeStyle =
-    card.attribute
-      ? ATTRIBUTE_STYLES[card.attribute] ??
-        "bg-slate-600 text-white"
-      : null;
-
-  const attributeLabel =
-    card.attribute
-      ? ATTRIBUTE_LABELS[card.attribute] ??
-        card.attribute.slice(0, 3)
-      : null;
 
   function handleDragStart(
     event: DragEvent<HTMLDivElement>
@@ -353,50 +284,6 @@ export default function MiniCardTile({
             to-transparent
           "
         />
-
-        {attributeStyle &&
-          attributeLabel && (
-            <span
-              className={`
-                absolute
-                left-1
-                top-1
-                rounded
-                px-1
-                py-0.5
-                text-[8px]
-                font-black
-                leading-none
-                tracking-wide
-                shadow
-                ${attributeStyle}
-              `}
-            >
-              {attributeLabel}
-            </span>
-          )}
-
-        {!attributeStyle &&
-          kindBadge && (
-            <span
-              className={`
-                absolute
-                left-1
-                top-1
-                rounded
-                px-1
-                py-0.5
-                text-[8px]
-                font-black
-                leading-none
-                tracking-wide
-                shadow
-                ${kindBadge.className}
-              `}
-            >
-              {kindBadge.label}
-            </span>
-          )}
 
         {levelLabel && (
           <span
