@@ -25,6 +25,8 @@ export const metadata: Metadata = {
 interface DecksPageProps {
   searchParams: Promise<{
     search?: string;
+    /** Alias usado por la Tier List para abrir un arquetipo. */
+    q?: string;
     skill?: string;
     page?: string;
   }>;
@@ -61,7 +63,11 @@ export default async function DecksPage({
 }: DecksPageProps) {
   const params = await searchParams;
 
-  const search = params.search?.trim() ?? "";
+  const search = (
+    params.q ??
+    params.search ??
+    ""
+  ).trim();
 
   const skill = params.skill?.trim() ?? "";
 

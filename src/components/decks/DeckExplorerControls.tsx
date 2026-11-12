@@ -71,7 +71,9 @@ export default function DeckExplorerControls({
     useRef(initialSkill);
 
   const paramSearch =
-    searchParams.get("search") ?? "";
+    searchParams.get("search") ??
+    searchParams.get("q") ??
+    "";
 
   const paramSkill =
     searchParams.get("skill") ?? "";
@@ -125,6 +127,15 @@ export default function DeckExplorerControls({
       } else {
         params.delete(key);
       }
+    }
+
+    /*
+     * `q` es el alias que usa la Tier List. Al escribir
+     * una búsqueda propia se reemplaza por `search` para
+     * no dejar dos términos compitiendo.
+     */
+    if (updates.search !== undefined) {
+      params.delete("q");
     }
 
     const query = params.toString();
