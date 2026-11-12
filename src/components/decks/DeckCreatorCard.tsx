@@ -1,13 +1,9 @@
 "use client";
 
-import { formatGemCost } from "@/lib/decks/gemCost";
-
 import type { MetaDeck } from "@/types/meta";
 
 interface Props {
   deck: MetaDeck;
-
-  gemCost: number;
 }
 
 export function formatDeckDate(iso: string) {
@@ -30,7 +26,6 @@ export function formatDeckDate(iso: string) {
 
 export default function DeckCreatorCard({
   deck,
-  gemCost,
 }: Props) {
   const author = deck.author ?? null;
 
@@ -129,16 +124,6 @@ export default function DeckCreatorCard({
 
           <dd className="font-semibold text-foreground">
             {formatDeckDate(deck.createdAt)}
-          </dd>
-        </div>
-
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-foreground-muted">
-            Costo en gemas
-          </dt>
-
-          <dd className="font-black text-amber-300">
-            ≈ {formatGemCost(gemCost)}
           </dd>
         </div>
 

@@ -7,22 +7,23 @@ import DeckCreatorCard, {
   formatDeckDate,
 } from "./DeckCreatorCard";
 import DeckExtraDeck from "./DeckExtraDeck";
+import DeckGemBreakdown from "./DeckGemBreakdown";
 import DeckGuide from "./DeckGuide";
 import DeckMainDeck from "./DeckMainDeck";
 import DeckMatchups from "./DeckMatchups";
 import RelatedDecks from "./RelatedDecks";
 import SkillHoverCard from "./SkillHoverCard";
 
-import {
-  estimateDeckGemCost,
-} from "@/lib/decks/gemCost";
-
 import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
+
+import type { DeckGemEstimate } from "@/lib/decks/gemCalculator";
 
 import type { MetaDeck } from "@/types/meta";
 
 interface Props {
   deck: MetaDeck;
+
+  gemEstimate: DeckGemEstimate;
 
   relatedDecks?: MetaDeck[];
 }
@@ -39,6 +40,7 @@ function countQuantity(
 
 export default function DeckViewer({
   deck,
+  gemEstimate,
   relatedDecks = [],
 }: Props) {
   const cards = deck.cards ?? [];
@@ -61,8 +63,6 @@ export default function DeckViewer({
 
   const totalCards =
     deck.totalCards ?? countQuantity(cards);
-
-  const gemCost = estimateDeckGemCost(deck);
 
   const author = deck.author ?? null;
 
@@ -259,9 +259,10 @@ export default function DeckViewer({
         <aside className="space-y-4 lg:sticky lg:top-6">
           <DeckArchetypeBanner deck={deck} />
 
-          <DeckCreatorCard
-            deck={deck}
-            gemCost={gemCost}
+          <DeckCreatorCard deck={deck} />
+
+          <DeckGemBreakdown
+            estimate={gemEstimate}
           />
         </aside>
       </div>

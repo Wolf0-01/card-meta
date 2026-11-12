@@ -1,5 +1,7 @@
 import DeckViewer from "@/components/decks/DeckViewer";
 
+import { calculateDeckGemEstimate } from "@/lib/decks/gemCalculator";
+
 import {
   findDeckByIdentifier,
 } from "@/services/decks";
@@ -45,6 +47,9 @@ export default async function DeckPage({
     );
   }
 
+  const gemEstimate =
+    await calculateDeckGemEstimate(deck);
+
   return (
     <main
       className="
@@ -72,6 +77,7 @@ export default async function DeckPage({
 
         <DeckViewer
           deck={deck}
+          gemEstimate={gemEstimate}
         />
       </div>
     </main>

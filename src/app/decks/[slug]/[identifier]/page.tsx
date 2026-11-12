@@ -6,6 +6,8 @@ import DeckViewer from "@/components/decks/DeckViewer";
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
 
+import { calculateDeckGemEstimate } from "@/lib/decks/gemCalculator";
+
 import {
   findDeckByIdentifier,
 } from "@/services/decks";
@@ -67,6 +69,9 @@ export default async function DeckPage({
     notFound();
   }
 
+  const gemEstimate =
+    await calculateDeckGemEstimate(deck);
+
   return (
     <main
       className="
@@ -77,6 +82,7 @@ export default async function DeckPage({
       <Container>
         <DeckViewer
           deck={deck}
+          gemEstimate={gemEstimate}
         />
       </Container>
     </main>
