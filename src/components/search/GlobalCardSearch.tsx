@@ -303,6 +303,28 @@ export default function GlobalCardSearch() {
   }, [pathname]);
 
   /*
+   * La portada y otros accesos pueden abrir el buscador
+   * sin navegar mediante un evento global.
+   */
+  useEffect(() => {
+    function handleOpenRequest() {
+      setOpen(true);
+    }
+
+    window.addEventListener(
+      "card-meta:open-search",
+      handleOpenRequest
+    );
+
+    return () => {
+      window.removeEventListener(
+        "card-meta:open-search",
+        handleOpenRequest
+      );
+    };
+  }, []);
+
+  /*
    * Atajos globales:
    * - Ctrl/Cmd + K alterna el buscador.
    * - "/" lo abre cuando no se está escribiendo.

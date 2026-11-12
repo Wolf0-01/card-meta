@@ -3,6 +3,8 @@ import { Prisma } from "@prisma/client";
 
 import { mapPrismaDeck } from "@/lib/mappers/deckMapper";
 
+import type { MetaDeck } from "@/types/meta";
+
 const deckInclude = Prisma.validator<Prisma.DeckInclude>()({
   archetype: true,
 
@@ -323,6 +325,162 @@ export async function getDecks({
       total / pageSize
     ),
   };
+}
+
+// =================================
+// EXPLORADOR PÚBLICO
+// =================================
+
+export interface PublicDeckExplorerOptions {
+  search?: string;
+
+  skill?: string;
+
+  page?: number;
+
+  pageSize?: number;
+}
+
+export interface PublicDeckExplorerResult {
+  items: MetaDeck[];
+
+  total: number;
+
+  page: number;
+
+  pageSize: number;
+
+  totalPages: number;
+
+  skills: string[];
+}
+
+export async function getPublicDeckExplorer({
+  search,
+  skill,
+  page = 1,
+  pageSize = 24,
+}: PublicDeckExplorerOptions = {}): Promise<PublicDeckExplorerResult> {
+  const safePage = Math.max(
+    Math.floor(page),
+    1
+  );
+
+  const safePageSize = Math.min(
+    Math.max(Math.floor(pageSize), 1),
+    60
+  );
+
+  const where: Prisma.DeckWhereInput = {
+    isPublic: true,
+  };
+
+  const term = search?.trim();
+
+  if (term) {
+    where.OR = [
+      {
+        name: {
+          contains: term,
+          mode: "insensitive",
+        },
+      },
+      {
+        archetype: {
+          name: {
+            contains: term,
+            mode: "insensitive",
+          },
+        },
+      },
+    ];
+  }
+
+  const selectedSkill = skill?.trim();
+
+  if (selectedSkill) {
+    where.skill = selectedSkill;
+  }
+
+  const [decks, total, skillRows] =
+    await Promise.all([
+      findDecks({
+        where,
+
+        skip:
+          (safePage - 1) * safePageSize,
+
+        take: safePageSize,
+
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+
+      prisma.deck.count({
+        where,
+      }),
+
+      prisma.deck.findMany({
+        where: {
+          isPublic: true,
+
+          skill: {
+            not: null,
+          },
+        },
+
+        select: {
+          skill: true,
+        },
+
+        distinct: ["skill"],
+
+        orderBy: {
+          skill: "asc",
+        },
+      }),
+    ]);
+
+  return {
+    items: decks.map(mapPrismaDeck),
+
+    total,
+
+    page: safePage,
+
+    pageSize: safePageSize,
+
+    totalPages: Math.max(
+      1,
+      Math.ceil(total / safePageSize)
+    ),
+
+    skills: skillRows
+      .map((row) => row.skill)
+      .filter(
+        (value): value is string =>
+          Boolean(value)
+      ),
+  };
+}
+
+export async function getRecentPublicDecks(
+  limit = 6
+) {
+  const decks = await findDecks({
+    where: {
+      isPublic: true,
+    },
+
+    take: Math.max(Math.floor(limit), 1),
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return decks.map(mapPrismaDeck);
 }
 
 // =================================

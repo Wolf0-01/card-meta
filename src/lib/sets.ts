@@ -184,6 +184,18 @@ export interface CardSetMeta {
   name: string;
 
   bannerUrl: string | null;
+
+  releasedAt: Date | null;
+}
+
+export interface LatestSet {
+  slug: string;
+
+  name: string;
+
+  bannerUrl: string;
+
+  releasedAt: Date | null;
 }
 
 /**
@@ -210,8 +222,121 @@ export const getSetMetaBySlug = cache(
         name: true,
 
         bannerUrl: true,
+
+        releasedAt: true,
       },
     });
+  }
+);
+
+/**
+ * Expansiones con banner ordenadas por fecha oficial de
+ * lanzamiento. La más reciente aparece primero.
+ */
+export const getLatestSetsWithBanners = cache(
+  async (limit = 6): Promise<LatestSet[]> => {
+    const rows = await prisma.setMeta.findMany({
+      where: {
+        bannerUrl: {
+          not: null,
+        },
+
+        releasedAt: {
+          not: null,
+        },
+      },
+
+      orderBy: [
+        {
+          releasedAt: "desc",
+        },
+        {
+          name: "asc",
+        },
+      ],
+
+      take: Math.max(limit, 1),
+
+      select: {
+        slug: true,
+
+        name: true,
+
+        bannerUrl: true,
+
+        releasedAt: true,
+      },
+    });
+
+    return rows.flatMap((row) =>
+      row.bannerUrl
+        ? [
+            {
+              slug: row.slug,
+
+              name: row.name,
+
+              bannerUrl: row.bannerUrl,
+
+              releasedAt: row.releasedAt,
+            },
+          ]
+        : []
+    );
+  }
+);
+
+/**
+ * Todas las expansiones con banner. Las que no tienen
+ * fecha se colocan al final para no romper el orden.
+ */
+export const getAllSetsWithBanners = cache(
+  async (): Promise<LatestSet[]> => {
+    const rows = await prisma.setMeta.findMany({
+      where: {
+        bannerUrl: {
+          not: null,
+        },
+      },
+
+      orderBy: [
+        {
+          releasedAt: {
+            sort: "desc",
+            nulls: "last",
+          },
+        },
+        {
+          name: "asc",
+        },
+      ],
+
+      select: {
+        slug: true,
+
+        name: true,
+
+        bannerUrl: true,
+
+        releasedAt: true,
+      },
+    });
+
+    return rows.flatMap((row) =>
+      row.bannerUrl
+        ? [
+            {
+              slug: row.slug,
+
+              name: row.name,
+
+              bannerUrl: row.bannerUrl,
+
+              releasedAt: row.releasedAt,
+            },
+          ]
+        : []
+    );
   }
 );
 

@@ -102,7 +102,12 @@ model SetMeta {
 
   bannerUrl String?
 
+  /// Fecha oficial de lanzamiento publicada por Duel Links Meta.
+  /// Permite ordenar las expansiones por recencia real.
+  releasedAt DateTime?
+
   @@index([name])
+  @@index([releasedAt])
 }
 
 model Archetype {

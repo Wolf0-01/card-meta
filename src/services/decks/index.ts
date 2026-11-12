@@ -30,3 +30,8 @@ export {
 export {
   findMetaSummary,
 } from "./meta";
+
+export {
+  findPublicDeckExplorer,
+  findRecentPublicDecks,
+} from "./explorer";

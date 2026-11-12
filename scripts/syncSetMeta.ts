@@ -55,6 +55,8 @@ interface DlmSet {
 
   type?: unknown;
 
+  release?: unknown;
+
   bannerImage?: unknown;
 
   linkedArticle?: {
@@ -68,6 +70,8 @@ interface DlmSetEntry {
   slug: string;
 
   bannerUrl: string | null;
+
+  releasedAt: Date | null;
 }
 
 interface DesiredSet {
@@ -76,6 +80,8 @@ interface DesiredSet {
   name: string;
 
   bannerUrl: string | null;
+
+  releasedAt: Date | null;
 }
 
 interface DbSetRow {
@@ -182,6 +188,26 @@ function normalizeName(value: string): string {
     .trim();
 }
 
+function parseReleaseDate(
+  value: unknown
+): Date | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  const date = new Date(trimmed);
+
+  return Number.isNaN(date.getTime())
+    ? null
+    : date;
+}
+
 function resolveBannerUrl(
   value: unknown
 ): string | null {
@@ -272,6 +298,10 @@ function buildDlmEntries(
       raw.bannerImage
     );
 
+    const releasedAt = parseReleaseDate(
+      raw.release
+    );
+
     const current = entries.get(slug);
 
     if (!current) {
@@ -279,16 +309,27 @@ function buildDlmEntries(
         name,
         slug,
         bannerUrl,
+        releasedAt,
       });
 
       continue;
     }
 
-    if (!current.bannerUrl && bannerUrl) {
+    const nextBannerUrl =
+      current.bannerUrl ?? bannerUrl;
+
+    const nextReleasedAt =
+      current.releasedAt ?? releasedAt;
+
+    if (
+      nextBannerUrl !== current.bannerUrl ||
+      nextReleasedAt !== current.releasedAt
+    ) {
       entries.set(slug, {
         name,
         slug,
-        bannerUrl,
+        bannerUrl: nextBannerUrl,
+        releasedAt: nextReleasedAt,
       });
     }
   }
@@ -539,6 +580,11 @@ function buildDesiredSets(
         dlm?.bannerUrl ??
         current?.bannerUrl ??
         null,
+
+      releasedAt:
+        dlm?.releasedAt ??
+        current?.releasedAt ??
+        null,
     });
   }
 
@@ -589,6 +635,8 @@ async function main() {
         name: true,
 
         bannerUrl: true,
+
+        releasedAt: true,
       },
     });
 
@@ -622,6 +670,9 @@ async function main() {
       ? current.bannerUrl
       : item.bannerUrl;
 
+    const nextReleasedAt =
+      item.releasedAt ?? current.releasedAt;
+
     if (
       keepManualBanner &&
       current.bannerUrl !== item.bannerUrl
@@ -631,7 +682,9 @@ async function main() {
 
     if (
       current.name === item.name &&
-      current.bannerUrl === nextBannerUrl
+      current.bannerUrl === nextBannerUrl &&
+      current.releasedAt?.getTime() ===
+        nextReleasedAt?.getTime()
     ) {
       continue;
     }
@@ -640,6 +693,8 @@ async function main() {
       ...item,
 
       bannerUrl: nextBannerUrl,
+
+      releasedAt: nextReleasedAt,
     });
   }
 
@@ -741,6 +796,8 @@ async function main() {
             name: item.name,
 
             bannerUrl: item.bannerUrl,
+
+            releasedAt: item.releasedAt,
           },
 
           create: {
@@ -749,6 +806,8 @@ async function main() {
             name: item.name,
 
             bannerUrl: item.bannerUrl,
+
+            releasedAt: item.releasedAt,
           },
         })
       )
