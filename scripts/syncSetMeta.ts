@@ -14,9 +14,13 @@ const BANNER_BASE = "https://s3.duellinksmeta.com";
 
 const SETS_API = `${SITE_BASE}/api/v1/sets`;
 
+const RUSH_SETS_API = `${SETS_API}?rush=true`;
+
 const PAGE_SIZE = 1000;
 
 const MAX_PAGES = 20;
+
+const CACHE_VERSION = 2;
 
 const CACHE_DIR = path.join(
   os.tmpdir(),
@@ -72,6 +76,12 @@ interface DlmSetEntry {
   bannerUrl: string | null;
 
   releasedAt: Date | null;
+}
+
+interface DlmSetsSnapshot {
+  sets?: DlmSet[];
+
+  rushSets?: DlmSet[];
 }
 
 interface DesiredSet {
@@ -165,7 +175,10 @@ function logOptions() {
   );
 
   console.log(
-    `   Fuente: ${options.input ?? SETS_API}`
+    `   Fuente: ${
+      options.input ??
+      `${SETS_API} + ${RUSH_SETS_API}`
+    }`
   );
 
   console.log(
@@ -339,9 +352,12 @@ function buildDlmEntries(
 
 async function fetchDlmSets(
   page: number,
+  rush: boolean,
   attempt = 1
 ): Promise<DlmSet[]> {
-  const url = `${SETS_API}?page=${page}&limit=${PAGE_SIZE}`;
+  const url = rush
+    ? `${RUSH_SETS_API}&page=${page}&limit=${PAGE_SIZE}`
+    : `${SETS_API}?page=${page}&limit=${PAGE_SIZE}`;
 
   let response: Response;
 
@@ -351,7 +367,7 @@ async function fetchDlmSets(
         accept: "application/json",
 
         "user-agent":
-          "card-meta-set-banner-sync/1.0",
+          "card-meta-set-banner-sync/2.0",
       },
     });
   } catch (error) {
@@ -364,7 +380,7 @@ async function fetchDlmSets(
 
       await sleep(500 * attempt);
 
-      return fetchDlmSets(page, attempt + 1);
+      return fetchDlmSets(page, rush, attempt + 1);
     }
 
     throw error;
@@ -378,7 +394,7 @@ async function fetchDlmSets(
 
       await sleep(500 * attempt);
 
-      return fetchDlmSets(page, attempt + 1);
+      return fetchDlmSets(page, rush, attempt + 1);
     }
 
     throw new Error(
@@ -397,19 +413,9 @@ async function fetchDlmSets(
   return payload as DlmSet[];
 }
 
-async function loadDlmSets(): Promise<DlmSet[]> {
-  if (options.input) {
-    console.log(
-      `📂 Leyendo snapshot local: ${options.input}`
-    );
-
-    return readSetsFile(options.input);
-  }
-
-  console.log(
-    "🌐 Descargando catálogo completo de sets y banners..."
-  );
-
+async function fetchAllDlmSets(
+  rush: boolean
+): Promise<DlmSet[]> {
   const sets: DlmSet[] = [];
 
   for (
@@ -417,7 +423,10 @@ async function loadDlmSets(): Promise<DlmSet[]> {
     page <= MAX_PAGES;
     page++
   ) {
-    const payload = await fetchDlmSets(page);
+    const payload = await fetchDlmSets(
+      page,
+      rush
+    );
 
     if (payload.length === 0) {
       break;
@@ -426,7 +435,7 @@ async function loadDlmSets(): Promise<DlmSet[]> {
     sets.push(...payload);
 
     console.log(
-      `   Página ${page}: ${payload.length} sets (${sets.length} acumulados).`
+      `   ${rush ? "Rush" : "General"} página ${page}: ${payload.length} sets (${sets.length} acumulados).`
     );
 
     if (payload.length < PAGE_SIZE) {
@@ -442,6 +451,30 @@ async function loadDlmSets(): Promise<DlmSet[]> {
     await sleep(50);
   }
 
+  return sets;
+}
+
+async function loadDlmSets(): Promise<{
+  general: DlmSet[];
+
+  rush: DlmSet[];
+}> {
+  if (options.input) {
+    console.log(
+      `📂 Leyendo snapshot local: ${options.input}`
+    );
+
+    return readSetsFile(options.input);
+  }
+
+  console.log(
+    "🌐 Descargando catálogo completo de sets y banners (general + Rush)..."
+  );
+
+  const general = await fetchAllDlmSets(false);
+
+  const rush = await fetchAllDlmSets(true);
+
   fs.mkdirSync(CACHE_DIR, {
     recursive: true,
   });
@@ -450,11 +483,17 @@ async function loadDlmSets(): Promise<DlmSet[]> {
     CACHE_FILE,
     JSON.stringify(
       {
+        version: CACHE_VERSION,
+
         source: SETS_API,
+
+        rushSource: RUSH_SETS_API,
 
         fetchedAt: new Date().toISOString(),
 
-        sets,
+        sets: general,
+
+        rushSets: rush,
       },
       null,
       2
@@ -465,12 +504,19 @@ async function loadDlmSets(): Promise<DlmSet[]> {
     `💾 Snapshot guardado en ${CACHE_FILE}`
   );
 
-  return sets;
+  return {
+    general,
+    rush,
+  };
 }
 
 function readSetsFile(
   filePath: string
-): DlmSet[] {
+): {
+  general: DlmSet[];
+
+  rush: DlmSet[];
+} {
   if (!fs.existsSync(filePath)) {
     throw new Error(
       `No existe el archivo: ${filePath}`
@@ -479,23 +525,31 @@ function readSetsFile(
 
   const parsed = JSON.parse(
     fs.readFileSync(filePath, "utf8")
-  ) as
-    | DlmSet[]
-    | {
-        sets?: DlmSet[];
-      };
+  ) as DlmSet[] | DlmSetsSnapshot;
 
-  const sets = Array.isArray(parsed)
-    ? parsed
-    : parsed.sets;
+  if (Array.isArray(parsed)) {
+    return {
+      general: parsed,
 
-  if (!sets) {
+      rush: [],
+    };
+  }
+
+  const general = parsed.sets;
+
+  const rush = parsed.rushSets;
+
+  if (!general && !rush) {
     throw new Error(
-      "El archivo debe ser un array o contener una propiedad sets."
+      "El archivo debe ser un array o contener las propiedades sets y/o rushSets."
     );
   }
 
-  return sets;
+  return {
+    general: general ?? [],
+
+    rush: rush ?? [],
+  };
 }
 
 async function loadDatabaseSetNames(): Promise<
@@ -613,10 +667,12 @@ function buildDesiredSets(
 async function main() {
   logOptions();
 
-  const dlmSets = await loadDlmSets();
+  const { general, rush } = await loadDlmSets();
+
+  const allSets = [...general, ...rush];
 
   const dlmEntries =
-    buildDlmEntries(dlmSets);
+    buildDlmEntries(allSets);
 
   const databaseNames =
     await loadDatabaseSetNames();
@@ -708,7 +764,9 @@ async function main() {
   ).length;
 
   printSummary({
-    dlmSets: dlmSets.length,
+    generalSets: general.length,
+
+    rushSets: rush.length,
 
     dlmEntries: dlmEntries.length,
 
@@ -829,7 +887,9 @@ async function main() {
 }
 
 function printSummary(stats: {
-  dlmSets: number;
+  generalSets: number;
+
+  rushSets: number;
 
   dlmEntries: number;
 
@@ -850,7 +910,11 @@ function printSummary(stats: {
   console.log("\n====== Resumen ======");
 
   console.log(
-    `Sets en la API de DLM: ${stats.dlmSets}`
+    `Sets del endpoint general: ${stats.generalSets}`
+  );
+
+  console.log(
+    `Sets del endpoint Rush: ${stats.rushSets}`
   );
 
   console.log(

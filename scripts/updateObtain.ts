@@ -25,7 +25,21 @@ const CACHE_FILE = path.join(
   "duel-links-cards.json"
 );
 
+const RUSH_CACHE_FILE = path.join(
+  CACHE_DIR,
+  "duel-links-rush-cards.json"
+);
+
 const MAX_PAGES = 400;
+
+const PAGE_SIZE = 1000;
+
+/**
+ * La API real de Rush devuelve más de 3.000 cartas. Si una
+ * ejecución recibe menos, se aborta para no vaciar el campo
+ * `obtain` de medio catálogo Rush.
+ */
+const MIN_EXPECTED_RUSH = 3000;
 
 const UPDATE_CHUNK_SIZE = 500;
 
@@ -65,6 +79,8 @@ interface CliOptions {
   apply: boolean;
 
   refresh: boolean;
+
+  rush: boolean;
 
   input?: string;
 
@@ -139,6 +155,8 @@ function parseArgs(argv: string[]): CliOptions {
 
     refresh: argv.includes("--refresh"),
 
+    rush: argv.includes("--rush"),
+
     input,
 
     limit,
@@ -176,7 +194,16 @@ function logOptions() {
   );
 
   console.log(
-    `   Fuente: ${options.input ?? API_BASE}`
+    `   Formato: ${options.rush ? "Rush Duel" : "Speed Duel"}`
+  );
+
+  console.log(
+    `   Fuente: ${
+      options.input ??
+      (options.rush
+        ? `${API_BASE}?rush=true`
+        : API_BASE)
+    }`
   );
 
   if (options.limit) {
@@ -453,7 +480,9 @@ async function fetchDlmPage(
   page: number,
   attempt = 1
 ): Promise<unknown[]> {
-  const url = `${API_BASE}?sort=name&page=${page}`;
+  const url = options.rush
+    ? `${API_BASE}?rush=true&sort=name&page=${page}&limit=${PAGE_SIZE}`
+    : `${API_BASE}?sort=name&page=${page}`;
 
   let response: Response;
 
@@ -462,8 +491,9 @@ async function fetchDlmPage(
       headers: {
         accept: "application/json",
 
-        "user-agent":
-          "card-meta-obtain-updater/1.0",
+        "user-agent": options.rush
+          ? "card-meta-rush-obtain-updater/1.0"
+          : "card-meta-obtain-updater/1.0",
       },
     });
   } catch (error) {
@@ -509,7 +539,8 @@ async function fetchDlmPage(
   return payload;
 }
 
-async function loadDlmCards(): Promise<DlmCard[]> {  if (options.input) {
+async function loadDlmCards(): Promise<DlmCard[]> {
+  if (options.input) {
     console.log(
       `📂 Leyendo snapshot local: ${options.input}`
     );
@@ -517,23 +548,37 @@ async function loadDlmCards(): Promise<DlmCard[]> {  if (options.input) {
     return readCardsFile(options.input);
   }
 
+  const cacheFile = options.rush
+    ? RUSH_CACHE_FILE
+    : CACHE_FILE;
+
   if (
     !options.refresh &&
-    fs.existsSync(CACHE_FILE)
+    fs.existsSync(cacheFile)
   ) {
-    const cache = readCardsFile(CACHE_FILE);
+    const cache = readCardsFile(cacheFile);
 
-    if (cache.length > 0) {
+    const enoughCards = options.rush
+      ? cache.length >= MIN_EXPECTED_RUSH
+      : cache.length > 0;
+
+    if (enoughCards) {
       console.log(
-        `📦 Usando caché local: ${CACHE_FILE}`
+        `📦 Usando caché local: ${cacheFile}`
       );
 
       return cache;
     }
+
+    console.log(
+      "   Caché ignorada: no contiene suficientes cartas."
+    );
   }
 
   console.log(
-    "🌐 Descargando catálogo de Duel Links Meta..."
+    `🌐 Descargando catálogo ${
+      options.rush ? "Rush " : ""
+    }de Duel Links Meta...`
   );
 
   const cards: DlmCard[] = [];
@@ -554,11 +599,19 @@ async function loadDlmCards(): Promise<DlmCard[]> {  if (options.input) {
       break;
     }
 
-    cards.push(...(payload as DlmCard[]));
+    const pageCards = options.rush
+      ? (payload as DlmCard[]).filter(
+          (card) =>
+            (card as { rush?: unknown }).rush ===
+            true
+        )
+      : (payload as DlmCard[]);
 
-    if (page % 20 === 0) {
+    cards.push(...pageCards);
+
+    if (options.rush || page % 20 === 0) {
       console.log(
-        `   Página ${page}: ${cards.length} cartas acumuladas.`
+        `   Página ${page}: ${pageCards.length} cartas (${cards.length} acumuladas).`
       );
     }
 
@@ -566,6 +619,13 @@ async function loadDlmCards(): Promise<DlmCard[]> {  if (options.input) {
       throw new Error(
         "Se superó el límite de seguridad de 50.000 cartas."
       );
+    }
+
+    if (
+      options.rush &&
+      payload.length < PAGE_SIZE
+    ) {
+      break;
     }
 
     await sleep(40);
@@ -580,10 +640,12 @@ async function loadDlmCards(): Promise<DlmCard[]> {  if (options.input) {
   });
 
   fs.writeFileSync(
-    CACHE_FILE,
+    cacheFile,
     JSON.stringify(
       {
-        source: `${API_BASE}?sort=name`,
+        source: options.rush
+          ? `${API_BASE}?rush=true&sort=name`
+          : `${API_BASE}?sort=name`,
 
         fetchedAt: new Date().toISOString(),
 
@@ -595,7 +657,7 @@ async function loadDlmCards(): Promise<DlmCard[]> {  if (options.input) {
   );
 
   console.log(
-    `💾 Caché guardada en ${CACHE_FILE}`
+    `💾 Caché guardada en ${cacheFile}`
   );
 
   return cards;
@@ -636,14 +698,29 @@ async function main() {
 
   const dlmCards = await loadDlmCards();
 
+  if (
+    options.rush &&
+    dlmCards.length < MIN_EXPECTED_RUSH
+  ) {
+    throw new Error(
+      `La fuente Rush devolvió ${dlmCards.length} cartas, por debajo del mínimo esperado (${MIN_EXPECTED_RUSH}). Se cancela.`
+    );
+  }
+
   console.log(
-    `📚 Cartas en Duel Links Meta: ${dlmCards.length}`
+    `📚 Cartas ${options.rush ? "Rush " : ""}en Duel Links Meta: ${dlmCards.length}`
   );
 
   const index = buildIndex(dlmCards);
 
   const cards =
     await prisma.card.findMany({
+      where: options.rush
+        ? {
+            format: "rush",
+          }
+        : undefined,
+
       select: {
         id: true,
         name: true,
@@ -655,6 +732,15 @@ async function main() {
         id: "asc",
       },
     });
+
+  if (
+    options.rush &&
+    cards.length < MIN_EXPECTED_RUSH
+  ) {
+    throw new Error(
+      `La base solo tiene ${cards.length} cartas Rush, por debajo del mínimo esperado (${MIN_EXPECTED_RUSH}). Se cancela para no dejar el catálogo a medias.`
+    );
+  }
 
   const stats: Stats = {
     total: cards.length,
