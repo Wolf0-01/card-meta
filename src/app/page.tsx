@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import {
   ArrowRight,
-  Boxes,
   Hammer,
   Newspaper,
   Trophy,
@@ -11,8 +10,6 @@ import {
 import PublicDeckCard from "@/components/decks/PublicDeckCard";
 
 import HomeShowcaseCard from "@/components/home/HomeShowcaseCard";
-
-import OpenGlobalSearchButton from "@/components/home/OpenGlobalSearchButton";
 
 import {
   formatDate,
@@ -46,16 +43,6 @@ const QUICK_LINK_CLASSES = `
 
 export default async function Home() {
   const data = await getHomeData();
-
-  const latestSetHref = data.latestSet
-    ? `/articles/sets/${data.latestSet.slug}`
-    : "/articles/sets";
-
-  const latestSetSubtitle = data.latestSet
-    ? `${data.latestSet.name} · ${formatDate(
-        data.latestSet.releasedAt
-      )}`
-    : "Explorar expansiones";
 
   return (
     <main
@@ -146,40 +133,40 @@ export default async function Home() {
           <HomeShowcaseCard
             title="Top Decks: Speed"
             subtitle={`${formatNumber(
-              data.publicDeckCount
-            )} mazos públicos`}
-            href="/decks"
-            image={data.topDeckArt}
+              data.speedDeckCount
+            )} mazos Speed`}
+            href="/decks?format=speed"
+            image={data.speedDeckArt}
           />
 
           <HomeShowcaseCard
-            title="Card Catalog"
+            title="Top Decks: Rush"
             subtitle={`${formatNumber(
-              data.cardCount
-            )} cards`}
-            href="/cards"
-            image={data.catalogArt}
+              data.rushDeckCount
+            )} mazos Rush`}
+            href="/decks?format=rush"
+            image={data.rushDeckArt}
           />
 
           <HomeShowcaseCard
-            title="Latest Sets"
-            subtitle={latestSetSubtitle}
-            href={latestSetHref}
-            image={data.latestSet?.bannerUrl ?? null}
+            title="Tournaments"
+            subtitle="Resultados y torneos"
+            href="/tournaments"
+            image={data.tournamentArt}
           />
 
           <HomeShowcaseCard
-            title="Skills & Guides"
-            subtitle={`${data.skillCount}+ skills`}
-            href="/cards?tab=skills"
-            image={data.skillsArt}
+            title="News & Updates"
+            subtitle="Novedades del juego"
+            href="/news"
+            image={data.newsArt}
           />
 
           <HomeShowcaseCard
-            title="My Decks"
-            subtitle="Tus mazos guardados"
-            href="/decks/mine"
-            image={data.myDecksArt}
+            title="Leaks & Guides"
+            subtitle="Filtraciones y guías"
+            href="/news?category=Leaks"
+            image={data.leaksArt}
           />
         </section>
 
@@ -190,7 +177,7 @@ export default async function Home() {
             grid-cols-1
             gap-2
             sm:grid-cols-2
-            lg:grid-cols-5
+            lg:grid-cols-3
           "
         >
           <Link
@@ -213,31 +200,6 @@ export default async function Home() {
               "
             />
           </Link>
-
-          <Link
-            href="/articles/sets"
-            className={QUICK_LINK_CLASSES}
-          >
-            <Boxes className="h-3.5 w-3.5 shrink-0 text-blue-300" />
-
-            <span>All Sets</span>
-
-            <ArrowRight
-              className="
-                ml-auto
-                h-3
-                w-3
-                opacity-40
-                transition-transform
-                group-hover:translate-x-0.5
-                group-hover:opacity-100
-              "
-            />
-          </Link>
-
-          <OpenGlobalSearchButton
-            className={QUICK_LINK_CLASSES}
-          />
 
           <Link
             href="/tournaments"

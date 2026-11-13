@@ -26,13 +26,16 @@ type FilterKey = "all" | NewsCategoryKey;
 
 interface NewsCatalogProps {
   articles: NewsArticle[];
+
+  initialCategory?: FilterKey;
 }
 
 export default function NewsCatalog({
   articles,
+  initialCategory = "all",
 }: NewsCatalogProps) {
   const [activeFilter, setActiveFilter] =
-    useState<FilterKey>("all");
+    useState<FilterKey>(initialCategory);
 
   const counts = useMemo(() => {
     const result = new Map<NewsCategoryKey, number>();

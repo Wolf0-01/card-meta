@@ -5,7 +5,6 @@ import GlobalCardSearch from "@/components/search/GlobalCardSearch";
 import Button from "@/components/ui/Button";
 
 const navigation = [
-  { href: "/cards", label: "Cards" },
   { href: "/decks", label: "Decks" },
   { href: "/tier-list", label: "Tier List" },
   { href: "/tournaments", label: "Tournaments" },

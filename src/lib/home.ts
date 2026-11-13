@@ -9,19 +9,13 @@ import {
 
 import { pickDeckEmblem } from "@/lib/decks/emblem";
 
-import {
-  getLatestSetsWithBanners,
-  type LatestSet,
-} from "@/lib/sets";
-
-import { querySkills } from "@/lib/skills/search";
-
 import type { MetaDeck } from "@/types/meta";
 
 const SHOWCASE_CARD_NAMES = [
   "Dark Magician",
   "Dark Magician Girl",
   "Blue-Eyes White Dragon",
+  "Elemental HERO Avian",
 ];
 
 interface ArtRow {
@@ -33,25 +27,23 @@ interface ArtRow {
 }
 
 export interface HomeData {
-  publicDeckCount: number;
+  speedDeckCount: number;
 
-  cardCount: number;
-
-  skillCount: number;
-
-  latestSet: LatestSet | null;
+  rushDeckCount: number;
 
   recentDecks: MetaDeck[];
 
   tierArt: string | null;
 
-  topDeckArt: string | null;
+  speedDeckArt: string | null;
 
-  catalogArt: string | null;
+  rushDeckArt: string | null;
 
-  skillsArt: string | null;
+  tournamentArt: string | null;
 
-  myDecksArt: string | null;
+  newsArt: string | null;
+
+  leaksArt: string | null;
 }
 
 function findArt(
@@ -67,15 +59,13 @@ function findArt(
 
 /**
  * Agrupa en una sola llamada todos los datos reales que
- * alimentan la portada: contadores, set más reciente,
- * mazos de la comunidad y arte de fondo.
+ * alimentan la portada: contadores por formato, mazos de la
+ * comunidad y arte de fondo.
  */
 export async function getHomeData(): Promise<HomeData> {
   const [
-    publicDeckCount,
-    cardCount,
-    skillResult,
-    latestSets,
+    speedDeckCount,
+    rushDeckCount,
     recentDecks,
     tierDecks,
     artRows,
@@ -83,17 +73,18 @@ export async function getHomeData(): Promise<HomeData> {
     prisma.deck.count({
       where: {
         isPublic: true,
+
+        format: "speed",
       },
     }),
 
-    prisma.card.count(),
+    prisma.deck.count({
+      where: {
+        isPublic: true,
 
-    querySkills({
-      page: 1,
-      limit: 1,
+        format: "rush",
+      },
     }),
-
-    getLatestSetsWithBanners(1),
 
     getRecentPublicDecks(6),
 
@@ -117,51 +108,51 @@ export async function getHomeData(): Promise<HomeData> {
   const tierDeck: MetaDeck | null =
     tierDecks[0] ?? recentDecks[0] ?? null;
 
-  const topDeck: MetaDeck | null =
-    recentDecks[0] ?? tierDeck;
+  const speedDeck: MetaDeck | null =
+    recentDecks.find(
+      (deck) => deck.format === "speed"
+    ) ?? tierDeck;
 
   const tierArt = getCardImageSrc(
     pickDeckEmblem(tierDeck)?.card
   );
 
-  const topDeckArt = getCardImageSrc(
-    pickDeckEmblem(topDeck)?.card
+  const speedDeckArt = getCardImageSrc(
+    pickDeckEmblem(speedDeck)?.card
   );
 
-  const catalogArt = findArt(
-    artRows,
-    "Dark Magician"
-  );
+  const rushDeckArt =
+    findArt(artRows, "Elemental HERO Avian") ??
+    tierArt;
 
-  const skillsArt =
+  const tournamentArt =
+    findArt(artRows, "Blue-Eyes White Dragon") ??
+    tierArt;
+
+  const newsArt =
     findArt(artRows, "Dark Magician Girl") ??
-    catalogArt;
+    tierArt;
 
-  const myDecksArt =
-    findArt(
-      artRows,
-      "Blue-Eyes White Dragon"
-    ) ?? catalogArt;
+  const leaksArt =
+    findArt(artRows, "Dark Magician") ?? tierArt;
 
   return {
-    publicDeckCount,
+    speedDeckCount,
 
-    cardCount,
-
-    skillCount: skillResult.total,
-
-    latestSet: latestSets[0] ?? null,
+    rushDeckCount,
 
     recentDecks,
 
     tierArt,
 
-    topDeckArt,
+    speedDeckArt,
 
-    catalogArt,
+    rushDeckArt,
 
-    skillsArt,
+    tournamentArt,
 
-    myDecksArt,
+    newsArt,
+
+    leaksArt,
   };
 }

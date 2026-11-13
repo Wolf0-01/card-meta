@@ -71,7 +71,25 @@ function Metric({ value, label }: MetricProps) {
   );
 }
 
-export default async function NewsPage() {
+interface NewsPageProps {
+  searchParams: Promise<{
+    category?: string;
+  }>;
+}
+
+export default async function NewsPage({
+  searchParams,
+}: NewsPageProps) {
+  const { category } = await searchParams;
+
+  const requestedCategory =
+    category?.toLowerCase();
+
+  const initialCategory =
+    NEWS_CATEGORIES.find(
+      (item) => item.key === requestedCategory
+    )?.key ?? "all";
+
   const articles = await getNewsArticles();
 
   const latest = articles[0];
@@ -352,7 +370,10 @@ export default async function NewsPage() {
           </span>
         </div>
 
-        <NewsCatalog articles={articles} />
+        <NewsCatalog
+          articles={articles}
+          initialCategory={initialCategory}
+        />
       </div>
     </main>
   );
