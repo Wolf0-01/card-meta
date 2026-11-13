@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuración de Next.js
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "s3.duellinksmeta.com",
+        pathname: "/cards/**",
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;
