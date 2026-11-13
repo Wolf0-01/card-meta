@@ -18,10 +18,10 @@ import { getNewsArticles } from "@/lib/news";
 import { NEWS_CATEGORIES } from "@/lib/newsCategories";
 
 export const metadata: Metadata = {
-  title: "News, Guides & Leaks | Card Meta",
+  title: "News, Leaks & Banlist | Card Meta",
 
   description:
-    "News, guides, leaks and banlist analysis for Yu-Gi-Oh! Duel Links. Editorial content with real cards from the catalog and direct access to every article.",
+    "News, leaks and banlist analysis for Yu-Gi-Oh! Duel Links. Editorial content with real cards from the catalog and direct access to every article.",
 };
 
 interface MetricProps {
@@ -168,7 +168,7 @@ export default async function NewsPage({
                   sm:text-3xl
                 "
               >
-                News & Guides
+                News, Leaks &amp; Banlist
               </h1>
 
               <p
@@ -180,10 +180,22 @@ export default async function NewsPage({
                   text-slate-400
                 "
               >
-                Leaks, archetype guides and banlist
-                analysis for Yu-Gi-Oh! Duel Links.
-                Every article links the real cards
-                from the catalog.
+                Leaks, game news and banlist analysis
+                for Yu-Gi-Oh! Duel Links. Every article
+                links the real cards from the catalog.
+                Looking for deck guides? Visit the{" "}
+                <Link
+                  href="/guides"
+                  className="
+                    font-bold
+                    text-blue-300
+                    transition-colors
+                    hover:text-blue-200
+                  "
+                >
+                  Guides Collection
+                </Link>
+                .
               </p>
             </div>
 

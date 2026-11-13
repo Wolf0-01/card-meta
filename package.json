@@ -12,7 +12,8 @@
     "cards:slugs": "tsx scripts/populateCardSlugs.ts",
     "cards:obtain": "tsx scripts/updateObtain.ts",
     "cards:rush": "tsx scripts/syncRushCards.ts",
-    "sets:sync": "tsx scripts/syncSetMeta.ts"
+    "sets:sync": "tsx scripts/syncSetMeta.ts",
+    "guides:seed": "tsx prisma/seedGuides.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",

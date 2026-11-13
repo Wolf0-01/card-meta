@@ -1,6 +1,5 @@
 export type NewsCategoryKey =
   | "leaks"
-  | "guides"
   | "updates"
   | "banlist";
 
@@ -30,17 +29,6 @@ export const NEWS_CATEGORIES: NewsCategoryDefinition[] = [
     dotClass: "bg-amber-300",
     glowClass:
       "from-amber-400/25 via-amber-500/10 to-transparent",
-  },
-  {
-    key: "guides",
-    label: "Guides",
-    description:
-      "Lines of play, ratios and tuning for every archetype.",
-    badgeClass:
-      "border-sky-400/30 bg-sky-400/10 text-sky-200",
-    dotClass: "bg-sky-300",
-    glowClass:
-      "from-sky-400/25 via-sky-500/10 to-transparent",
   },
   {
     key: "updates",

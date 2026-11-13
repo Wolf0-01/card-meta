@@ -163,10 +163,10 @@ export default async function Home() {
           />
 
           <HomeShowcaseCard
-            title="Leaks & Guides"
-            subtitle="Leaks & guides"
-            href="/news?category=Leaks"
-            image={data.leaksArt}
+            title="Guides"
+            subtitle="Guides collection"
+            href="/guides"
+            image={data.guidesArt}
           />
         </section>
 

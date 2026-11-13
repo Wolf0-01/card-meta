@@ -8,6 +8,7 @@ const navigation = [
   { href: "/decks", label: "Decks" },
   { href: "/tier-list", label: "Tier List" },
   { href: "/tournaments", label: "Tournaments" },
+  { href: "/guides", label: "Guides" },
   { href: "/news", label: "News" },
 ];
 

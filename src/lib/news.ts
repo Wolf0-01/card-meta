@@ -129,60 +129,6 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
     ],
   },
   {
-    slug: "guia-snake-eye-combos",
-    title: "Snake-Eye Guide: Lines, Extenders, and Closers",
-    summary:
-      "From the Poplar opener to the Flamberge line: how to chain the combo without running out of resources and when to break the turn.",
-    category: "guides",
-    author: "Wolf",
-    publishedAt: "2026-11-08T12:00:00.000Z",
-    tags: ["Snake-Eye", "Guide", "Combos"],
-    banner: {
-      kind: "card",
-      slug: "Snake-Eyes-Poplar",
-    },
-    featuredCardNames: [
-      "Snake-Eyes Poplar",
-      "Snake-Eyes Flamberge Dragon",
-      "Promethean Princess, Bestower of Flames",
-      "I:P Masquerena",
-    ],
-    sections: [
-      {
-        heading: "The Opener",
-        paragraphs: [
-          "The most efficient line starts with Poplar and a card that turns it into an extender. The goal is not to deploy everything, but to reach the first Link with enough resources to answer an interruption.",
-          "If the hand cannot complete the sequence, prioritize an intermediate board with one negation and a recurring threat. Forcing the full combo usually leaves the turn with no cards and no backup plan.",
-        ],
-      },
-      {
-        heading: "Extenders",
-        paragraphs: [
-          "Promethean Princess is the piece that turns a correct opener into a multi-turn threat. Its value increases when the opponent relies on destroying monsters to activate their own conditions.",
-          "I:P Masquerena lets you play on the opponent's turn and protects the combo's closing board. You do not always have to use it immediately: sometimes it is better to save it to answer a key removal.",
-        ],
-      },
-      {
-        heading: "Closers and Board",
-        paragraphs: [
-          "The ideal board combines an early interruption with a source of pressure that forces the opponent to spend resources. Flamberge and S:P Little Knight fill that role without demanding too many extra cards.",
-        ],
-        bullets: [
-          "Do not overextend if you already have an active interruption.",
-          "Save one extender for the opponent's turn.",
-          "Prioritize the line that survives a single negation.",
-        ],
-      },
-      {
-        heading: "Common Mistakes",
-        paragraphs: [
-          "The most frequent mistake is chaining the combo without reading the opponent's graveyard. Kurikara and other punish tools can turn a huge board into an immediate loss.",
-          "The second mistake is ignoring the resource clock: Snake-Eye wins long games, but only if it keeps access to its engine. Managing the graveyard is as important as managing the hand.",
-        ],
-      },
-    ],
-  },
-  {
     slug: "filtracion-shooting-majesty",
     title: "Shooting Majesty: Leaks, Reprints, and Key Cards",
     summary:
@@ -283,60 +229,6 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
         paragraphs: [
           "Before changing the entire deck, review which banlist cards you used and what role they played. In many cases, swapping one interruption for another is enough to keep the game plan.",
           "The first week after a banlist is always full of experiments. Wait for community tournament results before spending gems on a new archetype.",
-        ],
-      },
-    ],
-  },
-  {
-    slug: "guia-blue-eyes-cefiro",
-    title: "Blue-Eyes: The Zephyr Guide for the Current Format",
-    summary:
-      "How to build the Dragon engine, which ratios survive the banlist, and why the Skill still makes the difference.",
-    category: "guides",
-    author: "Rin",
-    publishedAt: "2026-11-01T10:00:00.000Z",
-    tags: ["Blue-Eyes", "Guide", "Speed Duel"],
-    banner: {
-      kind: "card",
-      slug: "Blue-Eyes-White-Dragon",
-    },
-    featuredCardNames: [
-      "Blue-Eyes White Dragon",
-      "Forbidden Droplet",
-      "S:P Little Knight",
-      "Kurikara Divincarnate",
-    ],
-    sections: [
-      {
-        heading: "The Engine",
-        paragraphs: [
-          "Blue-Eyes remains a deck of constant pressure. The Dragon base and search cards allow a solid opening board, but the difference between a good list and an excellent one lies in the ratios.",
-          "The goal is to maximize the chance of seeing a starter without filling the deck with pieces that only work in combination. Consistency matters more than the theoretical ceiling.",
-        ],
-      },
-      {
-        heading: "Ratios and Consistency",
-        paragraphs: [
-          "The banlist forces some configurations to be reconsidered. Ratios that used to be standard now leave the deck short on interaction, so it is worth reserving space for versatile answers.",
-        ],
-        bullets: [
-          "Prioritize starters that work on their own.",
-          "Avoid more than two copies of situational pieces.",
-          "Tune the sideboard to the expected top cut.",
-        ],
-      },
-      {
-        heading: "The Skill",
-        paragraphs: [
-          "The Skill remains a central part of the plan. It not only improves consistency but also enables lines that would be impossible with a generic deck. Choosing the right Skill changes the recommended ratios.",
-          "In the mirror, the Skill sets the pace. Whoever leverages it first usually forces the opponent to answer with resources they will need later.",
-        ],
-      },
-      {
-        heading: "Matchups",
-        paragraphs: [
-          "Against Snake-Eye, the plan is to interrupt the first extender and not spend all removal on the initial board. Against control decks, Blue-Eyes needs to close quickly before the opponent builds an advantage.",
-          "The key is identifying which card the opponent cannot afford to lose and saving the answer for that moment.",
         ],
       },
     ],
@@ -492,58 +384,6 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
         heading: "Verdict",
         paragraphs: [
           "Dark Magician remains viable in experienced hands, although it is no longer a comfortable top-cut option. The banlist punishes it, but does not eliminate it.",
-        ],
-      },
-    ],
-  },
-  {
-    slug: "guia-dark-magician-consistencia",
-    title: "Dark Magician: Consistency Over Nostalgia",
-    summary:
-      "Ratio adjustments, search cards, and a clear game plan so the magician stops depending on the perfect hand.",
-    category: "guides",
-    author: "Dante",
-    publishedAt: "2026-10-16T09:00:00.000Z",
-    tags: ["Dark Magician", "Guide", "Consistency"],
-    banner: {
-      kind: "card",
-      slug: "Dark-Magician",
-    },
-    featuredCardNames: [
-      "Dark Magician",
-      "I:P Masquerena",
-      "Knightmare Phoenix",
-    ],
-    sections: [
-      {
-        heading: "The Consistency Problem",
-        paragraphs: [
-          "Dark Magician has a known problem: many good hands and very few perfect hands. The difference between winning and losing usually comes down to turning a mediocre opener into a functional board.",
-          "The solution is not to add more combo cards but to reduce variance and ensure every card has a clear role in the opening hand.",
-        ],
-      },
-      {
-        heading: "Recommended Ratios",
-        paragraphs: [
-          "The deck's core must guarantee access to the magician and to an interaction card. Ratios that work in tournaments are usually more conservative than internet lists make them look.",
-        ],
-        bullets: [
-          "Keep the main engine at the viable minimum.",
-          "Include cards that work on their own in hand.",
-          "Reserve space for broad-spectrum answers.",
-        ],
-      },
-      {
-        heading: "Game Plan",
-        paragraphs: [
-          "The plan is simple: survive the first turn, recover resources, and win the exchange. Dark Magician does not need to close in one turn; it needs to avoid running out of cards.",
-          "I:P Masquerena and Knightmare Phoenix provide flexibility to interact without committing the engine. They are support pieces, not the center of the combo.",
-        ],
-      },
-      {
-        heading: "Side Deck Adjustments",
-        paragraphs: [
-          "The sideboard must cover the most common top-cut matchups. Against Fire decks, prioritize early interruptions. Against control, add pressure and ways to break established boards.",
         ],
       },
     ],

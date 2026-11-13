@@ -196,6 +196,34 @@ model Deck {
   @@index([tournamentResults])
 }
 
+/// Guía editorial independiente de las noticias.
+/// El contenido se guarda como JSON estructurado para poder
+/// editarlo desde Prisma Studio sin tocar el código.
+model Guide {
+  id String @id @default(cuid())
+
+  slug String @unique
+
+  title String
+
+  summary String
+
+  coverUrl String
+
+  author String
+
+  featured Boolean @default(false)
+
+  content Json
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@index([featured])
+  @@index([createdAt])
+}
+
 model DeckCard {
   id String @id @default(cuid())
 

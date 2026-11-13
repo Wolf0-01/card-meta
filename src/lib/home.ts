@@ -43,7 +43,7 @@ export interface HomeData {
 
   newsArt: string | null;
 
-  leaksArt: string | null;
+  guidesArt: string | null;
 }
 
 function findArt(
@@ -133,7 +133,7 @@ export async function getHomeData(): Promise<HomeData> {
     findArt(artRows, "Dark Magician Girl") ??
     tierArt;
 
-  const leaksArt =
+  const guidesArt =
     findArt(artRows, "Dark Magician") ?? tierArt;
 
   return {
@@ -153,6 +153,6 @@ export async function getHomeData(): Promise<HomeData> {
 
     newsArt,
 
-    leaksArt,
+    guidesArt,
   };
 }
