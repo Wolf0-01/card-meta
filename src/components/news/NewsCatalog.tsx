@@ -63,7 +63,7 @@ export default function NewsCatalog({
 
   return (
     <section
-      aria-label="Catálogo de noticias"
+      aria-label="News catalog"
       className="space-y-3"
     >
       <div
@@ -87,7 +87,7 @@ export default function NewsCatalog({
         <div className="flex flex-wrap items-center gap-1.5">
           <FilterButton
             active={activeFilter === "all"}
-            label="Todos"
+            label="All"
             count={articles.length}
             onClick={() => setActiveFilter("all")}
           />
@@ -118,8 +118,8 @@ export default function NewsCatalog({
         >
           {filtered.length}{" "}
           {filtered.length === 1
-            ? "artículo"
-            : "artículos"}
+            ? "article"
+            : "articles"}
         </span>
       </div>
 
@@ -144,12 +144,12 @@ export default function NewsCatalog({
           <Newspaper className="h-8 w-8 text-slate-600" />
 
           <p className="text-sm font-bold text-slate-300">
-            Todavía no hay artículos en esta categoría.
+            There are no articles in this category yet.
           </p>
 
           <p className="max-w-sm text-xs text-slate-500">
-            Prueba con otra categoría o vuelve a la
-            vista completa del catálogo.
+            Try another category or return to the full
+            catalog view.
           </p>
         </div>
       ) : (

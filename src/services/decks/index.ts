@@ -32,6 +32,7 @@ export {
 } from "./meta";
 
 export {
+  findPublicDeckArchetypeGroups,
   findPublicDeckExplorer,
   findRecentPublicDecks,
 } from "./explorer";

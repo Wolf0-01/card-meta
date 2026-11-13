@@ -24,7 +24,7 @@ export const NEWS_CATEGORIES: NewsCategoryDefinition[] = [
     key: "leaks",
     label: "Leaks",
     description:
-      "Filtraciones, nuevos boxes y cartas antes de su lanzamiento.",
+      "Leaks, new boxes and cards before their release.",
     badgeClass:
       "border-amber-400/30 bg-amber-400/10 text-amber-200",
     dotClass: "bg-amber-300",
@@ -33,9 +33,9 @@ export const NEWS_CATEGORIES: NewsCategoryDefinition[] = [
   },
   {
     key: "guides",
-    label: "Guías",
+    label: "Guides",
     description:
-      "Líneas de juego, ratios y ajustes para cada arquetipo.",
+      "Lines of play, ratios and tuning for every archetype.",
     badgeClass:
       "border-sky-400/30 bg-sky-400/10 text-sky-200",
     dotClass: "bg-sky-300",
@@ -44,9 +44,9 @@ export const NEWS_CATEGORIES: NewsCategoryDefinition[] = [
   },
   {
     key: "updates",
-    label: "Actualizaciones",
+    label: "Updates",
     description:
-      "Resultados, cambios de meta y novedades del juego.",
+      "Results, meta shifts and game news.",
     badgeClass:
       "border-emerald-400/30 bg-emerald-400/10 text-emerald-200",
     dotClass: "bg-emerald-300",
@@ -57,7 +57,7 @@ export const NEWS_CATEGORIES: NewsCategoryDefinition[] = [
     key: "banlist",
     label: "Banlist",
     description:
-      "Hits, liberaciones y su impacto real en Speed Duel.",
+      "Hits, releases and their real impact on Speed Duel.",
     badgeClass:
       "border-rose-400/30 bg-rose-400/10 text-rose-200",
     dotClass: "bg-rose-300",

@@ -157,14 +157,14 @@ export default async function Home() {
 
           <HomeShowcaseCard
             title="News & Updates"
-            subtitle="Novedades del juego"
+            subtitle="Game news"
             href="/news"
             image={data.newsArt}
           />
 
           <HomeShowcaseCard
             title="Leaks & Guides"
-            subtitle="Filtraciones y guías"
+            subtitle="Leaks & guides"
             href="/news?category=Leaks"
             image={data.leaksArt}
           />

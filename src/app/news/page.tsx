@@ -18,10 +18,10 @@ import { getNewsArticles } from "@/lib/news";
 import { NEWS_CATEGORIES } from "@/lib/newsCategories";
 
 export const metadata: Metadata = {
-  title: "Noticias, Guías y Leaks | Card Meta",
+  title: "News, Guides & Leaks | Card Meta",
 
   description:
-    "Noticias, guías, filtraciones y análisis de banlist de Yu-Gi-Oh! Duel Links. Contenido editorial con cartas reales del catálogo y acceso directo a cada artículo.",
+    "News, guides, leaks and banlist analysis for Yu-Gi-Oh! Duel Links. Editorial content with real cards from the catalog and direct access to every article.",
 };
 
 interface MetricProps {
@@ -141,7 +141,7 @@ export default async function NewsPage({
                 "
               >
                 <ArrowLeft className="h-3 w-3" />
-                Inicio
+                Home
               </Link>
 
               <p
@@ -168,7 +168,7 @@ export default async function NewsPage({
                   sm:text-3xl
                 "
               >
-                Noticias y Guías
+                News & Guides
               </h1>
 
               <p
@@ -180,10 +180,10 @@ export default async function NewsPage({
                   text-slate-400
                 "
               >
-                Filtraciones, guías de arquetipo y
-                análisis de banlist para Yu-Gi-Oh!
-                Duel Links. Cada artículo enlaza las
-                cartas reales del catálogo.
+                Leaks, archetype guides and banlist
+                analysis for Yu-Gi-Oh! Duel Links.
+                Every article links the real cards
+                from the catalog.
               </p>
             </div>
 
@@ -216,28 +216,28 @@ export default async function NewsPage({
               >
                 <CalendarDays className="h-3 w-3 text-blue-300" />
 
-                Actualizado{" "}
+                Updated{" "}
                 {formatDate(latest?.publishedAt)}
               </span>
 
               <div className="flex items-center gap-1.5">
                 <Metric
                   value={String(articles.length)}
-                  label="artículos"
+                  label="articles"
                 />
 
                 <Metric
                   value={String(
                     NEWS_CATEGORIES.length
                   )}
-                  label="categorías"
+                  label="categories"
                 />
               </div>
             </div>
           </div>
 
           <section
-            aria-label="Sobre el contenido editorial"
+            aria-label="About the editorial content"
             className="
               rounded-xl
               border
@@ -279,7 +279,7 @@ export default async function NewsPage({
                     text-slate-300
                   "
                 >
-                  Contenido curado, cartas reales
+                  Curated content, real cards
                 </p>
 
                 <p
@@ -291,12 +291,12 @@ export default async function NewsPage({
                     text-slate-400
                   "
                 >
-                  Los artículos combinan cobertura
-                  editorial con datos del catálogo de
-                  PostgreSQL. Los banners provienen
-                  de los sets oficiales y las cartas
-                  destacadas abren su ficha completa
-                  con tooltip interactivo.
+                  Articles combine editorial coverage
+                  with data from the PostgreSQL
+                  catalog. Banners come from official
+                  sets, and featured cards open their
+                  full page with an interactive
+                  tooltip.
                 </p>
               </div>
 
@@ -313,7 +313,7 @@ export default async function NewsPage({
                   value={String(
                     NEWS_CATEGORIES.length
                   )}
-                  label="secciones"
+                  label="sections"
                 />
 
                 <Metric
@@ -325,7 +325,7 @@ export default async function NewsPage({
                       )
                     ).size
                   )}
-                  label="activas"
+                  label="active"
                 />
               </div>
             </div>
@@ -353,7 +353,7 @@ export default async function NewsPage({
               text-slate-300
             "
           >
-            Últimos artículos
+            Latest articles
           </h2>
 
           <span
@@ -366,7 +366,7 @@ export default async function NewsPage({
               text-slate-500
             "
           >
-            Ordenados por fecha
+            Sorted by date
           </span>
         </div>
 

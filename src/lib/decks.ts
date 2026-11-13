@@ -1,12 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
+import { getCardImageSrc } from "@/lib/cards/image";
+
+import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
+
+import { pickDeckEmblem } from "@/lib/decks/emblem";
+
 import {
   normalizeDuelFormat,
   type DuelFormat,
 } from "@/lib/duelFormat";
 
 import { mapPrismaDeck } from "@/lib/mappers/deckMapper";
+
+import { getTierList } from "@/lib/tier-list";
 
 import type { MetaDeck } from "@/types/meta";
 
@@ -343,6 +351,9 @@ export interface PublicDeckExplorerOptions {
 
   format?: DuelFormat;
 
+  /** Nombre del arquetipo seleccionado en la cuadrícula. */
+  archetype?: string;
+
   page?: number;
 
   pageSize?: number;
@@ -366,6 +377,7 @@ export async function getPublicDeckExplorer({
   search,
   skill,
   format = "speed",
+  archetype,
   page = 1,
   pageSize = 24,
 }: PublicDeckExplorerOptions = {}): Promise<PublicDeckExplorerResult> {
@@ -390,23 +402,80 @@ export async function getPublicDeckExplorer({
 
   const term = search?.trim();
 
+  const archetypeTerm = archetype?.trim();
+
+  const conditions: Prisma.DeckWhereInput[] = [];
+
   if (term) {
-    where.OR = [
-      {
-        name: {
-          contains: term,
-          mode: "insensitive",
-        },
-      },
-      {
-        archetype: {
+    conditions.push({
+      OR: [
+        {
           name: {
             contains: term,
             mode: "insensitive",
           },
         },
-      },
-    ];
+        {
+          archetype: {
+            name: {
+              contains: term,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          cards: {
+            some: {
+              zone: "main",
+              card: {
+                archetype: {
+                  contains: term,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+        },
+      ],
+    });
+  }
+
+  if (archetypeTerm) {
+    conditions.push({
+      OR: [
+        {
+          name: {
+            contains: archetypeTerm,
+            mode: "insensitive",
+          },
+        },
+        {
+          archetype: {
+            name: {
+              contains: archetypeTerm,
+              mode: "insensitive",
+            },
+          },
+        },
+        {
+          cards: {
+            some: {
+              zone: "main",
+              card: {
+                archetype: {
+                  contains: archetypeTerm,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+        },
+      ],
+    });
+  }
+
+  if (conditions.length > 0) {
+    where.AND = conditions;
   }
 
   const selectedSkill = skill?.trim();
@@ -478,6 +547,120 @@ export async function getPublicDeckExplorer({
           Boolean(value)
       ),
   };
+}
+
+export interface PublicDeckArchetypeGroup {
+  name: string;
+
+  count: number;
+
+  image: string | null;
+
+  /** Etiqueta de Tier List cuando el arquetipo está rankeado. */
+  tier: string | null;
+}
+
+const TIER_BAND_LABELS: Record<string, string> = {
+  "tier-1": "Tier 1",
+  "tier-2": "Tier 2",
+  "tier-3": "Tier 3",
+  "high-potential": "High Potential",
+};
+
+/**
+ * Agrupa los mazos públicos de un formato por arquetipo.
+ *
+ * El nombre se deduce del arquetipo de las cartas cuando el
+ * mazo no tiene una relación explícita, de modo que la
+ * cuadrícula siempre refleja mazos reales y no etiquetas
+ * "Unknown".
+ */
+export async function getPublicDeckArchetypeGroups(
+  format: DuelFormat = "speed"
+): Promise<PublicDeckArchetypeGroup[]> {
+  const normalizedFormat =
+    normalizeDuelFormat(format);
+
+  const [deckRows, tierList] =
+    await Promise.all([
+      findDecks({
+        where: {
+          isPublic: true,
+
+          format: normalizedFormat,
+        },
+
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+
+      getTierList(normalizedFormat),
+    ]);
+
+  const decks = deckRows.map(mapPrismaDeck);
+
+  const tierByArchetype =
+    new Map<string, string>();
+
+  for (const band of tierList.bands) {
+    const label =
+      TIER_BAND_LABELS[band.key] ?? band.key;
+
+    for (const archetype of band.archetypes) {
+      tierByArchetype.set(
+        archetype.name.trim().toLowerCase(),
+        label
+      );
+    }
+  }
+
+  const groups = new Map<
+    string,
+    {
+      name: string;
+
+      decks: MetaDeck[];
+    }
+  >();
+
+  for (const deck of decks) {
+    const name = getDeckArchetypeLabel(deck);
+
+    const key = name.toLowerCase();
+
+    const group = groups.get(key) ?? {
+      name,
+
+      decks: [],
+    };
+
+    group.decks.push(deck);
+
+    groups.set(key, group);
+  }
+
+  return [...groups.entries()]
+    .map(([key, group]) => {
+      const representative = group.decks[0];
+
+      return {
+        name: group.name,
+
+        count: group.decks.length,
+
+        image: getCardImageSrc(
+          pickDeckEmblem(representative)?.card
+        ),
+
+        tier: tierByArchetype.get(key) ?? null,
+      };
+    })
+    .sort(
+      (a, b) =>
+        b.count - a.count ||
+        a.name.localeCompare(b.name)
+    );
 }
 
 export async function getRecentPublicDecks(

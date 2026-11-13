@@ -98,6 +98,9 @@ export default function DeckExplorerControls({
   const paramSkill =
     searchParams.get("skill") ?? "";
 
+  const paramArchetype =
+    searchParams.get("archetype") ?? "";
+
   const formatParam =
     searchParams.get("format");
 
@@ -144,6 +147,8 @@ export default function DeckExplorerControls({
     search?: string;
 
     skill?: string;
+
+    archetype?: string;
 
     format?: string;
   }) {
@@ -207,6 +212,8 @@ export default function DeckExplorerControls({
 
         pushParams({
           search: next,
+
+          archetype: "",
         });
       }, DEBOUNCE_MS);
   }
@@ -239,6 +246,8 @@ export default function DeckExplorerControls({
         format: "rush",
 
         skill: "",
+
+        archetype: "",
       });
 
       return;
@@ -246,6 +255,8 @@ export default function DeckExplorerControls({
 
     pushParams({
       format: "",
+
+      archetype: "",
     });
   }
 
@@ -268,12 +279,15 @@ export default function DeckExplorerControls({
       search: "",
 
       skill: "",
+
+      archetype: "",
     });
   }
 
   const hasFilters =
     search.trim().length > 0 ||
-    skill.length > 0;
+    skill.length > 0 ||
+    paramArchetype.length > 0;
 
   return (
     <section

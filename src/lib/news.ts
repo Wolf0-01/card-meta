@@ -82,13 +82,13 @@ export interface NewsArticle {
 const ARTICLE_SEEDS: NewsArticleSeed[] = [
   {
     slug: "snake-eye-domina-meta-weekly-312",
-    title: "Snake-Eye domina el Meta Weekly #312",
+    title: "Snake-Eye Dominates Meta Weekly #312",
     summary:
-      "El arquetipo de fuego vuelve a firmar el mejor resultado del fin de semana: tres copias de Poplar, un sideboard intacto y un espejo que ya tiene respuesta.",
+      "The Fire archetype once again posted the best result of the weekend: three copies of Poplar, an untouched sideboard, and a mirror match that already has an answer.",
     category: "updates",
-    author: "Redacción Card Meta",
+    author: "Card Meta Staff",
     publishedAt: "2026-11-10T09:30:00.000Z",
-    tags: ["Snake-Eye", "Meta Weekly", "Competitivo"],
+    tags: ["Snake-Eye", "Meta Weekly", "Competitive"],
     banner: {
       kind: "set",
       slug: "shooting-majesty",
@@ -101,42 +101,42 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
     ],
     sections: [
       {
-        heading: "El resultado del fin de semana",
+        heading: "The Weekend Result",
         paragraphs: [
-          "Snake-Eye vuelve a colocarse en la cima del Meta Weekly. La lista campeona apuesta por un motor compacto, con tres copias de Snake-Eyes Poplar y un paquete de extensores que le permite jugar a través de una interrupción sin comprometer todo el tablero.",
-          "El dato más relevante no es la victoria, sino la consistencia: el arquetipo apareció en cuatro de los ocho puestos del Top 8. La comunidad ya lo trata como el rival a batir y las listas de sideboard empiezan a reflejarlo.",
+          "Snake-Eye is back at the top of Meta Weekly. The winning list leans on a compact engine with three copies of Snake-Eyes Poplar and a package of extenders that lets it play through one interruption without committing the entire board.",
+          "The most important takeaway is not the win but the consistency: the archetype appeared in four of the eight Top 8 slots. The community already treats it as the deck to beat, and sideboard plans are starting to reflect that.",
         ],
       },
       {
-        heading: "La lista campeona",
+        heading: "The Winning List",
         paragraphs: [
-          "La versión ganadora prioriza la capacidad de reconstruir el campo en el turno dos. Promethean Princess actúa como extensión y como amenaza recurrente, mientras que S:P Little Knight da una salida limpia a los tableros más cargados.",
-          "El sideboard mantiene un equilibrio entre respuestas a monstruos y herramientas para el espejo. No hay espacio para cartas situacionales: cada slot tiene que servir en al menos dos matchups del top cut.",
+          "The winning build prioritizes the ability to rebuild the board on turn two. Promethean Princess works as both an extension and a recurring threat, while S:P Little Knight offers a clean out to heavily loaded boards.",
+          "The sideboard balances monster answers with tools for the mirror. There is no room for situational cards: every slot has to serve in at least two top-cut matchups.",
         ],
         bullets: [
-          "Tres Poplar para maximizar la probabilidad de apertura.",
-          "Un paquete de hand traps ajustado al ritmo del formato.",
-          "Cierre con Flamberge y presión constante en el turno siguiente.",
+          "Three Poplar to maximize opening odds.",
+          "A hand-trap package tuned to the pace of the format.",
+          "Close with Flamberge and keep pressure on the following turn.",
         ],
       },
       {
-        heading: "Qué mirar en el espejo",
+        heading: "What to Watch in the Mirror",
         paragraphs: [
-          "El mirror se decide por quién administra mejor la primera interrupción. Guardar la extensión correcta vale más que forzar el tablero completo, sobre todo cuando el rival tiene acceso a Kurikara o a una carta de remoción puntual.",
-          "La próxima semana será clave para ver si el resto del top cut adapta sus listas o si Snake-Eye sigue marcando el ritmo del formato.",
+          "The mirror comes down to who manages the first interruption better. Holding the right extender is worth more than forcing a full board, especially when the opponent has access to Kurikara or a targeted removal spell.",
+          "Next week will be key to see whether the rest of the top cut adapts its lists or Snake-Eye keeps setting the pace of the format.",
         ],
       },
     ],
   },
   {
     slug: "guia-snake-eye-combos",
-    title: "Guía de Snake-Eye: líneas, extensiones y cierres",
+    title: "Snake-Eye Guide: Lines, Extenders, and Closers",
     summary:
-      "De la apertura con Poplar a la línea de Flamberge: cómo encadenar el combo sin quedarte sin recursos y cuándo romper el turno.",
+      "From the Poplar opener to the Flamberge line: how to chain the combo without running out of resources and when to break the turn.",
     category: "guides",
     author: "Wolf",
     publishedAt: "2026-11-08T12:00:00.000Z",
-    tags: ["Snake-Eye", "Guía", "Combos"],
+    tags: ["Snake-Eye", "Guide", "Combos"],
     banner: {
       kind: "card",
       slug: "Snake-Eyes-Poplar",
@@ -149,46 +149,46 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
     ],
     sections: [
       {
-        heading: "La apertura",
+        heading: "The Opener",
         paragraphs: [
-          "La línea más eficiente empieza con Poplar y una carta que permita convertirla en extensión. El objetivo no es desplegar todo, sino llegar al primer Link con recursos suficientes para responder a una interrupción.",
-          "Si la mano no permite completar la secuencia, conviene priorizar un tablero intermedio con una negación y una amenaza recurrente. Forzar el combo completo suele dejar el turno sin cartas y sin plan B.",
+          "The most efficient line starts with Poplar and a card that turns it into an extender. The goal is not to deploy everything, but to reach the first Link with enough resources to answer an interruption.",
+          "If the hand cannot complete the sequence, prioritize an intermediate board with one negation and a recurring threat. Forcing the full combo usually leaves the turn with no cards and no backup plan.",
         ],
       },
       {
-        heading: "Extensiones",
+        heading: "Extenders",
         paragraphs: [
-          "Promethean Princess es la pieza que convierte una apertura correcta en una amenaza de varios turnos. Su valor aumenta cuando el rival depende de destruir monstruos para activar sus propias condiciones.",
-          "I:P Masquerena permite jugar en el turno del oponente y protege el cierre del combo. No siempre hay que usarla de inmediato: a veces conviene guardarla para responder a una remoción clave.",
+          "Promethean Princess is the piece that turns a correct opener into a multi-turn threat. Its value increases when the opponent relies on destroying monsters to activate their own conditions.",
+          "I:P Masquerena lets you play on the opponent's turn and protects the combo's closing board. You do not always have to use it immediately: sometimes it is better to save it to answer a key removal.",
         ],
       },
       {
-        heading: "Cierres y tablero",
+        heading: "Closers and Board",
         paragraphs: [
-          "El tablero ideal combina una interrupción temprana con una fuente de presión que obligue al rival a gastar recursos. Flamberge y S:P Little Knight cubren ese rol sin exigir demasiadas cartas adicionales.",
+          "The ideal board combines an early interruption with a source of pressure that forces the opponent to spend resources. Flamberge and S:P Little Knight fill that role without demanding too many extra cards.",
         ],
         bullets: [
-          "No sobreextiendas si ya tienes una interrupción activa.",
-          "Reserva una extensión para el turno del rival.",
-          "Prioriza la línea que sobrevive a una sola negación.",
+          "Do not overextend if you already have an active interruption.",
+          "Save one extender for the opponent's turn.",
+          "Prioritize the line that survives a single negation.",
         ],
       },
       {
-        heading: "Errores comunes",
+        heading: "Common Mistakes",
         paragraphs: [
-          "El error más frecuente es encadenar el combo sin leer el cementerio del oponente. Kurikara y otras herramientas de castigo pueden convertir un tablero enorme en una derrota inmediata.",
-          "El segundo error es ignorar el reloj de recursos: Snake-Eye gana los turnos largos, pero solo si conserva acceso a su motor. Administrar el cementerio es tan importante como administrar la mano.",
+          "The most frequent mistake is chaining the combo without reading the opponent's graveyard. Kurikara and other punish tools can turn a huge board into an immediate loss.",
+          "The second mistake is ignoring the resource clock: Snake-Eye wins long games, but only if it keeps access to its engine. Managing the graveyard is as important as managing the hand.",
         ],
       },
     ],
   },
   {
     slug: "filtracion-shooting-majesty",
-    title: "Shooting Majesty: filtraciones, reprints y cartas clave",
+    title: "Shooting Majesty: Leaks, Reprints, and Key Cards",
     summary:
-      "El próximo box llega con soporte para Dragón y una selección de reprints que puede mover el mercado de UR.",
+      "The next box arrives with Dragon support and a selection of reprints that could move the UR market.",
     category: "leaks",
-    author: "Redacción Card Meta",
+    author: "Card Meta Staff",
     publishedAt: "2026-11-06T08:15:00.000Z",
     tags: ["Shooting Majesty", "Leaks", "Box"],
     banner: {
@@ -202,45 +202,45 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
     ],
     sections: [
       {
-        heading: "Lo que apunta la filtración",
+        heading: "What the Leak Suggests",
         paragraphs: [
-          "Las primeras filtraciones de Shooting Majesty apuntan a un box centrado en el soporte de Dragón, con varias cartas que ya tienen hueco en listas competitivas. La información todavía no es oficial, así que conviene tratar los ratios como provisionales.",
-          "El banner del set ya está disponible en la base de datos de Duel Links Meta y coincide con la línea visual de los últimos lanzamientos. Eso no confirma el contenido, pero sí la ventana de lanzamiento.",
+          "The first Shooting Majesty leaks point to a box focused on Dragon support, with several cards that already have a place in competitive lists. The information is not official yet, so treat the ratios as provisional.",
+          "The set banner is already available in the Duel Links Meta database and matches the visual line of recent releases. That does not confirm the contents, but it does confirm the release window.",
         ],
       },
       {
-        heading: "Reprints que importan",
+        heading: "Reprints That Matter",
         paragraphs: [
-          "Si se confirman los reprints filtrados, el box podría rebajar el coste de entrada a varios arquetipos. Forbidden Droplet sigue siendo una de las cartas más demandadas y su reimpresión tendría un impacto directo en el mercado.",
+          "If the leaked reprints are confirmed, the box could lower the entry cost for several archetypes. Forbidden Droplet remains one of the most demanded cards, and its reprint would have a direct impact on the market.",
         ],
         bullets: [
-          "Forbidden Droplet como reprint de alto impacto.",
-          "Soporte de Dragón con sinergia directa para Blue-Eyes y Red-Eyes.",
-          "Cartas de remoción para el sideboard del formato actual.",
+          "Forbidden Droplet as a high-impact reprint.",
+          "Dragon support with direct synergy for Blue-Eyes and Red-Eyes.",
+          "Removal cards for the current format's sideboard.",
         ],
       },
       {
-        heading: "Impacto competitivo",
+        heading: "Competitive Impact",
         paragraphs: [
-          "Un box con soporte de Dragón y reprints de staples suele mover el meta en dos direcciones: mejora la consistencia de los mazos existentes y reduce la barrera de entrada para nuevos jugadores.",
-          "La clave estará en si las cartas nuevas resuelven los problemas actuales de Blue-Eyes o si solo añaden líneas adicionales a un arquetipo que ya es fuerte.",
+          "A box with Dragon support and staple reprints usually moves the meta in two directions: it improves the consistency of existing decks and lowers the entry barrier for new players.",
+          "The key will be whether the new cards solve Blue-Eyes' current problems or simply add extra lines to an already strong archetype.",
         ],
       },
       {
-        heading: "Qué falta por confirmar",
+        heading: "What Remains to Be Confirmed",
         paragraphs: [
-          "Faltan por confirmar rarezas, ratios y la fecha exacta de disponibilidad en el juego. Hasta entonces, la recomendación es no gastar gemas en función de una filtración y esperar a la información oficial.",
+          "Rarities, ratios, and the exact in-game availability date remain unconfirmed. Until then, the recommendation is not to spend gems based on a leak and to wait for official information.",
         ],
       },
     ],
   },
   {
     slug: "banlist-noviembre-2026-analisis",
-    title: "Banlist de noviembre: las cartas que cambian el formato",
+    title: "November Banlist: The Cards That Change the Format",
     summary:
-      "Analizamos los hits y las liberaciones de la lista más reciente y qué arquetipos ganan o pierden consistencia en Speed Duel.",
+      "We break down the hits and releases from the latest list and which archetypes gain or lose consistency in Speed Duel.",
     category: "banlist",
-    author: "Redacción Card Meta",
+    author: "Card Meta Staff",
     publishedAt: "2026-11-04T18:00:00.000Z",
     tags: ["Banlist", "Speed Duel", "Meta"],
     banner: {
@@ -254,48 +254,48 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
     ],
     sections: [
       {
-        heading: "Los hits",
+        heading: "The Hits",
         paragraphs: [
-          "La nueva lista toca varias de las herramientas que dominaron el último ciclo de torneos. Los límites buscan reducir la capacidad de respuesta gratuita y obligar a los mazos a elegir entre consistencia y interacción.",
-          "Forbidden Droplet y Lightning Storm siguen siendo cartas centrales del formato, pero su disponibilidad cambia según el arquetipo. Los mazos que dependían de ambas pierden margen de maniobra.",
+          "The new list touches several of the tools that dominated the last tournament cycle. The limits aim to reduce free interaction and force decks to choose between consistency and response power.",
+          "Forbidden Droplet and Lightning Storm remain central cards in the format, but their availability changes by archetype. Decks that relied on both lose room to maneuver.",
         ],
       },
       {
-        heading: "Las liberaciones",
+        heading: "The Releases",
         paragraphs: [
-          "Las liberaciones benefician a los arquetipos que habían quedado fuera del top cut. Algunas piezas vuelven a estar disponibles y eso reabre líneas de juego que llevaban meses sin verse en competitivo.",
-          "El efecto más inmediato se notará en los mazos de control, que recuperan herramientas para gestionar tableros grandes sin comprometer todo el sideboard.",
+          "The releases benefit archetypes that had fallen out of the top cut. Some pieces are available again, reopening lines of play that had not been seen in competitive play for months.",
+          "The most immediate effect will be felt in control decks, which regain tools to manage large boards without committing the entire sideboard.",
         ],
       },
       {
-        heading: "Ganadores y perdedores",
+        heading: "Winners and Losers",
         paragraphs: [
-          "Snake-Eye mantiene su posición gracias a un motor que no depende de una sola carta. Blue-Eyes y Dark Magician ganan algo de aire, aunque siguen necesitando resolver sus problemas de consistencia.",
+          "Snake-Eye holds its position thanks to an engine that does not depend on a single card. Blue-Eyes and Dark Magician gain some breathing room, though they still need to solve their consistency issues.",
         ],
         bullets: [
-          "Ganadores: arquetipos con motores internos y pocas dependencias.",
-          "Perdedores: listas que abusaban de una única interrupción.",
-          "A vigilar: el retorno de cartas de remoción al sideboard.",
+          "Winners: archetypes with internal engines and few dependencies.",
+          "Losers: lists that leaned on a single interruption.",
+          "Watch: the return of removal cards to the sideboard.",
         ],
       },
       {
-        heading: "Cómo ajustar tu lista",
+        heading: "How to Adjust Your List",
         paragraphs: [
-          "Antes de cambiar el mazo entero, revisa qué cartas de la banlist usabas y qué rol cumplían. En muchos casos basta con sustituir una interrupción por otra y mantener el plan de juego.",
-          "La primera semana después de una banlist siempre está inflada de experimentos. Espera a los resultados de los torneos comunitarios antes de invertir gemas en un arquetipo nuevo.",
+          "Before changing the entire deck, review which banlist cards you used and what role they played. In many cases, swapping one interruption for another is enough to keep the game plan.",
+          "The first week after a banlist is always full of experiments. Wait for community tournament results before spending gems on a new archetype.",
         ],
       },
     ],
   },
   {
     slug: "guia-blue-eyes-cefiro",
-    title: "Blue-Eyes: la guía de Céfiro para el formato actual",
+    title: "Blue-Eyes: The Zephyr Guide for the Current Format",
     summary:
-      "Cómo construir el motor de dragones, qué ratios resisten la banlist y por qué el skill sigue marcando la diferencia.",
+      "How to build the Dragon engine, which ratios survive the banlist, and why the Skill still makes the difference.",
     category: "guides",
     author: "Rin",
     publishedAt: "2026-11-01T10:00:00.000Z",
-    tags: ["Blue-Eyes", "Guía", "Speed Duel"],
+    tags: ["Blue-Eyes", "Guide", "Speed Duel"],
     banner: {
       kind: "card",
       slug: "Blue-Eyes-White-Dragon",
@@ -308,48 +308,48 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
     ],
     sections: [
       {
-        heading: "El motor",
+        heading: "The Engine",
         paragraphs: [
-          "Blue-Eyes sigue siendo un mazo de presión constante. La base de dragones y cartas de búsqueda permite abrir con un tablero sólido, pero la diferencia entre una lista buena y una excelente está en los ratios.",
-          "El objetivo es maximizar la probabilidad de ver una carta de inicio sin llenar el mazo de piezas que solo funcionan en combinación. La consistencia importa más que el techo teórico.",
+          "Blue-Eyes remains a deck of constant pressure. The Dragon base and search cards allow a solid opening board, but the difference between a good list and an excellent one lies in the ratios.",
+          "The goal is to maximize the chance of seeing a starter without filling the deck with pieces that only work in combination. Consistency matters more than the theoretical ceiling.",
         ],
       },
       {
-        heading: "Ratios y consistencia",
+        heading: "Ratios and Consistency",
         paragraphs: [
-          "La banlist obliga a replantear algunas configuraciones. Los ratios que antes eran estándar ahora dejan el mazo corto de interacción, así que conviene reservar espacio para respuestas versátiles.",
+          "The banlist forces some configurations to be reconsidered. Ratios that used to be standard now leave the deck short on interaction, so it is worth reserving space for versatile answers.",
         ],
         bullets: [
-          "Prioriza cartas de inicio que funcionen solas.",
-          "Evita más de dos copias de piezas situacionales.",
-          "Ajusta el sideboard según el top cut esperado.",
+          "Prioritize starters that work on their own.",
+          "Avoid more than two copies of situational pieces.",
+          "Tune the sideboard to the expected top cut.",
         ],
       },
       {
-        heading: "El skill",
+        heading: "The Skill",
         paragraphs: [
-          "El skill sigue siendo una parte central del plan. No solo mejora la consistencia, también permite jugar líneas que serían imposibles con un mazo genérico. Elegir el skill correcto cambia los ratios recomendados.",
-          "En el espejo, el skill marca el ritmo. Quien lo aprovecha primero suele obligar al rival a responder con recursos que necesitará más tarde.",
+          "The Skill remains a central part of the plan. It not only improves consistency but also enables lines that would be impossible with a generic deck. Choosing the right Skill changes the recommended ratios.",
+          "In the mirror, the Skill sets the pace. Whoever leverages it first usually forces the opponent to answer with resources they will need later.",
         ],
       },
       {
         heading: "Matchups",
         paragraphs: [
-          "Contra Snake-Eye, el plan pasa por interrumpir la primera extensión y no gastar toda la remoción en el tablero inicial. Contra mazos de control, Blue-Eyes necesita cerrar rápido antes de que el rival acumule ventaja.",
-          "La clave está en identificar cuál es la carta que el rival no puede permitirse perder y guardar la respuesta para ese momento.",
+          "Against Snake-Eye, the plan is to interrupt the first extender and not spend all removal on the initial board. Against control decks, Blue-Eyes needs to close quickly before the opponent builds an advantage.",
+          "The key is identifying which card the opponent cannot afford to lose and saving the answer for that moment.",
         ],
       },
     ],
   },
   {
     slug: "selection-box-mini-vol-8",
-    title: "Selection Box Mini Vol. 8: lo mejor del nuevo mini box",
+    title: "Selection Box Mini Vol. 8: The Best of the New Mini Box",
     summary:
-      "Repasamos las cartas con más potencial competitivo del mini box y las que conviene evitar si buscas eficiencia de gemas.",
+      "We review the cards with the most competitive potential in the mini box and the ones to avoid if you are looking for gem efficiency.",
     category: "leaks",
-    author: "Redacción Card Meta",
+    author: "Card Meta Staff",
     publishedAt: "2026-10-28T07:45:00.000Z",
-    tags: ["Selection Box", "Mini Box", "Gemas"],
+    tags: ["Selection Box", "Mini Box", "Gems"],
     banner: {
       kind: "set",
       slug: "selection-box-mini-vol-8",
@@ -361,47 +361,47 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
     ],
     sections: [
       {
-        heading: "Cartas destacadas",
+        heading: "Featured Cards",
         paragraphs: [
-          "El Selection Box Mini Vol. 8 llega con varias cartas que ya tienen presencia en el meta. Diabellstar y WANTED forman un paquete con sinergia directa, mientras que S:P Little Knight sigue siendo una de las extra deck más versátiles del juego.",
-          "El box está pensado para jugadores que buscan piezas concretas, no para completar un arquetipo desde cero. Eso cambia por completo la forma de evaluar su valor.",
+          "Selection Box Mini Vol. 8 arrives with several cards that already have a presence in the meta. Diabellstar and WANTED form a package with direct synergy, while S:P Little Knight remains one of the most versatile Extra Deck cards in the game.",
+          "The box is aimed at players looking for specific pieces, not at completing an archetype from scratch. That completely changes how to evaluate its value.",
         ],
       },
       {
-        heading: "Valor competitivo",
+        heading: "Competitive Value",
         paragraphs: [
-          "La presencia de staples en un mini box suele traducirse en una mejor relación gemas/valor, siempre que las cartas encajen en tus mazos. Si no juegas los arquetipos que las aprovechan, el cálculo cambia.",
+          "The presence of staples in a mini box usually translates into a better gem-to-value ratio, as long as the cards fit your decks. If you do not play the archetypes that use them, the math changes.",
         ],
         bullets: [
-          "Alto valor si ya tienes un motor de fuego u oscuridad.",
-          "Valor medio para coleccionistas y jugadores casuales.",
-          "Bajo valor si solo buscas una carta concreta y no hay pity garantizado.",
+          "High value if you already have a Fire or Dark engine.",
+          "Medium value for collectors and casual players.",
+          "Low value if you only want one specific card and there is no guaranteed pity.",
         ],
       },
       {
-        heading: "Relación gemas/valor",
+        heading: "Gem-to-Value Ratio",
         paragraphs: [
-          "Antes de abrir, define cuántas cartas del box necesitas realmente. Si el número es inferior a tres, probablemente sea mejor esperar a un box principal o a una futura reimpresión.",
-          "La eficiencia de gemas no se mide por la rareza de la carta, sino por cuántos mazos competitivos puede mejorar. Una UR que no encaja en tu colección vale menos que una SR que usas en tres listas.",
+          "Before opening, define how many cards from the box you actually need. If the number is below three, it is probably better to wait for a main box or a future reprint.",
+          "Gem efficiency is not measured by card rarity but by how many competitive decks it can improve. A UR that does not fit your collection is worth less than an SR you use in three lists.",
         ],
       },
       {
-        heading: "Veredicto",
+        heading: "Verdict",
         paragraphs: [
-          "El mini box es interesante para quien ya tenga el motor necesario para aprovechar sus mejores cartas. Para el resto, es una colección de piezas que probablemente vuelvan en futuros lanzamientos.",
+          "The mini box is interesting for anyone who already has the engine needed to use its best cards. For everyone else, it is a collection of pieces that will likely return in future releases.",
         ],
       },
     ],
   },
   {
     slug: "aniversario-box-vol-04-repaso",
-    title: "Anniversary Box Vol. 04: un repaso a sus mejores cartas",
+    title: "Anniversary Box Vol. 04: A Look at Its Best Cards",
     summary:
-      "El box de aniversario trae reprints de alto impacto y nuevas piezas para arquetipos de fuego y dragón.",
+      "The anniversary box brings high-impact reprints and new pieces for Fire and Dragon archetypes.",
     category: "updates",
-    author: "Redacción Card Meta",
+    author: "Card Meta Staff",
     publishedAt: "2026-10-24T11:20:00.000Z",
-    tags: ["Anniversary Box", "Reprints", "Colección"],
+    tags: ["Anniversary Box", "Reprints", "Collection"],
     banner: {
       kind: "set",
       slug: "anniversary-box-vol-04",
@@ -413,46 +413,46 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
     ],
     sections: [
       {
-        heading: "Qué incluye",
+        heading: "What's Inside",
         paragraphs: [
-          "El Anniversary Box Vol. 04 combina reprints de cartas muy buscadas con nuevas piezas para arquetipos establecidos. Es un lanzamiento pensado para jugadores que quieren reforzar su colección sin depender de un único arquetipo.",
-          "La selección de cartas toca fuego, dragón y oscuridad, tres de los ejes más presentes en el formato actual. Eso lo convierte en un box con demanda transversal.",
+          "Anniversary Box Vol. 04 combines reprints of highly sought cards with new pieces for established archetypes. It is a release aimed at players who want to strengthen their collection without depending on a single archetype.",
+          "The card selection touches Fire, Dragon, and Dark, three of the most present axes in the current format. That makes it a box with cross-archetype demand.",
         ],
       },
       {
-        heading: "Reprints clave",
+        heading: "Key Reprints",
         paragraphs: [
-          "Snake-Eyes Poplar y Diabellstar siguen siendo cartas centrales en sus respectivos motores. Su presencia en el box reduce la barrera de entrada y aumenta la oferta disponible en el mercado.",
+          "Snake-Eyes Poplar and Diabellstar remain central cards in their respective engines. Their presence in the box lowers the entry barrier and increases the supply available on the market.",
         ],
         bullets: [
-          "Poplar para jugadores de Snake-Eye.",
-          "Diabellstar como pieza de motores de oscuridad.",
-          "Blue-Eyes White Dragon como reprint emblemático.",
+          "Poplar for Snake-Eye players.",
+          "Diabellstar as a piece for Dark engines.",
+          "Blue-Eyes White Dragon as an iconic reprint.",
         ],
       },
       {
-        heading: "¿Vale la pena?",
+        heading: "Is It Worth It?",
         paragraphs: [
-          "Depende de cuántas de las cartas destacadas necesites. Si te faltan dos o más piezas clave, el box tiene sentido. Si solo buscas una, probablemente sea mejor esperar a una reimpresión específica.",
+          "It depends on how many of the featured cards you need. If you are missing two or more key pieces, the box makes sense. If you only want one, it is probably better to wait for a specific reprint.",
         ],
       },
       {
-        heading: "Conclusión",
+        heading: "Conclusion",
         paragraphs: [
-          "Es un box sólido para la comunidad, con cartas que seguirán viéndose en torneos. No cambia el meta por sí solo, pero facilita el acceso a piezas que hasta ahora eran difíciles de conseguir.",
+          "It is a solid box for the community, with cards that will keep showing up in tournaments. It does not change the meta on its own, but it makes access easier to pieces that were previously hard to obtain.",
         ],
       },
     ],
   },
   {
     slug: "impacto-banlist-dark-magician",
-    title: "El impacto de la banlist en Dark Magician",
+    title: "The Banlist's Impact on Dark Magician",
     summary:
-      "La lista deja al arquetipo en una posición incómoda: menos consistencia, pero un techo competitivo que sigue vivo.",
+      "The list leaves the archetype in an awkward spot: less consistency, but a competitive ceiling that is still alive.",
     category: "banlist",
     author: "Dante",
     publishedAt: "2026-10-20T16:30:00.000Z",
-    tags: ["Dark Magician", "Banlist", "Análisis"],
+    tags: ["Dark Magician", "Banlist", "Analysis"],
     banner: {
       kind: "card",
       slug: "Dark-Magician",
@@ -464,47 +464,47 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
     ],
     sections: [
       {
-        heading: "Qué cambió",
+        heading: "What Changed",
         paragraphs: [
-          "Dark Magician pierde parte de la consistencia que lo mantenía en el top cut. La banlist no destruye el arquetipo, pero obliga a elegir entre cartas de búsqueda y respuestas defensivas.",
-          "El resultado es una lista más frágil en la apertura y más dependiente de la calidad de la mano inicial. En un formato rápido, eso se paga caro.",
+          "Dark Magician loses part of the consistency that kept it in the top cut. The banlist does not destroy the archetype, but it forces a choice between search cards and defensive answers.",
+          "The result is a list that is more fragile on the opening and more dependent on the quality of the starting hand. In a fast format, that is costly.",
         ],
       },
       {
-        heading: "La lista que sobrevive",
+        heading: "The List That Survives",
         paragraphs: [
-          "Las versiones que mejor se adaptan reducen la dependencia de una sola línea y añaden cartas de interacción versátiles. El objetivo es llegar al turno tres con recursos suficientes para cerrar.",
+          "The builds that adapt best reduce their dependence on a single line and add versatile interaction cards. The goal is to reach turn three with enough resources to close.",
         ],
         bullets: [
-          "Menos piezas de combo y más respuestas inmediatas.",
-          "Un motor de búsqueda ajustado al nuevo límite.",
-          "Sideboard orientado a los matchups más frecuentes.",
+          "Fewer combo pieces and more immediate answers.",
+          "A search engine tuned to the new limit.",
+          "A sideboard aimed at the most frequent matchups.",
         ],
       },
       {
         heading: "Matchups",
         paragraphs: [
-          "Contra Snake-Eye, Dark Magician necesita interrumpir la primera extensión y evitar que el rival reconstruya el tablero. Contra Blue-Eyes, la clave es no quedarse sin remoción antes del cierre.",
-          "El arquetipo sigue teniendo un techo alto, pero exige un manejo de recursos más cuidadoso que antes. No es un mazo para jugar en piloto automático.",
+          "Against Snake-Eye, Dark Magician needs to interrupt the first extender and prevent the opponent from rebuilding the board. Against Blue-Eyes, the key is not running out of removal before the closing turn.",
+          "The archetype still has a high ceiling, but it demands more careful resource management than before. It is not a deck to play on autopilot.",
         ],
       },
       {
-        heading: "Veredicto",
+        heading: "Verdict",
         paragraphs: [
-          "Dark Magician sigue siendo viable en manos experimentadas, aunque deja de ser una opción cómoda para el top cut. La banlist lo castiga, pero no lo elimina.",
+          "Dark Magician remains viable in experienced hands, although it is no longer a comfortable top-cut option. The banlist punishes it, but does not eliminate it.",
         ],
       },
     ],
   },
   {
     slug: "guia-dark-magician-consistencia",
-    title: "Dark Magician: consistencia por encima de la nostalgia",
+    title: "Dark Magician: Consistency Over Nostalgia",
     summary:
-      "Ajustes de ratios, cartas de búsqueda y un plan de juego claro para que el mago deje de depender de la mano perfecta.",
+      "Ratio adjustments, search cards, and a clear game plan so the magician stops depending on the perfect hand.",
     category: "guides",
     author: "Dante",
     publishedAt: "2026-10-16T09:00:00.000Z",
-    tags: ["Dark Magician", "Guía", "Consistencia"],
+    tags: ["Dark Magician", "Guide", "Consistency"],
     banner: {
       kind: "card",
       slug: "Dark-Magician",
@@ -516,34 +516,34 @@ const ARTICLE_SEEDS: NewsArticleSeed[] = [
     ],
     sections: [
       {
-        heading: "El problema de la consistencia",
+        heading: "The Consistency Problem",
         paragraphs: [
-          "Dark Magician tiene un problema conocido: muchas manos buenas y muy pocas manos perfectas. La diferencia entre ganar y perder suele estar en la capacidad de convertir una apertura mediocre en un tablero funcional.",
-          "La solución no es añadir más cartas de combo, sino reducir la varianza y asegurar que cada carta cumpla un rol claro en la mano inicial.",
+          "Dark Magician has a known problem: many good hands and very few perfect hands. The difference between winning and losing usually comes down to turning a mediocre opener into a functional board.",
+          "The solution is not to add more combo cards but to reduce variance and ensure every card has a clear role in the opening hand.",
         ],
       },
       {
-        heading: "Ratios recomendados",
+        heading: "Recommended Ratios",
         paragraphs: [
-          "La base del mazo debe garantizar acceso al mago y a una carta de interacción. Los ratios que funcionan en torneo suelen ser más conservadores de lo que parece en las listas de internet.",
+          "The deck's core must guarantee access to the magician and to an interaction card. Ratios that work in tournaments are usually more conservative than internet lists make them look.",
         ],
         bullets: [
-          "Mantén el motor principal en el mínimo viable.",
-          "Incluye cartas que funcionen solas en la mano.",
-          "Reserva espacio para respuestas de amplio espectro.",
+          "Keep the main engine at the viable minimum.",
+          "Include cards that work on their own in hand.",
+          "Reserve space for broad-spectrum answers.",
         ],
       },
       {
-        heading: "Plan de juego",
+        heading: "Game Plan",
         paragraphs: [
-          "El plan es simple: sobrevivir al primer turno, recuperar recursos y ganar la partida en el intercambio. Dark Magician no necesita cerrar en un turno, necesita no quedarse sin cartas.",
-          "I:P Masquerena y Knightmare Phoenix dan flexibilidad para interactuar sin comprometer el motor. Son piezas de soporte, no el centro del combo.",
+          "The plan is simple: survive the first turn, recover resources, and win the exchange. Dark Magician does not need to close in one turn; it needs to avoid running out of cards.",
+          "I:P Masquerena and Knightmare Phoenix provide flexibility to interact without committing the engine. They are support pieces, not the center of the combo.",
         ],
       },
       {
-        heading: "Ajustes de side",
+        heading: "Side Deck Adjustments",
         paragraphs: [
-          "El sideboard debe cubrir los matchups más comunes del top cut. Contra mazos de fuego, prioriza interrupciones tempranas. Contra control, añade presión y formas de romper tableros establecidos.",
+          "The sideboard must cover the most common top-cut matchups. Against Fire decks, prioritize early interruptions. Against control, add pressure and ways to break established boards.",
         ],
       },
     ],
@@ -616,11 +616,11 @@ function estimateReadingMinutes(
 }
 
 /**
- * Resuelve banners y cartas destacadas contra PostgreSQL.
+ * Resolves banners and featured cards against PostgreSQL.
  *
- * Los artículos son contenido editorial curado, pero las
- * imágenes y los datos de carta siempre salen de la base de
- * datos real para evitar enlaces o imágenes rotas.
+ * Articles are curated editorial content, but images and card
+ * data always come from the real database to avoid broken
+ * links or images.
  */
 export const getNewsArticles = cache(
   async (): Promise<NewsArticle[]> => {

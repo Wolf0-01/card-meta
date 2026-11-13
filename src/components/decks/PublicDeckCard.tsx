@@ -11,6 +11,8 @@ import { getCardImageSrc } from "@/lib/cards/image";
 
 import { pickDeckEmblem } from "@/lib/decks/emblem";
 
+import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
+
 import { getDuelFormatLabel } from "@/lib/duelFormat";
 
 import {
@@ -40,9 +42,7 @@ export default function PublicDeckCard({
   const gemCost = estimateDeckGemCost(deck);
 
   const archetype =
-    deck.archetype?.name ??
-    deck.archetypeName ??
-    null;
+    getDeckArchetypeLabel(deck);
 
   const author =
     deck.author?.displayName?.trim() ||
@@ -168,7 +168,7 @@ export default function PublicDeckCard({
               "
             >
               <span className="truncate">
-                {archetype ?? "Sin arquetipo"}
+                {archetype}
               </span>
 
               {deck.tier && (

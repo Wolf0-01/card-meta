@@ -1,13 +1,22 @@
 import {
+  getPublicDeckArchetypeGroups,
   getPublicDeckExplorer,
   getRecentPublicDecks,
   type PublicDeckExplorerOptions,
 } from "@/lib/decks";
 
+import type { DuelFormat } from "@/lib/duelFormat";
+
 export async function findPublicDeckExplorer(
   options: PublicDeckExplorerOptions = {}
 ) {
   return getPublicDeckExplorer(options);
+}
+
+export async function findPublicDeckArchetypeGroups(
+  format: DuelFormat = "speed"
+) {
+  return getPublicDeckArchetypeGroups(format);
 }
 
 export async function findRecentPublicDecks(

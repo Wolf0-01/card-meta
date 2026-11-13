@@ -6,20 +6,26 @@ import {
   ArrowLeft,
   ArrowRight,
   Layers,
+  LayoutGrid,
   Search,
 } from "lucide-react";
+
+import DeckArchetypeCard from "@/components/decks/DeckArchetypeCard";
 
 import DeckExplorerControls from "@/components/decks/DeckExplorerControls";
 
 import PublicDeckCard from "@/components/decks/PublicDeckCard";
 
-import { findPublicDeckExplorer } from "@/services/decks";
+import {
+  findPublicDeckArchetypeGroups,
+  findPublicDeckExplorer,
+} from "@/services/decks";
 
 export const metadata: Metadata = {
-  title: "Top Decks: Speed | Card Meta",
+  title: "Top Decks | Card Meta",
 
   description:
-    "Explora los mazos públicos de Yu-Gi-Oh! Duel Links, ordenados por fecha de publicación, con búsqueda y filtro por Skill.",
+    "Explora los mazos públicos de Yu-Gi-Oh! Duel Links agrupados por arquetipo, con búsqueda y filtro por Skill.",
 };
 
 interface DecksPageProps {
@@ -29,6 +35,7 @@ interface DecksPageProps {
     q?: string;
     skill?: string;
     format?: string;
+    archetype?: string;
     page?: string;
   }>;
 }
@@ -37,6 +44,7 @@ function buildPageHref(
   base: {
     search?: string;
     skill?: string;
+    archetype?: string;
     format?: string;
   },
   page: number
@@ -49,6 +57,10 @@ function buildPageHref(
 
   if (base.skill) {
     params.set("skill", base.skill);
+  }
+
+  if (base.archetype) {
+    params.set("archetype", base.archetype);
   }
 
   if (base.format === "rush") {
@@ -77,6 +89,9 @@ export default async function DecksPage({
 
   const skill = params.skill?.trim() ?? "";
 
+  const archetype =
+    params.archetype?.trim() ?? "";
+
   const format =
     params.format === "rush"
       ? "rush"
@@ -89,16 +104,55 @@ export default async function DecksPage({
       ? Math.floor(parsedPage)
       : 1;
 
-  const result = await findPublicDeckExplorer({
-    search,
-    skill,
-    format,
-    page,
-    pageSize: 24,
-  });
+  const [result, archetypes] =
+    await Promise.all([
+      findPublicDeckExplorer({
+        search,
+        skill,
+        format,
+        archetype,
+        page,
+        pageSize: 24,
+      }),
+
+      findPublicDeckArchetypeGroups(format),
+    ]);
 
   const hasFilters =
-    search.length > 0 || skill.length > 0;
+    search.length > 0 ||
+    skill.length > 0 ||
+    archetype.length > 0;
+
+  const formatSuffix =
+    format === "rush" ? "?format=rush" : "";
+
+  const resetHref = `/decks${formatSuffix}`;
+
+  const formatDeckTotal = archetypes.reduce(
+    (total, group) => total + group.count,
+    0
+  );
+
+  function buildArchetypeHref(
+    name: string
+  ): string {
+    const next = new URLSearchParams();
+
+    if (format === "rush") {
+      next.set("format", "rush");
+    }
+
+    if (
+      name.toLowerCase() !==
+      archetype.toLowerCase()
+    ) {
+      next.set("archetype", name);
+    }
+
+    const query = next.toString();
+
+    return query ? `/decks?${query}` : "/decks";
+  }
 
   return (
     <main
@@ -120,38 +174,49 @@ export default async function DecksPage({
           space-y-4
         "
       >
-        <header
-          className="
-            flex
-            flex-wrap
-            items-end
-            justify-between
-            gap-3
-          "
-        >
-          <div className="min-w-0">
-            <Link
-              href="/"
+        <header className="space-y-2">
+          <Link
+            href="/"
+            className="
+              inline-flex
+              items-center
+              gap-1
+              text-[9px]
+              font-black
+              uppercase
+              tracking-[0.18em]
+              text-slate-500
+              transition-colors
+              hover:text-blue-300
+            "
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Inicio
+          </Link>
+
+          <div
+            className="
+              flex
+              flex-col
+              items-center
+              gap-1.5
+              text-center
+            "
+          >
+            <p
               className="
-                inline-flex
-                items-center
-                gap-1
                 text-[9px]
                 font-black
                 uppercase
-                tracking-[0.18em]
-                text-slate-500
-                transition-colors
-                hover:text-blue-300
+                tracking-[0.24em]
+                text-blue-300
               "
             >
-              <ArrowLeft className="h-3 w-3" />
-              Inicio
-            </Link>
+              Card Meta · Duel Links
+            </p>
 
             <h1
               className="
-                mt-1
                 text-2xl
                 font-black
                 uppercase
@@ -166,7 +231,6 @@ export default async function DecksPage({
 
             <p
               className="
-                mt-1
                 max-w-xl
                 text-[11px]
                 leading-relaxed
@@ -177,37 +241,37 @@ export default async function DecksPage({
               {format === "rush"
                 ? "Rush Duel"
                 : "Speed Duel"}
-              , ordenados por publicación más
-              reciente.
+              , agrupados por arquetipo.
             </p>
-          </div>
 
-          <Link
-            href="/decks/new"
-            className="
-              inline-flex
-              h-9
-              items-center
-              gap-1.5
-              rounded-lg
-              border
-              border-blue-500/40
-              bg-blue-500/10
-              px-3
-              text-[10px]
-              font-black
-              uppercase
-              tracking-[0.14em]
-              text-blue-200
-              transition-colors
-              hover:border-blue-400
-              hover:bg-blue-500/20
-              hover:text-white
-            "
-          >
-            <Layers className="h-3.5 w-3.5" />
-            Crear mazo
-          </Link>
+            <Link
+              href={`/decks/new${formatSuffix}`}
+              className="
+                mt-1
+                inline-flex
+                h-9
+                items-center
+                gap-1.5
+                rounded-lg
+                border
+                border-blue-500/40
+                bg-blue-500/10
+                px-3
+                text-[10px]
+                font-black
+                uppercase
+                tracking-[0.14em]
+                text-blue-200
+                transition-colors
+                hover:border-blue-400
+                hover:bg-blue-500/20
+                hover:text-white
+              "
+            >
+              <Layers className="h-3.5 w-3.5" />
+              Crear mazo
+            </Link>
+          </div>
         </header>
 
         <DeckExplorerControls
@@ -217,6 +281,142 @@ export default async function DecksPage({
           skills={result.skills}
           total={result.total}
         />
+
+        {archetypes.length > 0 && (
+          <section
+            aria-label="Arquetipos con mazos públicos"
+            className="space-y-2"
+          >
+            <div
+              className="
+                flex
+                flex-wrap
+                items-center
+                justify-between
+                gap-2
+                border-b
+                border-slate-800
+                pb-2
+              "
+            >
+              <div className="flex items-center gap-2">
+                <Layers className="h-3.5 w-3.5 text-blue-300" />
+
+                <h2
+                  className="
+                    text-[10px]
+                    font-black
+                    uppercase
+                    tracking-[0.2em]
+                    text-slate-300
+                  "
+                >
+                  Arquetipos
+                </h2>
+              </div>
+
+              <span
+                className="
+                  text-[9px]
+                  font-bold
+                  uppercase
+                  tracking-[0.14em]
+                  text-slate-500
+                "
+              >
+                {archetypes.length}{" "}
+                {archetypes.length === 1
+                  ? "arquetipo"
+                  : "arquetipos"}{" "}
+                ·{" "}
+                <span className="tabular-nums text-slate-300">
+                  {formatDeckTotal}
+                </span>{" "}
+                {formatDeckTotal === 1
+                  ? "mazo"
+                  : "mazos"}
+              </span>
+            </div>
+
+            <div
+              className="
+                grid
+                grid-cols-1
+                gap-2.5
+                sm:grid-cols-2
+                lg:grid-cols-4
+              "
+            >
+              {archetypes.map((group) => (
+                <DeckArchetypeCard
+                  key={group.name}
+                  name={group.name}
+                  count={group.count}
+                  image={group.image}
+                  tier={group.tier}
+                  href={buildArchetypeHref(
+                    group.name
+                  )}
+                  active={
+                    group.name.toLowerCase() ===
+                    archetype.toLowerCase()
+                  }
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <div
+          className="
+            flex
+            flex-wrap
+            items-center
+            justify-between
+            gap-2
+            border-b
+            border-slate-800
+            pb-2
+          "
+        >
+          <div className="flex min-w-0 items-center gap-2">
+            <LayoutGrid className="h-3.5 w-3.5 shrink-0 text-blue-300" />
+
+            <h2
+              className="
+                truncate
+                text-[10px]
+                font-black
+                uppercase
+                tracking-[0.2em]
+                text-slate-300
+              "
+            >
+              {archetype
+                ? `Mazos de ${archetype}`
+                : search
+                  ? `Resultados para "${search}"`
+                  : "Mazos públicos"}
+            </h2>
+          </div>
+
+          <span
+            className="
+              text-[9px]
+              font-bold
+              uppercase
+              tracking-[0.14em]
+              text-slate-500
+            "
+          >
+            <span className="tabular-nums text-slate-300">
+              {result.total}
+            </span>{" "}
+            {result.total === 1
+              ? "mazo"
+              : "mazos"}
+          </span>
+        </div>
 
         {result.items.length === 0 ? (
           <section
@@ -248,7 +448,7 @@ export default async function DecksPage({
 
             <p className="max-w-sm text-xs text-slate-500">
               {hasFilters
-                ? "Prueba con otro nombre, arquetipo o Skill."
+                ? "Prueba con otro arquetipo, nombre o Skill."
                 : format === "rush"
                   ? "Publica el primer mazo Rush de la comunidad."
                   : "Publica tu primer mazo para que aparezca aquí."}
@@ -257,12 +457,8 @@ export default async function DecksPage({
             <Link
               href={
                 hasFilters
-                  ? "/decks"
-                  : `/decks/new${
-                      format === "rush"
-                        ? "?format=rush"
-                        : ""
-                    }`
+                  ? resetHref
+                  : `/decks/new${formatSuffix}`
               }
               className="
                 mt-2
@@ -325,7 +521,12 @@ export default async function DecksPage({
             {result.page > 1 ? (
               <Link
                 href={buildPageHref(
-                  { search, skill, format },
+                  {
+                    search,
+                    skill,
+                    archetype,
+                    format,
+                  },
                   result.page - 1
                 )}
                 className="
@@ -353,7 +554,12 @@ export default async function DecksPage({
             {result.page < result.totalPages ? (
               <Link
                 href={buildPageHref(
-                  { search, skill, format },
+                  {
+                    search,
+                    skill,
+                    archetype,
+                    format,
+                  },
                   result.page + 1
                 )}
                 className="

@@ -733,6 +733,33 @@ export default function GlobalCardSearch() {
     }
   }
 
+  function handleCardFormatChange(
+    value: DuelFormat
+  ) {
+    if (value === cardFormat) {
+      return;
+    }
+
+    /*
+     * Al cambiar de formato se limpian los resultados
+     * anteriores: así nunca se muestran cartas de Speed
+     * mientras llega la respuesta de Rush (o viceversa).
+     */
+    setCardFormat(value);
+
+    setCardPage(1);
+
+    setCards([]);
+
+    setCardTotal(0);
+
+    setCardPages(1);
+
+    setCardsError(null);
+
+    scrollResultsToTop();
+  }
+
   function resetCardFilters() {
     setCardSearchInput("");
 
@@ -753,6 +780,12 @@ export default function GlobalCardSearch() {
     setCardDirection("asc");
 
     setCardPage(1);
+
+    setCards([]);
+
+    setCardTotal(0);
+
+    setCardPages(1);
   }
 
   function resetSkills() {
@@ -901,11 +934,9 @@ export default function GlobalCardSearch() {
                     onSearchChange={
                       setCardSearchInput
                     }
-                    onFormatChange={(value) => {
-                      setCardFormat(value);
-
-                      setCardPage(1);
-                    }}
+                    onFormatChange={
+                      handleCardFormatChange
+                    }
                     onFilterChange={
                       handleCardFilterChange
                     }

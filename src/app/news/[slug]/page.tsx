@@ -41,7 +41,7 @@ export async function generateMetadata({
 
   if (!article) {
     return {
-      title: "Artículo no encontrado | Card Meta",
+      title: "Article not found | Card Meta",
     };
   }
 
@@ -103,7 +103,7 @@ export default async function NewsArticlePage({
           "
         >
           <ArrowLeft className="h-3 w-3" />
-          Volver a Noticias
+          Back to News
         </Link>
 
         <header
@@ -241,8 +241,7 @@ export default async function NewsArticlePage({
               >
                 <Clock3 className="h-2.5 w-2.5" />
 
-                {article.readingMinutes} min de
-                lectura
+                {article.readingMinutes} min read
               </span>
             </div>
 
@@ -467,9 +466,9 @@ export default async function NewsArticlePage({
                   text-slate-400
                 "
               >
-                Explora el catálogo completo de
-                cartas citadas y arma tu próxima
-                lista.
+                Explore the full catalog of cards
+                cited in this article and build your
+                next list.
               </p>
 
               <Link
@@ -496,7 +495,7 @@ export default async function NewsArticlePage({
                 "
               >
                 <ArrowLeft className="h-3 w-3" />
-                Todos los artículos
+                All articles
               </Link>
             </div>
           </article>
@@ -510,7 +509,7 @@ export default async function NewsArticlePage({
             "
           >
             <section
-              aria-label="Cartas destacadas del artículo"
+              aria-label="Featured cards from the article"
               className="
                 rounded-xl
                 border
@@ -534,7 +533,7 @@ export default async function NewsArticlePage({
                     text-slate-200
                   "
                 >
-                  Cartas destacadas
+                  Featured cards
                 </h2>
 
                 <span
@@ -592,8 +591,8 @@ export default async function NewsArticlePage({
                     text-slate-500
                   "
                 >
-                  Este artículo no tiene cartas
-                  destacadas asociadas.
+                  This article has no featured cards
+                  associated with it.
                 </p>
               )}
 
@@ -608,8 +607,8 @@ export default async function NewsArticlePage({
                   text-slate-500
                 "
               >
-                Pasa el cursor sobre una carta para
-                ver su información completa.
+                Hover over a card to see its full
+                information.
               </p>
             </section>
 
@@ -670,7 +669,7 @@ export default async function NewsArticlePage({
                     text-slate-500
                   "
                 >
-                  Busca cualquier carta
+                  Search any card
                 </span>
               </span>
 
@@ -712,7 +711,7 @@ export default async function NewsArticlePage({
                   text-slate-300
                 "
               >
-                Seguir leyendo
+                Keep reading
               </h2>
             </div>
 
