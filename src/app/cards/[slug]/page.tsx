@@ -192,6 +192,8 @@ export default async function CardDetailPage({
 
               slug: true,
 
+              format: true,
+
               image: true,
 
               type: true,

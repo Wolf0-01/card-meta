@@ -91,7 +91,7 @@ const BAND_BASE_SCORE: Record<
   "high-potential": 38,
 };
 
-const SEEDS: ArchetypeSeed[] = [
+const SPEED_SEEDS: ArchetypeSeed[] = [
   {
     key: "snake-eye",
     name: "Snake-Eye",
@@ -203,6 +203,154 @@ const SEEDS: ArchetypeSeed[] = [
     fallbackTier: "high-potential",
   },
 ];
+
+/**
+ * Arquetipos con presencia real en Rush Duel.
+ *
+ * Se construyen a partir de las cartas del catálogo marcadas
+ * como `format = "rush"` y de los mazos públicos Rush. La
+ * clasificación editorial actúa como respaldo cuando todavía
+ * no existen datos de torneo.
+ */
+const RUSH_SEEDS: ArchetypeSeed[] = [
+  {
+    key: "rush-elemental-hero",
+    name: "Elemental HERO",
+    searchTerm: "Elemental HERO",
+    cardArchetype: "Elemental HERO",
+    signatureCard: "Elemental HERO Avian",
+    aliases: ["elemental hero", "elemental-hero"],
+    fallbackTier: "tier-1",
+  },
+  {
+    key: "rush-dark-magician",
+    name: "Dark Magician",
+    searchTerm: "Dark Magician",
+    cardArchetype: "Dark Magician",
+    signatureCard: "Dark Magician",
+    aliases: ["dark magician", "dark-magician"],
+    fallbackTier: "tier-1",
+  },
+  {
+    key: "rush-harpie",
+    name: "Harpie",
+    searchTerm: "Harpie",
+    cardArchetype: "Harpie",
+    signatureCard: "Harpie Lady",
+    aliases: ["harpie", "harpies"],
+    fallbackTier: "tier-2",
+  },
+  {
+    key: "rush-monarch",
+    name: "Monarch",
+    searchTerm: "Monarch",
+    cardArchetype: "Monarch",
+    signatureCard: "Caius the Shadow Monarch",
+    aliases: ["monarch", "monarchs"],
+    fallbackTier: "tier-2",
+  },
+  {
+    key: "rush-abc",
+    name: "ABC",
+    searchTerm: "ABC",
+    cardArchetype: "ABC",
+    signatureCard: "X-Head Cannon",
+    aliases: ["abc"],
+    fallbackTier: "tier-2",
+  },
+  {
+    key: "rush-ancient-gear",
+    name: "Ancient Gear",
+    searchTerm: "Ancient Gear",
+    cardArchetype: "Ancient Gear",
+    signatureCard: "Ancient Gear Golem",
+    aliases: ["ancient gear", "ancient-gear"],
+    fallbackTier: "tier-2",
+  },
+  {
+    key: "rush-blue-eyes",
+    name: "Blue-Eyes",
+    searchTerm: "Blue Eyes",
+    cardArchetype: "Blue-Eyes",
+    signatureCard: "Blue-Eyes White Dragon",
+    aliases: ["blue eyes", "blue-eyes"],
+    fallbackTier: "tier-2",
+  },
+  {
+    key: "rush-cyber-dragon",
+    name: "Cyber Dragon",
+    searchTerm: "Cyber Dragon",
+    cardArchetype: "Cyber Dragon",
+    signatureCard: "Cyber Dragon",
+    aliases: ["cyber dragon", "cyber-dragon"],
+    fallbackTier: "tier-3",
+  },
+  {
+    key: "rush-red-eyes",
+    name: "Red-Eyes",
+    searchTerm: "Red-Eyes",
+    cardArchetype: "Red-Eyes",
+    signatureCard: "Red-Eyes Black Dragon",
+    aliases: ["red eyes", "red-eyes"],
+    fallbackTier: "tier-3",
+  },
+  {
+    key: "rush-gadget",
+    name: "Gadget",
+    searchTerm: "Gadget",
+    cardArchetype: "Gadget",
+    signatureCard: "Red Gadget",
+    aliases: ["gadget", "gadgets"],
+    fallbackTier: "tier-3",
+  },
+  {
+    key: "rush-charmer",
+    name: "Charmer",
+    searchTerm: "Charmer",
+    cardArchetype: "Charmer",
+    signatureCard: "Aussa the Earth Charmer",
+    aliases: ["charmer", "charmers"],
+    fallbackTier: "high-potential",
+  },
+  {
+    key: "rush-gaia",
+    name: "Gaia The Fierce Knight",
+    searchTerm: "Gaia The Fierce Knight",
+    cardArchetype: "Gaia The Fierce Knight",
+    signatureCard: "Gaia The Fierce Knight",
+    aliases: [
+      "gaia the fierce knight",
+      "gaia-the-fierce-knight",
+    ],
+    fallbackTier: "high-potential",
+  },
+  {
+    key: "rush-neo-spacian",
+    name: "Neo-Spacian",
+    searchTerm: "Neo-Spacian",
+    cardArchetype: "Neo-Spacian",
+    signatureCard: "Neo-Spacian Grand Mole",
+    aliases: ["neo spacian", "neo-spacian"],
+    fallbackTier: "high-potential",
+  },
+  {
+    key: "rush-umi",
+    name: "Umi",
+    searchTerm: "Umi",
+    cardArchetype: "Umi",
+    signatureCard: "Levia-Dragon - Daedalus",
+    aliases: ["umi"],
+    fallbackTier: "high-potential",
+  },
+];
+
+function getSeeds(
+  format: DuelFormat
+): ArchetypeSeed[] {
+  return format === "rush"
+    ? RUSH_SEEDS
+    : SPEED_SEEDS;
+}
 
 function normalize(value: string): string {
   return value
@@ -422,6 +570,8 @@ export const getTierList = cache(
   async (
     format: DuelFormat = "speed"
   ): Promise<TierListData> => {
+    const seeds = getSeeds(format);
+
     const decks = await prisma.deck.findMany({
       where: {
         isPublic: true,
@@ -474,8 +624,10 @@ export const getTierList = cache(
           by: ["archetype"],
 
           where: {
+            format,
+
             archetype: {
-              in: SEEDS.map(
+              in: seeds.map(
                 (seed) => seed.cardArchetype
               ),
             },
@@ -488,8 +640,10 @@ export const getTierList = cache(
 
         prisma.card.findMany({
           where: {
+            format,
+
             name: {
-              in: SEEDS.map(
+              in: seeds.map(
                 (seed) => seed.signatureCard
               ),
             },
@@ -522,7 +676,7 @@ export const getTierList = cache(
       ArchetypeSeed
     >();
 
-    for (const seed of SEEDS) {
+    for (const seed of seeds) {
       aliasIndex.set(normalize(seed.name), seed);
 
       aliasIndex.set(
@@ -556,7 +710,8 @@ export const getTierList = cache(
     }
 
     const archetypes: TierListArchetype[] =
-      SEEDS.map((seed) => {
+      seeds
+        .map((seed) => {
         const seedDecks =
           decksBySeed.get(seed.key) ?? [];
 
@@ -614,7 +769,13 @@ export const getTierList = cache(
           signatureName:
             signature?.name ?? null,
         };
-      });
+        })
+        .filter((archetype) =>
+          format === "rush"
+            ? archetype.cardCount > 0 ||
+              archetype.deckCount > 0
+            : true
+        );
 
     const bands: TierListBand[] = TIER_ORDER.map(
       (key) => ({
@@ -652,7 +813,11 @@ export const getTierList = cache(
 
       totalArchetypes: archetypes.length,
 
-      hasData: formatDecks.length > 0,
+      hasData:
+        formatDecks.length > 0 ||
+        archetypes.some(
+          (archetype) => archetype.cardCount > 0
+        ),
 
       bands,
     };

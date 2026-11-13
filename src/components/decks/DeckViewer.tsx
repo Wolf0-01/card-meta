@@ -16,6 +16,8 @@ import SkillHoverCard from "./SkillHoverCard";
 
 import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
 
+import { getDuelFormatLabel } from "@/lib/duelFormat";
+
 import type { DeckGemEstimate } from "@/lib/decks/gemCalculator";
 
 import type { MetaDeck } from "@/types/meta";
@@ -117,7 +119,7 @@ export default function DeckViewer({
           "
         >
           {getDeckArchetypeLabel(deck)}{" "}
-          · {deck.format ?? "Advanced"}
+          · {getDuelFormatLabel(deck.format)}
         </p>
 
         <p

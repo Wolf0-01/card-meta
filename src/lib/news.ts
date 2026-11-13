@@ -559,6 +559,8 @@ const FEATURED_CARD_SELECT = {
 
   slug: true,
 
+  format: true,
+
   image: true,
 
   type: true,

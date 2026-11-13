@@ -38,6 +38,10 @@ export async function GET(
       searchParams.get("slug") ??
       undefined;
 
+    const format =
+      searchParams.get("format") ??
+      undefined;
+
     const type =
       searchParams.get("type") ??
       undefined;
@@ -109,6 +113,7 @@ export async function GET(
       await queryCards({
         search,
         slug,
+        format,
         type,
         attribute,
         rarity,

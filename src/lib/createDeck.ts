@@ -248,7 +248,7 @@ export async function createDeck(
           archetype?.id ?? null,
 
         format:
-          "Speed Duel",
+          "speed",
 
         description: `Deck creado: ${data.name}`,
 

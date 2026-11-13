@@ -28,6 +28,7 @@ interface DecksPageProps {
     /** Alias usado por la Tier List para abrir un arquetipo. */
     q?: string;
     skill?: string;
+    format?: string;
     page?: string;
   }>;
 }
@@ -36,6 +37,7 @@ function buildPageHref(
   base: {
     search?: string;
     skill?: string;
+    format?: string;
   },
   page: number
 ): string {
@@ -47,6 +49,10 @@ function buildPageHref(
 
   if (base.skill) {
     params.set("skill", base.skill);
+  }
+
+  if (base.format === "rush") {
+    params.set("format", "rush");
   }
 
   if (page > 1) {
@@ -71,6 +77,11 @@ export default async function DecksPage({
 
   const skill = params.skill?.trim() ?? "";
 
+  const format =
+    params.format === "rush"
+      ? "rush"
+      : "speed";
+
   const parsedPage = Number(params.page);
 
   const page =
@@ -81,6 +92,7 @@ export default async function DecksPage({
   const result = await findPublicDeckExplorer({
     search,
     skill,
+    format,
     page,
     pageSize: 24,
   });
@@ -148,7 +160,8 @@ export default async function DecksPage({
                 sm:text-3xl
               "
             >
-              Top Decks: Speed
+              Top Decks:{" "}
+              {format === "rush" ? "Rush" : "Speed"}
             </h1>
 
             <p
@@ -160,8 +173,11 @@ export default async function DecksPage({
                 text-slate-400
               "
             >
-              Mazos públicos de la comunidad,
-              ordenados por publicación más
+              Mazos públicos de la comunidad de{" "}
+              {format === "rush"
+                ? "Rush Duel"
+                : "Speed Duel"}
+              , ordenados por publicación más
               reciente.
             </p>
           </div>
@@ -197,6 +213,7 @@ export default async function DecksPage({
         <DeckExplorerControls
           initialSearch={search}
           initialSkill={skill}
+          initialFormat={format}
           skills={result.skills}
           total={result.total}
         />
@@ -224,18 +241,28 @@ export default async function DecksPage({
             <p className="text-sm font-bold text-slate-300">
               {hasFilters
                 ? "Ningún mazo coincide con estos filtros."
-                : "Todavía no hay mazos públicos."}
+                : format === "rush"
+                  ? "Todavía no hay mazos Rush públicos."
+                  : "Todavía no hay mazos públicos."}
             </p>
 
             <p className="max-w-sm text-xs text-slate-500">
               {hasFilters
                 ? "Prueba con otro nombre, arquetipo o Skill."
-                : "Publica tu primer mazo para que aparezca aquí."}
+                : format === "rush"
+                  ? "Publica el primer mazo Rush de la comunidad."
+                  : "Publica tu primer mazo para que aparezca aquí."}
             </p>
 
             <Link
               href={
-                hasFilters ? "/decks" : "/decks/new"
+                hasFilters
+                  ? "/decks"
+                  : `/decks/new${
+                      format === "rush"
+                        ? "?format=rush"
+                        : ""
+                    }`
               }
               className="
                 mt-2
@@ -298,7 +325,7 @@ export default async function DecksPage({
             {result.page > 1 ? (
               <Link
                 href={buildPageHref(
-                  { search, skill },
+                  { search, skill, format },
                   result.page - 1
                 )}
                 className="
@@ -326,7 +353,7 @@ export default async function DecksPage({
             {result.page < result.totalPages ? (
               <Link
                 href={buildPageHref(
-                  { search, skill },
+                  { search, skill, format },
                   result.page + 1
                 )}
                 className="

@@ -9,6 +9,8 @@ findDeckByIdentifier,
 import DeckStats from "@/components/decks/DeckStats";
 import DeckCardList from "@/components/decks/DeckCardList";
 
+import { getDuelFormatLabel } from "@/lib/duelFormat";
+
 interface Props {
 params: Promise<{
 id: string;
@@ -181,7 +183,7 @@ return ( <main
               mt-1
             "
           >
-            {deck.format}
+            {getDuelFormatLabel(deck.format)}
           </p>
         </div>
       </div>

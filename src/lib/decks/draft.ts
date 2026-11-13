@@ -1,3 +1,5 @@
+import type { DuelFormat } from "@/lib/duelFormat";
+
 import type { CardPreviewData } from "@/types/CardPreviewData";
 
 import type { DeckZone } from "@/types/deck";
@@ -65,8 +67,13 @@ export function getDraftStats(
  * se añaden directamente al Extra Deck.
  */
 export function getDefaultDraftZone(
-  card: Pick<CardPreviewData, "type" | "frameType">
+  card: Pick<CardPreviewData, "type" | "frameType">,
+  format: DuelFormat = "speed"
 ): DeckZone {
+  if (format === "rush") {
+    return "main";
+  }
+
   const text =
     `${card.type ?? ""} ${
       card.frameType ?? ""
@@ -86,10 +93,13 @@ export function getDefaultDraftZone(
 export function addDraftCard(
   cards: DraftCard[],
   card: CardPreviewData,
-  zone?: DeckZone
+  zone?: DeckZone,
+  format: DuelFormat = "speed"
 ): DraftCard[] {
   const targetZone =
-    zone ?? getDefaultDraftZone(card);
+    format === "rush"
+      ? "main"
+      : zone ?? getDefaultDraftZone(card);
 
   if (
     getDraftCardCopies(cards, card.id) >=
@@ -303,7 +313,8 @@ export function clearDraftCards(): DraftCard[] {
 }
 
 export function validateDraft(
-  cards: DraftCard[]
+  cards: DraftCard[],
+  format: DuelFormat = "speed"
 ): DraftValidation {
   const stats = getDraftStats(cards);
 
@@ -343,7 +354,14 @@ export function validateDraft(
     });
   }
 
-  if (stats.extra > DECK_RULES.extraMax) {
+  if (format === "rush" && stats.extra > 0) {
+    issues.push({
+      path: "extra",
+
+      message:
+        "Rush Duel no utiliza Extra Deck: mueve esas cartas al Main Deck",
+    });
+  } else if (stats.extra > DECK_RULES.extraMax) {
     issues.push({
       path: "extra",
 

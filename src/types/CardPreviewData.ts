@@ -1,3 +1,5 @@
+import type { DuelFormat } from "@/lib/duelFormat";
+
 import type {
 LinkMarker,
 } from "./card";
@@ -10,6 +12,8 @@ ygoproId: number | null;
 name: string;
 
 slug: string;
+
+format: DuelFormat;
 
 image: string | null;
 

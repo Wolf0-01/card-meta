@@ -140,6 +140,9 @@ card.id,
     slug:
       card.slug,
 
+    format:
+      card.format,
+
     description:
       card.description ??
       "",

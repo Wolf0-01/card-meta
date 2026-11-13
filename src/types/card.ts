@@ -1,3 +1,5 @@
+import type { DuelFormat } from "@/lib/duelFormat";
+
 /**
  * Posiciones posibles de las flechas de un Link Monster.
  */
@@ -46,6 +48,9 @@ export interface Card {
   name: string;
 
   slug: string;
+
+  /** Formato del catálogo: Speed o Rush Duel. */
+  format: DuelFormat;
 
   obtain: CardObtainEntry[] | null;
 

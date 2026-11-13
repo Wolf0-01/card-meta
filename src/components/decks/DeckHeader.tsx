@@ -5,6 +5,8 @@ import Badge from "@/components/ui/Badge";
 
 import { Zap } from "lucide-react";
 
+import { getDuelFormatLabel } from "@/lib/duelFormat";
+
 import DeckActions from "./DeckActions";
 
 import { MetaDeck } from "@/types/meta";
@@ -96,7 +98,7 @@ export default function DeckHeader({
               </Badge>
 
               <Badge variant="secondary">
-                {deck.format ?? "Advanced"}
+                {getDuelFormatLabel(deck.format)}
               </Badge>
 
               <Badge variant="success">

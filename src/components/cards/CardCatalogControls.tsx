@@ -111,8 +111,8 @@ export default function CardCatalogControls() {
   const filterRef =
     useRef<HTMLDivElement>(null);
 
-  const mode =
-    searchParams.get("mode") === "rush"
+  const format =
+    searchParams.get("format") === "rush"
       ? "rush"
       : "speed";
 
@@ -414,7 +414,7 @@ export default function CardCatalogControls() {
             ] as const
           ).map((item, index) => {
             const active =
-              item.value === mode;
+              item.value === format;
 
             return (
               <button
@@ -422,12 +422,12 @@ export default function CardCatalogControls() {
                 type="button"
                 aria-pressed={active}
                 onClick={() =>
-                  pushParams(
-                    {
-                      mode: item.value,
-                    },
-                    false
-                  )
+                  pushParams({
+                    format:
+                      item.value === "rush"
+                        ? "rush"
+                        : "",
+                  })
                 }
                 className={`
                   flex
@@ -813,12 +813,6 @@ export default function CardCatalogControls() {
           )}
         </div>
 
-      {mode === "rush" && (
-        <p className="mt-1.5 text-[9px] font-semibold leading-3 text-amber-300/80">
-          Rush Duel: catálogo en preparación.
-          Se muestran las cartas de Speed.
-        </p>
-      )}
     </div>
   );
 }

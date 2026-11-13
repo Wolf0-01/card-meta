@@ -4,6 +4,8 @@ import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import StatCard from "@/components/ui/StatCard";
 
+import { getDuelFormatLabel } from "@/lib/duelFormat";
+
 import { MetaDeck } from "@/types/meta";
 
 interface Props {
@@ -125,8 +127,7 @@ export default function ArchetypeHeader({
               "
             >
               <Badge variant="secondary">
-                {deck.format ??
-                  "Advanced"}
+                {getDuelFormatLabel(deck.format)}
               </Badge>
 
               <Badge variant="success">
@@ -213,10 +214,9 @@ export default function ArchetypeHeader({
 
           <StatCard
             title="Format"
-            value={
-              deck.format ??
-              "Advanced"
-            }
+            value={getDuelFormatLabel(
+              deck.format
+            )}
           />
         </div>
       </div>

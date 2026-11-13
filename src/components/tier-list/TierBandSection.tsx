@@ -1,4 +1,7 @@
-import type { TierListBand } from "@/lib/tier-list";
+import type {
+  DuelFormat,
+  TierListBand,
+} from "@/lib/tier-list";
 
 import ArchetypeTierCard from "./ArchetypeTierCard";
 
@@ -6,6 +9,8 @@ import { TIER_BAND_META } from "./tierBands";
 
 interface TierBandSectionProps {
   band: TierListBand;
+
+  format: DuelFormat;
 }
 
 /**
@@ -14,6 +19,7 @@ interface TierBandSectionProps {
  */
 export default function TierBandSection({
   band,
+  format,
 }: TierBandSectionProps) {
   const meta = TIER_BAND_META[band.key];
 
@@ -139,6 +145,7 @@ export default function TierBandSection({
               <ArchetypeTierCard
                 key={archetype.key}
                 archetype={archetype}
+                format={format}
               />
             ))}
           </div>

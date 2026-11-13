@@ -17,9 +17,13 @@ import {
   ChevronDown,
   Loader2,
   RotateCcw,
+  Rocket,
   Search,
   X,
+  Zap,
 } from "lucide-react";
+
+import type { DuelFormat } from "@/lib/duelFormat";
 
 const DEBOUNCE_MS = 300;
 
@@ -28,10 +32,25 @@ interface DeckExplorerControlsProps {
 
   initialSkill: string;
 
+  initialFormat: DuelFormat;
+
   skills: string[];
 
   total: number;
 }
+
+const FORMAT_TABS = [
+  {
+    value: "speed",
+    label: "Speed",
+    icon: Zap,
+  },
+  {
+    value: "rush",
+    label: "Rush",
+    icon: Rocket,
+  },
+] as const;
 
 /**
  * Barra compacta del explorador público.
@@ -43,6 +62,7 @@ interface DeckExplorerControlsProps {
 export default function DeckExplorerControls({
   initialSearch,
   initialSkill,
+  initialFormat,
   skills,
   total,
 }: DeckExplorerControlsProps) {
@@ -77,6 +97,16 @@ export default function DeckExplorerControls({
 
   const paramSkill =
     searchParams.get("skill") ?? "";
+
+  const formatParam =
+    searchParams.get("format");
+
+  const format: DuelFormat =
+    formatParam === "rush"
+      ? "rush"
+      : formatParam === "speed"
+        ? "speed"
+        : initialFormat;
 
   useEffect(() => {
     if (
@@ -114,6 +144,8 @@ export default function DeckExplorerControls({
     search?: string;
 
     skill?: string;
+
+    format?: string;
   }) {
     const params = new URLSearchParams(
       searchParams.toString()
@@ -191,6 +223,32 @@ export default function DeckExplorerControls({
     });
   }
 
+  function handleFormatChange(
+    nextFormat: DuelFormat
+  ) {
+    if (nextFormat === format) {
+      return;
+    }
+
+    if (nextFormat === "rush") {
+      setSkill("");
+
+      lastPushedSkill.current = "";
+
+      pushParams({
+        format: "rush",
+
+        skill: "",
+      });
+
+      return;
+    }
+
+    pushParams({
+      format: "",
+    });
+  }
+
   function resetFilters() {
     if (timerRef.current) {
       window.clearTimeout(
@@ -233,6 +291,60 @@ export default function DeckExplorerControls({
       "
     >
       <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center">
+        <div
+          role="group"
+          aria-label="Formato de los mazos"
+          className="
+            flex
+            shrink-0
+            overflow-hidden
+            rounded-md
+            border
+            border-slate-700/80
+            bg-[#070D1F]
+          "
+        >
+          {FORMAT_TABS.map(({ value, label, icon: Icon }, index) => {
+            const active = format === value;
+
+            return (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={active}
+                onClick={() =>
+                  handleFormatChange(value)
+                }
+                className={`
+                  inline-flex
+                  h-8
+                  items-center
+                  gap-1
+                  px-2.5
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.14em]
+                  transition-colors
+                  ${
+                    index > 0
+                      ? "border-l border-slate-700/80"
+                      : ""
+                  }
+                  ${
+                    active
+                      ? "bg-blue-500/15 text-blue-200"
+                      : "text-slate-500 hover:text-slate-300"
+                  }
+                `}
+              >
+                <Icon className="h-3 w-3" />
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="relative min-w-0 flex-1">
           <Search
             className="
@@ -307,6 +419,7 @@ export default function DeckExplorerControls({
         </div>
 
         <div className="flex items-center gap-1.5">
+          {format !== "rush" && (
           <div className="relative min-w-0 flex-1 sm:flex-none">
             <span
               aria-hidden
@@ -381,6 +494,7 @@ export default function DeckExplorerControls({
               "
             />
           </div>
+          )}
 
           {hasFilters && (
             <button

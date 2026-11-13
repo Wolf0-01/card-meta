@@ -4,6 +4,8 @@ import type {
   Prisma,
 } from "@prisma/client";
 
+import { normalizeDuelFormat } from "@/lib/duelFormat";
+
 import type { LinkMarker } from "@/types/card";
 import type {
   DeckCard,
@@ -59,6 +61,8 @@ ygoproId: card.ygoproId,
 name: card.name,
 
 slug: card.slug,
+
+format: normalizeDuelFormat(card.format),
 
 description: card.description,
 
@@ -122,6 +126,10 @@ card: {
   name: deckCard.card.name,
 
   slug: deckCard.card.slug,
+
+  format: normalizeDuelFormat(
+    deckCard.card.format
+  ),
 
   description:
     deckCard.card.description,
@@ -228,8 +236,9 @@ export function mapPrismaDeck(
       (deck.trend as MetaDeck["trend"]) ??
       "stable",
 
-    format:
-      deck.format ?? "Advanced",
+    format: normalizeDuelFormat(
+      deck.format
+    ),
 
     popularity:
       deck.popularity ?? 0,

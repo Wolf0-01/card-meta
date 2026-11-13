@@ -55,6 +55,12 @@ model Card {
 
   slug String @unique
 
+  /**
+   * Formato del catálogo al que pertenece la carta.
+   * Valores normalizados: "speed" | "rush".
+   */
+  format String @default("speed")
+
   obtain Json?
 
   type String
@@ -93,6 +99,7 @@ model Card {
 
   @@index([name])
   @@index([type])
+  @@index([format])
 }
 
 model SetMeta {
@@ -161,7 +168,7 @@ model Deck {
 
   trend DeckTrend @default(stable)
 
-  format String @default("Advanced")
+  format String @default("speed")
 
   description String?
 

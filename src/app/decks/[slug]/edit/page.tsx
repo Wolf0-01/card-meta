@@ -72,6 +72,11 @@ export default async function EditDeckPage({
 
     skill: deck.skill ?? "",
 
+    format:
+      deck.format === "rush"
+        ? "rush"
+        : "speed",
+
     isPublic: deck.isPublic,
 
     cards,

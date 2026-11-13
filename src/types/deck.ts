@@ -14,6 +14,7 @@ Card,
 | "ygoproId"
 | "name"
 | "slug"
+| "format"
 | "image"
 | "description"
 | "type"

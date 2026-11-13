@@ -11,6 +11,7 @@
     "cards:rarities": "tsx scripts/updateRarities.ts",
     "cards:slugs": "tsx scripts/populateCardSlugs.ts",
     "cards:obtain": "tsx scripts/updateObtain.ts",
+    "cards:rush": "tsx scripts/syncRushCards.ts",
     "sets:sync": "tsx scripts/syncSetMeta.ts"
   },
   "dependencies": {

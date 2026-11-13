@@ -63,6 +63,8 @@ const setCardsSelect =
 
     slug: true,
 
+    format: true,
+
     image: true,
 
     type: true,

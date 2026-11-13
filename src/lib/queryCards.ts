@@ -10,6 +10,9 @@ export interface QueryOptions {
 
   slug?: string;
 
+  /** Formato del catálogo. Por defecto, Speed Duel. */
+  format?: string;
+
   type?: string;
   attribute?: string;
   monsterType?: string;
@@ -102,6 +105,7 @@ function buildWhere(
   const {
     search,
     slug,
+    format,
     type,
     attribute,
     monsterType,
@@ -138,6 +142,11 @@ function buildWhere(
   if (slug) {
     where.slug = slug;
   }
+
+  where.format =
+    format?.trim().toLowerCase() === "rush"
+      ? "rush"
+      : "speed";
 
   if (type) {
     where.type = {
@@ -245,6 +254,8 @@ const cardSelect =
 
     name: true,
     slug: true,
+
+    format: true,
 
     obtain: true,
 

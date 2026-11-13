@@ -19,6 +19,8 @@ import useDeckDraft, {
 
 import { DECK_RULES } from "@/lib/decks/rules";
 
+import type { DuelFormat } from "@/lib/duelFormat";
+
 import type {
   CardPreviewData,
 } from "@/types/CardPreviewData";
@@ -185,6 +187,32 @@ export default function DeckBuilderWorkspace({
     setError(null);
   }
 
+  function handleFormatChange(
+    nextFormat: DuelFormat
+  ) {
+    if (nextFormat === draft.format) {
+      return;
+    }
+
+    if (
+      nextFormat === "rush" &&
+      (draft.stats.extra > 0 ||
+        draft.skill.trim().length > 0)
+    ) {
+      const confirmed = window.confirm(
+        "Rush Duel no usa el Extra Deck ni las Skills de Speed. Se quitarán las cartas del Extra Deck y la Skill asignada. ¿Continuar?"
+      );
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    draft.setFormat(nextFormat);
+
+    setError(null);
+  }
+
   async function handleSave(
     publish: boolean
   ) {
@@ -256,9 +284,11 @@ export default function DeckBuilderWorkspace({
               null,
 
             skill:
-              draft.skill.trim() || null,
+              draft.format === "rush"
+                ? null
+                : draft.skill.trim() || null,
 
-            format: "Advanced",
+            format: draft.format,
 
             isPublic: makePublic,
 
@@ -378,9 +408,73 @@ export default function DeckBuilderWorkspace({
                 ? "Editar mazo"
                 : "Nuevo mazo"}
               <span className="ml-2 text-sm font-semibold text-foreground-muted">
-                Advanced
+                {draft.format === "rush"
+                  ? "Rush Duel"
+                  : "Speed Duel"}
               </span>
             </h1>
+
+            <div
+              role="group"
+              aria-label="Formato del mazo"
+              className="
+                mt-2
+                inline-flex
+                items-center
+                gap-1
+                rounded-lg
+                border
+                border-border
+                bg-background-secondary
+                p-1
+              "
+            >
+              {(
+                [
+                  {
+                    value: "speed",
+                    label: "Speed",
+                  },
+                  {
+                    value: "rush",
+                    label: "Rush",
+                  },
+                ] as const
+              ).map((item) => {
+                const active =
+                  draft.format === item.value;
+
+                return (
+                  <button
+                    key={item.value}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() =>
+                      handleFormatChange(
+                        item.value
+                      )
+                    }
+                    className={`
+                      rounded-md
+                      px-3
+                      py-1
+                      text-[10px]
+                      font-black
+                      uppercase
+                      tracking-[0.14em]
+                      transition-colors
+                      ${
+                        active
+                          ? "bg-primary text-white shadow-sm"
+                          : "text-foreground-muted hover:text-foreground"
+                      }
+                    `}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -489,6 +583,7 @@ export default function DeckBuilderWorkspace({
         >
           <CardSearchSidebar
             copiesById={copiesById}
+            format={draft.format}
             onAddCard={handleAddCard}
             activeSkill={draft.skill}
             onSelectSkill={draft.setSkill}
@@ -582,6 +677,7 @@ export default function DeckBuilderWorkspace({
               </label>
             </div>
 
+            {draft.format !== "rush" && (
             <SkillHoverCard
               skillName={draft.skill}
               cards={cardsByZone.main}
@@ -661,6 +757,27 @@ export default function DeckBuilderWorkspace({
                 {draft.stats.main} cards
               </span>
             </SkillHoverCard>
+            )}
+
+            {draft.format === "rush" && (
+              <p
+                className="
+                  rounded-xl
+                  border
+                  border-border
+                  bg-background-secondary
+                  px-3.5
+                  py-2.5
+                  text-[11px]
+                  font-semibold
+                  text-foreground-muted
+                "
+              >
+                Rush Duel no utiliza Skills de Speed
+                ni Extra Deck. El mazo se construye
+                únicamente con el Main Deck.
+              </p>
+            )}
 
             <DraftZone
               zone="main"
@@ -684,25 +801,27 @@ export default function DeckBuilderWorkspace({
               scrollable
             />
 
-            <DraftZone
-              zone="extra"
-              cards={cardsByZone.extra}
-              total={draft.stats.extra}
-              limit={DECK_RULES.extraMax}
-              onAddCard={handleAddCard}
-              onMoveCard={draft.moveCard}
-              onRemoveOne={draft.removeCard}
-              onRemoveAll={(
-                cardId,
-                zone
-              ) =>
-                draft.setQuantity(
+            {draft.format !== "rush" && (
+              <DraftZone
+                zone="extra"
+                cards={cardsByZone.extra}
+                total={draft.stats.extra}
+                limit={DECK_RULES.extraMax}
+                onAddCard={handleAddCard}
+                onMoveCard={draft.moveCard}
+                onRemoveOne={draft.removeCard}
+                onRemoveAll={(
                   cardId,
-                  zone,
-                  0
-                )
-              }
-            />
+                  zone
+                ) =>
+                  draft.setQuantity(
+                    cardId,
+                    zone,
+                    0
+                  )
+                }
+              />
+            )}
 
             <div
               className="
@@ -723,8 +842,9 @@ export default function DeckBuilderWorkspace({
               "
             >
               <span>
-                Arrastra las cartas entre zonas ·
-                Clic derecho para quitar una copia
+                {draft.format === "rush"
+                  ? "Clic derecho para quitar una copia"
+                  : "Arrastra las cartas entre zonas · Clic derecho para quitar una copia"}
               </span>
 
               <div className="flex flex-wrap items-center gap-3">

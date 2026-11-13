@@ -2,6 +2,8 @@ import {
   MetaDeck
 } from "@/types/meta";
 
+import { getDuelFormatLabel } from "@/lib/duelFormat";
+
 
 
 export function getMetaStats(
@@ -83,7 +85,9 @@ export function getMetaStats(
 
     format:
 
-      decks[0]?.format ?? "Unknown",
+      decks[0]
+        ? getDuelFormatLabel(decks[0].format)
+        : "Unknown",
 
 
 

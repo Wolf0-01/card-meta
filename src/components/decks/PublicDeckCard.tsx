@@ -11,6 +11,8 @@ import { getCardImageSrc } from "@/lib/cards/image";
 
 import { pickDeckEmblem } from "@/lib/decks/emblem";
 
+import { getDuelFormatLabel } from "@/lib/duelFormat";
+
 import {
   estimateDeckGemCost,
   formatGemCost,
@@ -206,7 +208,7 @@ export default function PublicDeckCard({
               text-slate-400
             "
           >
-            {deck.format ?? "Advanced"}
+            {getDuelFormatLabel(deck.format)}
           </span>
         </div>
 

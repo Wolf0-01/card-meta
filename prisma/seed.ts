@@ -385,7 +385,7 @@ async function main(){
 
 
       format:
-      "Speed Duel",
+      "speed",
 
 
 
@@ -562,7 +562,7 @@ async function main(){
 
 
       format:
-      "Speed Duel",
+      "speed",
 
 
 

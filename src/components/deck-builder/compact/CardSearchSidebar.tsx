@@ -7,6 +7,8 @@ import {
 
 import SkillCardTile from "@/components/cards/skills/SkillCardTile";
 
+import type { DuelFormat } from "@/lib/duelFormat";
+
 import type {
   CardPreviewData,
 } from "@/types/CardPreviewData";
@@ -97,6 +99,8 @@ interface CardsApiResponse {
 interface CardSearchSidebarProps {
   copiesById: Record<number, number>;
 
+  format: DuelFormat;
+
   onAddCard: (
     card: CardPreviewData,
     zone?: DeckZone
@@ -140,6 +144,7 @@ const tabButtonClasses = `
 
 export default function CardSearchSidebar({
   copiesById,
+  format,
   onAddCard,
   activeSkill = "",
   onSelectSkill,
@@ -214,6 +219,25 @@ export default function CardSearchSidebar({
   const [skillError, setSkillError] =
     useState<string | null>(null);
 
+  /*
+   * Ajuste de estado al cambiar el formato: se vuelve a la
+   * primera página y, en Rush, se abandona la pestaña de
+   * Skills. Se hace durante el render (patrón recomendado
+   * por React) para evitar efectos en cascada.
+   */
+  const [previousFormat, setPreviousFormat] =
+    useState(format);
+
+  if (previousFormat !== format) {
+    setPreviousFormat(format);
+
+    setPage(1);
+
+    if (format === "rush" && tab === "skills") {
+      setTab("cards");
+    }
+  }
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setDebouncedSearch(search.trim());
@@ -257,6 +281,8 @@ export default function CardSearchSidebar({
           limit: String(CARD_PAGE_SIZE),
 
           page: String(page),
+
+          format,
         });
 
         if (debouncedSearch) {
@@ -341,6 +367,7 @@ export default function CardSearchSidebar({
     debouncedSearch,
     type,
     attribute,
+    format,
     page,
   ]);
 
@@ -516,7 +543,10 @@ export default function CardSearchSidebar({
       <header className="space-y-2 border-b border-border p-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm font-black text-foreground">
-            Catálogo
+            Catálogo{" "}
+            <span className="text-[10px] font-bold uppercase tracking-wide text-primary">
+              {format === "rush" ? "Rush" : "Speed"}
+            </span>
           </h2>
 
           <span className="text-[10px] font-semibold text-foreground-muted">
@@ -526,7 +556,22 @@ export default function CardSearchSidebar({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-surface p-1">
+        <div
+          className={`
+            grid
+            gap-1
+            rounded-lg
+            border
+            border-border
+            bg-surface
+            p-1
+            ${
+              format === "rush"
+                ? "grid-cols-1"
+                : "grid-cols-2"
+            }
+          `}
+        >
           <button
             type="button"
             onClick={() => setTab("cards")}
@@ -542,20 +587,22 @@ export default function CardSearchSidebar({
             Cartas
           </button>
 
-          <button
-            type="button"
-            onClick={() => setTab("skills")}
-            className={`
-              ${tabButtonClasses}
-              ${
-                !isCardsTab
-                  ? "bg-primary text-white shadow-sm"
-                  : "text-foreground-muted hover:text-foreground"
-              }
-            `}
-          >
-            Skills
-          </button>
+          {format !== "rush" && (
+            <button
+              type="button"
+              onClick={() => setTab("skills")}
+              className={`
+                ${tabButtonClasses}
+                ${
+                  !isCardsTab
+                    ? "bg-primary text-white shadow-sm"
+                    : "text-foreground-muted hover:text-foreground"
+                }
+              `}
+            >
+              Skills
+            </button>
+          )}
         </div>
 
         {isCardsTab ? (
@@ -858,9 +905,11 @@ export default function CardSearchSidebar({
                     onClick={() =>
                       onAddCard(
                         card,
-                        getDefaultDraftZone(
-                          card
-                        )
+                        format === "rush"
+                          ? "main"
+                          : getDefaultDraftZone(
+                              card
+                            )
                       )
                     }
                   />

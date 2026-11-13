@@ -29,6 +29,8 @@ import type {
 
 import SkillsGrid from "@/components/cards/skills/SkillsGrid";
 
+import type { DuelFormat } from "@/lib/duelFormat";
+
 import type {
   CardPreviewData,
 } from "@/types/CardPreviewData";
@@ -176,6 +178,9 @@ export default function GlobalCardSearch() {
 
   const [cardSearch, setCardSearch] =
     useState("");
+
+  const [cardFormat, setCardFormat] =
+    useState<DuelFormat>("speed");
 
   const [cardType, setCardType] =
     useState("");
@@ -455,6 +460,8 @@ export default function GlobalCardSearch() {
 
     const params = new URLSearchParams();
 
+    params.set("format", cardFormat);
+
     if (cardSearch) {
       params.set("search", cardSearch);
     }
@@ -566,6 +573,7 @@ export default function GlobalCardSearch() {
     open,
     tab,
     cardSearch,
+    cardFormat,
     cardType,
     cardAttribute,
     cardRarity,
@@ -730,6 +738,8 @@ export default function GlobalCardSearch() {
 
     setCardSearch("");
 
+    setCardFormat("speed");
+
     setCardType("");
 
     setCardAttribute("");
@@ -881,6 +891,7 @@ export default function GlobalCardSearch() {
                 <>
                   <GlobalCatalogControls
                     search={cardSearchInput}
+                    format={cardFormat}
                     type={cardType}
                     attribute={cardAttribute}
                     rarity={cardRarity}
@@ -890,6 +901,11 @@ export default function GlobalCardSearch() {
                     onSearchChange={
                       setCardSearchInput
                     }
+                    onFormatChange={(value) => {
+                      setCardFormat(value);
+
+                      setCardPage(1);
+                    }}
                     onFilterChange={
                       handleCardFilterChange
                     }

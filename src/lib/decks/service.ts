@@ -1,5 +1,10 @@
 import { Prisma } from "@prisma/client";
 
+import {
+  normalizeDuelFormat,
+  type DuelFormat,
+} from "@/lib/duelFormat";
+
 import { prisma } from "@/lib/prisma";
 
 import {
@@ -181,7 +186,7 @@ function mapUserDeck(
 
     skill: deck.skill,
 
-    format: deck.format,
+    format: normalizeDuelFormat(deck.format),
 
     isPublic: deck.isPublic,
 
@@ -202,7 +207,8 @@ function mapUserDeck(
 }
 
 async function ensureCardsExist(
-  cards: NormalizedDeckCard[]
+  cards: NormalizedDeckCard[],
+  format: DuelFormat
 ) {
   const uniqueIds = [
     ...new Set(cards.map((card) => card.cardId)),
@@ -221,15 +227,17 @@ async function ensureCardsExist(
 
     select: {
       id: true,
+      name: true,
+      format: true,
     },
   });
 
-  const foundIds = new Set(
-    found.map((card) => card.id)
+  const foundById = new Map(
+    found.map((card) => [card.id, card])
   );
 
   const missing = uniqueIds.filter(
-    (id) => !foundIds.has(id)
+    (id) => !foundById.has(id)
   );
 
   if (missing.length > 0) {
@@ -240,6 +248,30 @@ async function ensureCardsExist(
         path: "cards",
 
         message: `La carta #${id} no existe`,
+      }))
+    );
+  }
+
+  const wrongFormat = found.filter(
+    (card) => card.format !== format
+  );
+
+  if (wrongFormat.length > 0) {
+    throw new DeckError(
+      "VALIDATION",
+      `El mazo contiene cartas que no pertenecen a ${
+        format === "rush"
+          ? "Rush Duel"
+          : "Speed Duel"
+      }`,
+      wrongFormat.slice(0, 10).map((card) => ({
+        path: "cards",
+
+        message: `La carta "${card.name}" no está disponible en ${
+          format === "rush"
+            ? "Rush Duel"
+            : "Speed Duel"
+        }`,
       }))
     );
   }
@@ -323,9 +355,17 @@ export async function createUserDeck(
 
   const isPublic = input.isPublic ?? false;
 
-  validateDeckCards(cards, isPublic);
+  const format = normalizeDuelFormat(
+    input.format
+  );
 
-  await ensureCardsExist(cards);
+  validateDeckCards(
+    cards,
+    isPublic,
+    format
+  );
+
+  await ensureCardsExist(cards, format);
 
   const archetypeId = await resolveArchetypeId(
     input.archetypeId
@@ -346,11 +386,14 @@ export async function createUserDeck(
 
       isPublic,
 
-      format: input.format ?? "Advanced",
+      format,
 
       description: input.description ?? null,
 
-      skill: input.skill?.trim() || null,
+      skill:
+        format === "rush"
+          ? null
+          : input.skill?.trim() || null,
 
       archetypeId,
 
@@ -430,9 +473,17 @@ export async function updateUserDeck(
   const isPublic =
     patch.isPublic ?? existing.isPublic;
 
-  validateDeckCards(cards, isPublic);
+  const format = normalizeDuelFormat(
+    patch.format ?? existing.format
+  );
 
-  await ensureCardsExist(cards);
+  validateDeckCards(
+    cards,
+    isPublic,
+    format
+  );
+
+  await ensureCardsExist(cards, format);
 
   const archetypeId =
     patch.archetypeId !== undefined
@@ -449,14 +500,11 @@ export async function updateUserDeck(
       : existing.description;
 
   const skill =
-    patch.skill !== undefined
-      ? patch.skill?.trim() || null
-      : existing.skill;
-
-  const format =
-    patch.format ??
-    existing.format ??
-    "Advanced";
+    format === "rush"
+      ? null
+      : patch.skill !== undefined
+        ? patch.skill?.trim() || null
+        : existing.skill;
 
   const deck = await prisma.$transaction(
     async (tx) => {
@@ -614,7 +662,7 @@ export async function listUserDecks(
 
     skill: deck.skill,
 
-    format: deck.format,
+    format: normalizeDuelFormat(deck.format),
 
     isPublic: deck.isPublic,
 

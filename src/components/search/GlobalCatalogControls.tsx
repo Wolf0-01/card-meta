@@ -16,6 +16,8 @@ import {
   X,
 } from "lucide-react";
 
+import type { DuelFormat } from "@/lib/duelFormat";
+
 import {
   CARD_ATTRIBUTE_OPTIONS,
   CARD_CONTROL_CLASSES,
@@ -28,6 +30,8 @@ import {
 
 interface GlobalCatalogControlsProps {
   search: string;
+
+  format: DuelFormat;
 
   type: string;
 
@@ -42,6 +46,8 @@ interface GlobalCatalogControlsProps {
   direction: "asc" | "desc";
 
   onSearchChange: (value: string) => void;
+
+  onFormatChange: (value: DuelFormat) => void;
 
   onFilterChange: (
     key: CardFilterKey,
@@ -66,6 +72,7 @@ interface GlobalCatalogControlsProps {
  */
 export default function GlobalCatalogControls({
   search,
+  format,
   type,
   attribute,
   rarity,
@@ -73,6 +80,7 @@ export default function GlobalCatalogControls({
   sort,
   direction,
   onSearchChange,
+  onFormatChange,
   onFilterChange,
   onSortChange,
   onDirectionToggle,
@@ -232,6 +240,62 @@ export default function GlobalCatalogControls({
               <X className="h-2.5 w-2.5" />
             </button>
           )}
+        </div>
+
+        <div
+          className="
+            flex
+            shrink-0
+            overflow-hidden
+            rounded-md
+            border
+            border-slate-700/80
+            bg-[#070D1F]
+          "
+        >
+          {(
+            [
+              { value: "speed", label: "Speed" },
+              { value: "rush", label: "Rush" },
+            ] as const
+          ).map((item, index) => {
+            const active =
+              item.value === format;
+
+            return (
+              <button
+                key={item.value}
+                type="button"
+                aria-pressed={active}
+                onClick={() =>
+                  onFormatChange(item.value)
+                }
+                className={`
+                  flex
+                  h-8
+                  items-center
+                  px-2.5
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.14em]
+                  transition-colors
+                  ${
+                    index > 0
+                      ? "border-l border-slate-700/80"
+                      : ""
+                  }
+                  ${
+                    active
+                      ? "bg-blue-500/15 text-blue-200"
+                      : "text-slate-500 hover:text-slate-300"
+                  }
+                `}
+              >
+                {item.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 

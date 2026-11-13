@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { DuelFormat } from "@/lib/duelFormat";
+
 import type { DeckZone } from "@/types/deck";
 
 import {
@@ -210,7 +212,8 @@ export function countDeckCards(
 
 export function validateDeckCards(
   cards: NormalizedDeckCard[],
-  isPublic: boolean
+  isPublic: boolean,
+  format: DuelFormat = "speed"
 ): DeckCounts {
   const issues: DeckIssue[] = [];
 
@@ -250,7 +253,14 @@ export function validateDeckCards(
     });
   }
 
-  if (counts.extra > DECK_RULES.extraMax) {
+  if (format === "rush" && counts.extra > 0) {
+    issues.push({
+      path: "cards",
+
+      message:
+        "Rush Duel no utiliza Extra Deck: todas las cartas deben estar en el Main Deck",
+    });
+  } else if (counts.extra > DECK_RULES.extraMax) {
     issues.push({
       path: "cards",
 

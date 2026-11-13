@@ -1,6 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
+import {
+  normalizeDuelFormat,
+  type DuelFormat,
+} from "@/lib/duelFormat";
+
 import { mapPrismaDeck } from "@/lib/mappers/deckMapper";
 
 import type { MetaDeck } from "@/types/meta";
@@ -336,6 +341,8 @@ export interface PublicDeckExplorerOptions {
 
   skill?: string;
 
+  format?: DuelFormat;
+
   page?: number;
 
   pageSize?: number;
@@ -358,9 +365,13 @@ export interface PublicDeckExplorerResult {
 export async function getPublicDeckExplorer({
   search,
   skill,
+  format = "speed",
   page = 1,
   pageSize = 24,
 }: PublicDeckExplorerOptions = {}): Promise<PublicDeckExplorerResult> {
+  const normalizedFormat =
+    normalizeDuelFormat(format);
+
   const safePage = Math.max(
     Math.floor(page),
     1
@@ -373,6 +384,8 @@ export async function getPublicDeckExplorer({
 
   const where: Prisma.DeckWhereInput = {
     isPublic: true,
+
+    format: normalizedFormat,
   };
 
   const term = search?.trim();
@@ -424,6 +437,8 @@ export async function getPublicDeckExplorer({
       prisma.deck.findMany({
         where: {
           isPublic: true,
+
+          format: normalizedFormat,
 
           skill: {
             not: null,
@@ -523,7 +538,7 @@ export async function getMetaSummary() {
 
     totalPlayers,
 
-    format: "Advanced",
+    format: "Speed Duel",
 
     lastUpdate: new Date()
       .toISOString()

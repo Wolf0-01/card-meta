@@ -1,5 +1,7 @@
 import type { Card as PrismaCard } from "@prisma/client";
 
+import { normalizeDuelFormat } from "@/lib/duelFormat";
+
 import type {
   Card,
   CardObtainEntry,
@@ -75,6 +77,8 @@ export function mapPrismaCard(
   return {
     ...card,
 
+    format: normalizeDuelFormat(card.format),
+
     type: card.type ?? "",
 
     linkMarkers: Array.isArray(card.linkMarkers)
@@ -92,13 +96,17 @@ export function mapPrismaCard(
 export function mapPrismaCardPreview(
   card: Omit<
     CardPreviewData,
-    "linkMarkers"
+    "linkMarkers" | "format"
   > & {
+    format: string;
+
     linkMarkers: unknown;
   }
 ): CardPreviewData {
   return {
     ...card,
+
+    format: normalizeDuelFormat(card.format),
 
     linkMarkers: Array.isArray(card.linkMarkers)
       ? (card.linkMarkers as LinkMarker[])

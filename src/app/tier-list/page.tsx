@@ -379,7 +379,9 @@ export default async function TierListPage({
                 text-slate-200
               "
             >
-              Rush Duel está en preparación
+              {format === "rush"
+                ? "Todavía no hay datos Rush"
+                : "Todavía no hay datos competitivos"}
             </h2>
 
             <p
@@ -390,15 +392,17 @@ export default async function TierListPage({
                 text-slate-500
               "
             >
-              Todavía no hay mazos Rush públicos
-              registrados. En cuanto la comunidad
-              publique listas, aparecerán aquí con
-              su Power Ranking y contador
-              automático.
+              {format === "rush"
+                ? "No hay mazos Rush públicos ni arquetipos Rush en el catálogo. En cuanto existan cartas o listas, aparecerán aquí con su Power Ranking."
+                : "Todavía no hay mazos públicos registrados. En cuanto la comunidad publique listas, aparecerán aquí con su Power Ranking y contador automático."}
             </p>
 
             <Link
-              href="/decks/new"
+              href={
+                format === "rush"
+                  ? "/decks/new?format=rush"
+                  : "/decks/new"
+              }
               className="
                 mt-2
                 inline-flex
@@ -422,6 +426,7 @@ export default async function TierListPage({
               <TierBandSection
                 key={band.key}
                 band={band}
+                format={format}
               />
             ))}
           </div>

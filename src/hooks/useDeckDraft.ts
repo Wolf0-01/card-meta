@@ -7,6 +7,11 @@ import {
   useSyncExternalStore,
 } from "react";
 
+import {
+  normalizeDuelFormat,
+  type DuelFormat,
+} from "@/lib/duelFormat";
+
 import type { CardPreviewData } from "@/types/CardPreviewData";
 
 import type { DeckZone } from "@/types/deck";
@@ -57,6 +62,8 @@ export interface DeckDraftSeed {
   isPublic: boolean;
 
   skill: string;
+
+  format?: DuelFormat;
 }
 
 interface UseDeckDraftOptions {
@@ -139,6 +146,12 @@ function readStoredDraft(
         typeof parsed.skill === "string"
           ? parsed.skill
           : "",
+
+      format: normalizeDuelFormat(
+        typeof parsed.format === "string"
+          ? parsed.format
+          : null
+      ),
     };
   } catch {
     return null;
@@ -185,6 +198,13 @@ export default function useDeckDraft({
     () => initialDraft?.skill ?? ""
   );
 
+  const [format, setFormatState] =
+    useState<DuelFormat>(() =>
+      normalizeDuelFormat(
+        initialDraft?.format
+      )
+    );
+
   const hasLoadedStorage =
     useSyncExternalStore(
       subscribeToHydration,
@@ -214,6 +234,7 @@ export default function useDeckDraft({
           description,
           isPublic,
           skill,
+          format,
         })
       );
     } catch {
@@ -228,6 +249,7 @@ export default function useDeckDraft({
     description,
     isPublic,
     skill,
+    format,
     isReady,
     storageKey,
   ]);
@@ -280,8 +302,9 @@ export default function useDeckDraft({
   );
 
   const validation = useMemo(
-    () => validateDraft(visibleCards),
-    [visibleCards]
+    () =>
+      validateDraft(visibleCards, format),
+    [visibleCards, format]
   );
 
   function addCard(
@@ -289,7 +312,12 @@ export default function useDeckDraft({
     zone?: DeckZone
   ) {
     setCards((current) =>
-      addDraftCard(current, card, zone)
+      addDraftCard(
+        current,
+        card,
+        zone,
+        format
+      )
     );
   }
 
@@ -336,6 +364,25 @@ export default function useDeckDraft({
     );
   }
 
+  function setFormat(nextFormat: DuelFormat) {
+    setFormatState(nextFormat);
+
+    if (nextFormat === "rush") {
+      /*
+       * Rush Duel no usa Extra Deck ni Skills de Speed.
+       * Al cambiar de formato se retiran esas cartas y la
+       * skill para que el borrador quede válido.
+       */
+      setCards((current) =>
+        current.filter(
+          (card) => card.zone === "main"
+        )
+      );
+
+      setSkill("");
+    }
+  }
+
   function clearDeck() {
     setCards(clearDraftCards());
 
@@ -346,6 +393,8 @@ export default function useDeckDraft({
     setIsPublic(false);
 
     setSkill("");
+
+    setFormatState("speed");
 
     /*
      * Borramos también el almacenamiento de forma
@@ -392,6 +441,10 @@ export default function useDeckDraft({
     skill: isReady ? skill : "",
 
     setSkill,
+
+    format: isReady ? format : "speed",
+
+    setFormat,
 
     stats,
 

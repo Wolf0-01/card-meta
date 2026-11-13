@@ -2,6 +2,8 @@
 
 import Card from "@/components/ui/Card";
 
+import { getDuelFormatLabel } from "@/lib/duelFormat";
+
 import { MetaDeck } from "@/types/meta";
 
 interface Props {
@@ -40,10 +42,9 @@ export default function DeckOverview({
 
         <OverviewItem
           label="Formato"
-          value={
-            deck.format ??
-            "Advanced"
-          }
+          value={getDuelFormatLabel(
+            deck.format
+          )}
         />
 
         <OverviewItem

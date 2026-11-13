@@ -11,6 +11,7 @@ import {
 import { formatNumber } from "@/lib/format";
 
 import type {
+  DuelFormat,
   TierListArchetype,
 } from "@/lib/tier-list";
 
@@ -18,6 +19,8 @@ import { TIER_BAND_META } from "./tierBands";
 
 interface ArchetypeTierCardProps {
   archetype: TierListArchetype;
+
+  format: DuelFormat;
 }
 
 /**
@@ -26,6 +29,7 @@ interface ArchetypeTierCardProps {
  */
 export default function ArchetypeTierCard({
   archetype,
+  format,
 }: ArchetypeTierCardProps) {
   const meta = TIER_BAND_META[archetype.tier];
 
@@ -33,7 +37,9 @@ export default function ArchetypeTierCard({
     <Link
       href={`/decks?q=${encodeURIComponent(
         archetype.searchTerm
-      )}`}
+      )}${
+        format === "rush" ? "&format=rush" : ""
+      }`}
       aria-label={`Ver mazos públicos de ${archetype.name}`}
       className="
         group

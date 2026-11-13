@@ -58,6 +58,11 @@ export default async function NewDeckPage({
 
         skill: deck.skill ?? "",
 
+        format:
+          deck.format === "rush"
+            ? "rush"
+            : "speed",
+
         isPublic: false,
 
         cards: deck.cards.map(

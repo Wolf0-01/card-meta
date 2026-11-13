@@ -7,6 +7,8 @@ import StatCard, {
 
 import { getWinRate } from "@/lib/deckUtils";
 
+import { getDuelFormatLabel } from "@/lib/duelFormat";
+
 import { MetaDeck } from "@/types/meta";
 
 interface Props {
@@ -64,7 +66,7 @@ export default function DeckStats({
     },
     {
       label: "FORMAT",
-      value: deck.format ?? "Advanced",
+      value: getDuelFormatLabel(deck.format),
       variant: "neutral",
     },
     {

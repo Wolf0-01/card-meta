@@ -55,7 +55,7 @@ interface CardsPageProps {
     maxDef?: string;
     sort?: string;
     direction?: string;
-    mode?: string;
+    format?: string;
   }>;
 }
 
@@ -93,10 +93,17 @@ export default async function CardsPage({
       ? "desc"
       : "asc";
 
+  const format =
+    params.format === "rush"
+      ? "rush"
+      : "speed";
+
   const result =
     activeTab === "cards"
       ? await queryCards({
           search: params.search,
+
+          format,
 
           type: params.type,
 
