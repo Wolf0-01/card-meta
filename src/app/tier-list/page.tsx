@@ -14,7 +14,13 @@ import {
 
 import TierBandSection from "@/components/tier-list/TierBandSection";
 
+import TierEntryManager from "@/components/tier-list/TierEntryManager";
+
 import TierListTabs from "@/components/tier-list/TierListTabs";
+
+import { getCurrentUser } from "@/lib/auth/currentUser";
+
+import { canManageGuides } from "@/lib/auth/roles";
 
 import {
   formatDate,
@@ -25,6 +31,8 @@ import {
   getTierList,
   type DuelFormat,
 } from "@/lib/tier-list";
+
+import { getTierEntriesForFormat } from "@/lib/tier-entries/service";
 
 interface TierListPageProps {
   searchParams: Promise<{
@@ -118,7 +126,12 @@ export default async function TierListPage({
 
   const format = resolveFormat(params.format);
 
-  const data = await getTierList(format);
+  const [data, user, entries] =
+    await Promise.all([
+      getTierList(format),
+      getCurrentUser(),
+      getTierEntriesForFormat(format),
+    ]);
 
   const isRush = format === "rush";
 
@@ -173,7 +186,7 @@ export default async function TierListPage({
                 "
               >
                 <ArrowLeft className="h-3 w-3" />
-                Inicio
+                Home
               </Link>
 
               <p
@@ -213,9 +226,10 @@ export default async function TierListPage({
                 "
               >
                 The competitive order of Duel Links,
-                with the real performance of public
-                decks and the card pool
-                of each archetype.
+                curated by the staff from real
+                tournament results, public deck
+                performance and the card pool of each
+                archetype.
               </p>
             </div>
 
@@ -311,13 +325,12 @@ export default async function TierListPage({
                     text-slate-400
                   "
                 >
-                  The ranking reflects
-                  tournament and ladder performance,
-                  archetype popularity and the
-                  depth of its card pool.
-                  Deck counters update
-                  automatically with
-                  public lists.
+                  Tiers are curated by the
+                  editorial team using tournament
+                  and ladder performance, archetype
+                  popularity and card pool depth.
+                  The ranking updates as new
+                  results are published.
                 </p>
               </div>
 
@@ -350,6 +363,13 @@ export default async function TierListPage({
           </section>
         </header>
 
+        {canManageGuides(user) && (
+          <TierEntryManager
+            format={format}
+            entries={entries}
+          />
+        )}
+
         {!data.hasData ? (
           <section
             className="
@@ -380,8 +400,8 @@ export default async function TierListPage({
               "
             >
               {format === "rush"
-                ? "No Rush data yet"
-                : "No competitive data yet"}
+                ? "Rush Duel tier list coming soon"
+                : "Tier list coming soon"}
             </h2>
 
             <p
@@ -393,16 +413,12 @@ export default async function TierListPage({
               "
             >
               {format === "rush"
-                ? "There are no public Rush decks or Rush archetypes in the catalog yet. As soon as cards or lists exist, they will appear here with their Power Ranking."
-                : "No public decks registered yet. As soon as the community publishes lists, they will appear here with their Power Ranking and automatic counter."}
+                ? "The competitive Rush Duel ranking will be updated with the next tournament results. New Tier 1, Tier 2, Tier 3 and High Potential archetypes will appear here as soon as the staff publishes them."
+                : "The competitive ranking will be updated with the next tournament results. New Tier 1, Tier 2, Tier 3 and High Potential archetypes will appear here as soon as the staff publishes them."}
             </p>
 
             <Link
-              href={
-                format === "rush"
-                  ? "/decks/new?format=rush"
-                  : "/decks/new"
-              }
+              href="/tournaments"
               className="
                 mt-2
                 inline-flex
@@ -417,7 +433,7 @@ export default async function TierListPage({
                 hover:text-blue-200
               "
             >
-              Create a deck
+              View tournaments
             </Link>
           </section>
         ) : (

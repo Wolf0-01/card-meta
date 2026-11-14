@@ -154,7 +154,7 @@ export default function ArchetypeTierCard({
               "
             >
               {archetype.signatureName ??
-                "Arquetipo"}
+                "Archetype"}
             </p>
           </div>
 

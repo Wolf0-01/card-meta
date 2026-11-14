@@ -1,6 +1,12 @@
 import { cache } from "react";
 
+import { getCardImageSrc } from "@/lib/cards/image";
+
 import { prisma } from "@/lib/prisma";
+
+import { getTierEntriesForFormat } from "@/lib/tier-entries/service";
+
+import type { TierEntryTier } from "@/lib/tier-entries/editor";
 
 export type TierBandKey =
   | "tier-1"
@@ -13,6 +19,9 @@ export type DuelFormat = "speed" | "rush";
 export interface TierListArchetype {
   key: string;
 
+  /** Id de la entrada editable de la Tier List. */
+  entryId: string;
+
   name: string;
 
   /** Término que se envía a /decks?q= para abrir sus listas. */
@@ -20,7 +29,7 @@ export interface TierListArchetype {
 
   tier: TierBandKey;
 
-  /** Puntuación 0-100 calculada con datos reales de la BD. */
+  /** Puntuación 0-100 definida por el staff. */
   powerScore: number;
 
   /** Mazos públicos registrados para este arquetipo. */
@@ -32,6 +41,9 @@ export interface TierListArchetype {
   image: string | null;
 
   signatureName: string | null;
+
+  /** Nota editorial del staff. */
+  notes: string | null;
 }
 
 export interface TierListBand {
@@ -54,26 +66,6 @@ export interface TierListData {
   bands: TierListBand[];
 }
 
-interface ArchetypeSeed {
-  key: string;
-
-  name: string;
-
-  searchTerm: string;
-
-  /** Nombre canónico en Card.archetype. */
-  cardArchetype: string;
-
-  /** Carta insignia que se muestra como miniatura. */
-  signatureCard: string;
-
-  /** Alias normalizados para relacionar mazos sin archetypeId. */
-  aliases: string[];
-
-  /** Tier editorial de respaldo cuando no hay datos de torneo. */
-  fallbackTier: TierBandKey;
-}
-
 const TIER_ORDER: TierBandKey[] = [
   "tier-1",
   "tier-2",
@@ -81,276 +73,15 @@ const TIER_ORDER: TierBandKey[] = [
   "high-potential",
 ];
 
-const BAND_BASE_SCORE: Record<
-  TierBandKey,
-  number
+const BAND_BY_TIER: Record<
+  TierEntryTier,
+  TierBandKey
 > = {
-  "tier-1": 80,
-  "tier-2": 66,
-  "tier-3": 52,
-  "high-potential": 38,
+  TIER_1: "tier-1",
+  TIER_2: "tier-2",
+  TIER_3: "tier-3",
+  HIGH_POTENTIAL: "high-potential",
 };
-
-const SPEED_SEEDS: ArchetypeSeed[] = [
-  {
-    key: "snake-eye",
-    name: "Snake-Eye",
-    searchTerm: "Snake-Eye",
-    cardArchetype: "Snake-Eye",
-    signatureCard: "Snake-Eyes Poplar",
-    aliases: ["snake eye", "snake-eye"],
-    fallbackTier: "tier-1",
-  },
-  {
-    key: "blue-eyes",
-    name: "Blue-Eyes",
-    searchTerm: "Blue Eyes",
-    cardArchetype: "Blue-Eyes",
-    signatureCard: "Blue-Eyes White Dragon",
-    aliases: ["blue eyes", "blue-eyes"],
-    fallbackTier: "tier-1",
-  },
-  {
-    key: "dark-magician",
-    name: "Dark Magician",
-    searchTerm: "Dark Magician",
-    cardArchetype: "Dark Magician",
-    signatureCard: "Dark Magician",
-    aliases: ["dark magician", "dark-magician"],
-    fallbackTier: "tier-2",
-  },
-  {
-    key: "salamangreat",
-    name: "Salamangreat",
-    searchTerm: "Salamangreat",
-    cardArchetype: "Salamangreat",
-    signatureCard: "Salamangreat Gazelle",
-    aliases: ["salamangreat", "salamangreats"],
-    fallbackTier: "tier-2",
-  },
-  {
-    key: "elemental-hero",
-    name: "Elemental HERO",
-    searchTerm: "Elemental HERO",
-    cardArchetype: "Elemental HERO",
-    signatureCard: "Elemental HERO Stratos",
-    aliases: ["elemental hero", "elemental-hero"],
-    fallbackTier: "tier-2",
-  },
-  {
-    key: "sky-striker",
-    name: "Sky Striker",
-    searchTerm: "Sky Striker",
-    cardArchetype: "Sky Striker",
-    signatureCard: "Sky Striker Ace - Raye",
-    aliases: ["sky striker", "sky-striker"],
-    fallbackTier: "tier-3",
-  },
-  {
-    key: "blackwing",
-    name: "Blackwing",
-    searchTerm: "Blackwing",
-    cardArchetype: "Blackwing",
-    signatureCard: "Blackwing - Gale the Whirlwind",
-    aliases: ["blackwing", "blackwings"],
-    fallbackTier: "tier-3",
-  },
-  {
-    key: "gladiator-beast",
-    name: "Gladiator Beast",
-    searchTerm: "Gladiator Beast",
-    cardArchetype: "Gladiator Beast",
-    signatureCard: "Gladiator Beast Bestiari",
-    aliases: ["gladiator beast", "gladiator-beast"],
-    fallbackTier: "tier-3",
-  },
-  {
-    key: "phantom-knights",
-    name: "Phantom Knights",
-    searchTerm: "Phantom Knights",
-    cardArchetype: "Phantom Knights",
-    signatureCard:
-      "The Phantom Knights of Rusty Bardiche",
-    aliases: ["phantom knights", "phantom-knights"],
-    fallbackTier: "high-potential",
-  },
-  {
-    key: "six-samurai",
-    name: "Six Samurai",
-    searchTerm: "Six Samurai",
-    cardArchetype: "Six Samurai",
-    signatureCard:
-      "Legendary Six Samurai - Shi En",
-    aliases: ["six samurai", "six-samurai"],
-    fallbackTier: "high-potential",
-  },
-  {
-    key: "noble-knight",
-    name: "Noble Knight",
-    searchTerm: "Noble Knight",
-    cardArchetype: "Noble Knight",
-    signatureCard: "Noble Knight Medraut",
-    aliases: ["noble knight", "noble-knight"],
-    fallbackTier: "high-potential",
-  },
-  {
-    key: "ancient-gear",
-    name: "Ancient Gear",
-    searchTerm: "Ancient Gear",
-    cardArchetype: "Ancient Gear",
-    signatureCard: "Ancient Gear Golem",
-    aliases: ["ancient gear", "ancient-gear"],
-    fallbackTier: "high-potential",
-  },
-];
-
-/**
- * Arquetipos con presencia real en Rush Duel.
- *
- * Se construyen a partir de las cartas del catálogo marcadas
- * como `format = "rush"` y de los mazos públicos Rush. La
- * clasificación editorial actúa como respaldo cuando todavía
- * no existen datos de torneo.
- */
-const RUSH_SEEDS: ArchetypeSeed[] = [
-  {
-    key: "rush-elemental-hero",
-    name: "Elemental HERO",
-    searchTerm: "Elemental HERO",
-    cardArchetype: "Elemental HERO",
-    signatureCard: "Elemental HERO Avian",
-    aliases: ["elemental hero", "elemental-hero"],
-    fallbackTier: "tier-1",
-  },
-  {
-    key: "rush-dark-magician",
-    name: "Dark Magician",
-    searchTerm: "Dark Magician",
-    cardArchetype: "Dark Magician",
-    signatureCard: "Dark Magician",
-    aliases: ["dark magician", "dark-magician"],
-    fallbackTier: "tier-1",
-  },
-  {
-    key: "rush-harpie",
-    name: "Harpie",
-    searchTerm: "Harpie",
-    cardArchetype: "Harpie",
-    signatureCard: "Harpie Lady",
-    aliases: ["harpie", "harpies"],
-    fallbackTier: "tier-2",
-  },
-  {
-    key: "rush-monarch",
-    name: "Monarch",
-    searchTerm: "Monarch",
-    cardArchetype: "Monarch",
-    signatureCard: "Caius the Shadow Monarch",
-    aliases: ["monarch", "monarchs"],
-    fallbackTier: "tier-2",
-  },
-  {
-    key: "rush-abc",
-    name: "ABC",
-    searchTerm: "ABC",
-    cardArchetype: "ABC",
-    signatureCard: "X-Head Cannon",
-    aliases: ["abc"],
-    fallbackTier: "tier-2",
-  },
-  {
-    key: "rush-ancient-gear",
-    name: "Ancient Gear",
-    searchTerm: "Ancient Gear",
-    cardArchetype: "Ancient Gear",
-    signatureCard: "Ancient Gear Golem",
-    aliases: ["ancient gear", "ancient-gear"],
-    fallbackTier: "tier-2",
-  },
-  {
-    key: "rush-blue-eyes",
-    name: "Blue-Eyes",
-    searchTerm: "Blue Eyes",
-    cardArchetype: "Blue-Eyes",
-    signatureCard: "Blue-Eyes White Dragon",
-    aliases: ["blue eyes", "blue-eyes"],
-    fallbackTier: "tier-2",
-  },
-  {
-    key: "rush-cyber-dragon",
-    name: "Cyber Dragon",
-    searchTerm: "Cyber Dragon",
-    cardArchetype: "Cyber Dragon",
-    signatureCard: "Cyber Dragon",
-    aliases: ["cyber dragon", "cyber-dragon"],
-    fallbackTier: "tier-3",
-  },
-  {
-    key: "rush-red-eyes",
-    name: "Red-Eyes",
-    searchTerm: "Red-Eyes",
-    cardArchetype: "Red-Eyes",
-    signatureCard: "Red-Eyes Black Dragon",
-    aliases: ["red eyes", "red-eyes"],
-    fallbackTier: "tier-3",
-  },
-  {
-    key: "rush-gadget",
-    name: "Gadget",
-    searchTerm: "Gadget",
-    cardArchetype: "Gadget",
-    signatureCard: "Red Gadget",
-    aliases: ["gadget", "gadgets"],
-    fallbackTier: "tier-3",
-  },
-  {
-    key: "rush-charmer",
-    name: "Charmer",
-    searchTerm: "Charmer",
-    cardArchetype: "Charmer",
-    signatureCard: "Aussa the Earth Charmer",
-    aliases: ["charmer", "charmers"],
-    fallbackTier: "high-potential",
-  },
-  {
-    key: "rush-gaia",
-    name: "Gaia The Fierce Knight",
-    searchTerm: "Gaia The Fierce Knight",
-    cardArchetype: "Gaia The Fierce Knight",
-    signatureCard: "Gaia The Fierce Knight",
-    aliases: [
-      "gaia the fierce knight",
-      "gaia-the-fierce-knight",
-    ],
-    fallbackTier: "high-potential",
-  },
-  {
-    key: "rush-neo-spacian",
-    name: "Neo-Spacian",
-    searchTerm: "Neo-Spacian",
-    cardArchetype: "Neo-Spacian",
-    signatureCard: "Neo-Spacian Grand Mole",
-    aliases: ["neo spacian", "neo-spacian"],
-    fallbackTier: "high-potential",
-  },
-  {
-    key: "rush-umi",
-    name: "Umi",
-    searchTerm: "Umi",
-    cardArchetype: "Umi",
-    signatureCard: "Levia-Dragon - Daedalus",
-    aliases: ["umi"],
-    fallbackTier: "high-potential",
-  },
-];
-
-function getSeeds(
-  format: DuelFormat
-): ArchetypeSeed[] {
-  return format === "rush"
-    ? RUSH_SEEDS
-    : SPEED_SEEDS;
-}
 
 function normalize(value: string): string {
   return value
@@ -360,67 +91,6 @@ function normalize(value: string): string {
     .replace(/[^a-z0-9]+/g, "");
 }
 
-function clamp(
-  value: number,
-  min: number,
-  max: number
-): number {
-  return Math.min(Math.max(value, min), max);
-}
-
-function bandFromTier(
-  tier: string | null
-): TierBandKey | null {
-  if (!tier) {
-    return null;
-  }
-
-  const value = tier
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim();
-
-  if (value.includes("tier 1") || value === "t1") {
-    return "tier-1";
-  }
-
-  if (value.includes("tier 2") || value === "t2") {
-    return "tier-2";
-  }
-
-  if (value.includes("tier 3") || value === "t3") {
-    return "tier-3";
-  }
-
-  if (
-    value.includes("rogue") ||
-    value.includes("potential")
-  ) {
-    return "high-potential";
-  }
-
-  return null;
-}
-
-function bestBand(
-  bands: (TierBandKey | null)[]
-): TierBandKey | null {
-  const found = bands.filter(
-    (band): band is TierBandKey => band !== null
-  );
-
-  if (found.length === 0) {
-    return null;
-  }
-
-  return found.reduce((best, current) =>
-    TIER_ORDER.indexOf(current) <
-    TIER_ORDER.indexOf(best)
-      ? current
-      : best
-  );
-}
-
 function isRushFormat(format: string): boolean {
   return format.toLowerCase().includes("rush");
 }
@@ -428,354 +98,205 @@ function isRushFormat(format: string): boolean {
 interface DeckForTierList {
   name: string;
 
-  slug: string;
-
   format: string;
-
-  tier: string | null;
-
-  popularity: number;
-
-  tournamentResults: number;
-
-  updatedAt: Date;
 
   archetype: {
     name: string;
   } | null;
-
-  cards: {
-    quantity: number;
-
-    card: {
-      archetype: string | null;
-    };
-  }[];
-}
-
-function resolveDeckSeed(
-  deck: DeckForTierList,
-  aliasIndex: Map<string, ArchetypeSeed>
-): ArchetypeSeed | null {
-  const relationName = deck.archetype?.name;
-
-  if (relationName) {
-    const match = aliasIndex.get(
-      normalize(relationName)
-    );
-
-    if (match) {
-      return match;
-    }
-  }
-
-  const deckIdentity = normalize(
-    `${deck.name} ${deck.slug}`
-  );
-
-  for (const [alias, seed] of aliasIndex) {
-    if (alias.length >= 4 && deckIdentity.includes(alias)) {
-      return seed;
-    }
-  }
-
-  const cardWeights = new Map<string, number>();
-
-  for (const entry of deck.cards) {
-    const archetype = entry.card.archetype;
-
-    if (!archetype) {
-      continue;
-    }
-
-    cardWeights.set(
-      archetype,
-      (cardWeights.get(archetype) ?? 0) +
-        Math.max(entry.quantity, 1)
-    );
-  }
-
-  let bestSeed: ArchetypeSeed | null = null;
-
-  let bestWeight = 0;
-
-  for (const [archetype, weight] of cardWeights) {
-    const seed = aliasIndex.get(normalize(archetype));
-
-    if (seed && weight > bestWeight) {
-      bestSeed = seed;
-
-      bestWeight = weight;
-    }
-  }
-
-  return bestSeed;
-}
-
-function scoreArchetype({
-  band,
-  deckCount,
-  tournamentResults,
-  popularity,
-  cardCount,
-}: {
-  band: TierBandKey;
-
-  deckCount: number;
-
-  tournamentResults: number;
-
-  popularity: number;
-
-  cardCount: number;
-}): number {
-  const base = BAND_BASE_SCORE[band];
-
-  const deckBonus = Math.min(deckCount * 3, 9);
-
-  const tournamentBonus = Math.min(
-    tournamentResults,
-    6
-  );
-
-  const popularityBonus = Math.min(
-    popularity / 5,
-    5
-  );
-
-  const poolBonus = Math.min(cardCount / 10, 4);
-
-  return Math.round(
-    clamp(
-      base +
-        deckBonus +
-        tournamentBonus +
-        popularityBonus +
-        poolBonus,
-      0,
-      100
-    )
-  );
 }
 
 /**
- * Construye la Tier List competitiva combinando:
+ * Construye la Tier List competitiva a partir de las
+ * entradas reales que mantiene el staff en PostgreSQL.
  *
- * - La clasificación editorial de arquetipos (Tier 1/2/3/High Potential).
- * - El tier real de los mazos públicos cuando existe.
- * - Resultados de torneo, popularidad y profundidad del pool de cartas.
- * - El contador de mazos públicos registrados por arquetipo.
+ * Los contadores de mazos y cartas se calculan con el
+ * catálogo público; el orden y el Power Score son
+ * editoriales y se editan desde /tier-list.
  */
 export const getTierList = cache(
   async (
     format: DuelFormat = "speed"
   ): Promise<TierListData> => {
-    const seeds = getSeeds(format);
+    const entries =
+      await getTierEntriesForFormat(format);
 
-    const decks = await prisma.deck.findMany({
-      where: {
-        isPublic: true,
-      },
+    const [decks, cardCountRows] =
+      await Promise.all([
+        prisma.deck.findMany({
+          where: {
+            isPublic: true,
+          },
 
-      select: {
-        name: true,
-
-        slug: true,
-
-        format: true,
-
-        tier: true,
-
-        popularity: true,
-
-        tournamentResults: true,
-
-        updatedAt: true,
-
-        archetype: {
           select: {
             name: true,
-          },
-        },
 
-        cards: {
-          select: {
-            quantity: true,
+            format: true,
 
-            card: {
+            archetype: {
               select: {
-                archetype: true,
+                name: true,
               },
             },
           },
-        },
-      },
-    });
+        }),
 
-    const formatDecks = decks.filter((deck) =>
-      format === "rush"
-        ? isRushFormat(deck.format)
-        : !isRushFormat(deck.format)
-    );
-
-    const [cardCountRows, signatureCards] =
-      await Promise.all([
         prisma.card.groupBy({
           by: ["archetype"],
 
           where: {
             format,
-
-            archetype: {
-              in: seeds.map(
-                (seed) => seed.cardArchetype
-              ),
-            },
           },
 
           _count: {
             _all: true,
           },
         }),
-
-        prisma.card.findMany({
-          where: {
-            format,
-
-            name: {
-              in: seeds.map(
-                (seed) => seed.signatureCard
-              ),
-            },
-          },
-
-          select: {
-            name: true,
-            ygoproId: true,
-            image: true,
-          },
-        }),
       ]);
+
+    const formatDecks: DeckForTierList[] =
+      decks.filter((deck) =>
+        format === "rush"
+          ? isRushFormat(deck.format)
+          : !isRushFormat(deck.format)
+      );
 
     const cardCounts = new Map(
       cardCountRows.map((row) => [
-        row.archetype ?? "",
+        normalize(row.archetype ?? ""),
         row._count._all,
       ])
     );
 
-    const signatures = new Map(
-      signatureCards.map((card) => [
+    const ygoproIds = entries.flatMap(
+      (entry) =>
+        entry.ygoproId ? [entry.ygoproId] : []
+    );
+
+    const cardNames = entries.flatMap(
+      (entry) =>
+        entry.cardName ? [entry.cardName] : []
+    );
+
+    const cards =
+      ygoproIds.length > 0 ||
+      cardNames.length > 0
+        ? await prisma.card.findMany({
+            where: {
+              OR: [
+                ...(ygoproIds.length > 0
+                  ? [
+                      {
+                        ygoproId: {
+                          in: ygoproIds,
+                        },
+                      },
+                    ]
+                  : []),
+
+                ...(cardNames.length > 0
+                  ? [
+                      {
+                        name: {
+                          in: cardNames,
+                        },
+                      },
+                    ]
+                  : []),
+              ],
+            },
+
+            select: {
+              name: true,
+              ygoproId: true,
+              image: true,
+            },
+          })
+        : [];
+
+    const cardsById = new Map(
+      cards.flatMap((card) =>
+        card.ygoproId
+          ? [[card.ygoproId, card] as const]
+          : []
+      )
+    );
+
+    const cardsByName = new Map(
+      cards.map((card) => [
         card.name,
         card,
       ])
     );
 
-    const aliasIndex = new Map<
-      string,
-      ArchetypeSeed
-    >();
-
-    for (const seed of seeds) {
-      aliasIndex.set(normalize(seed.name), seed);
-
-      aliasIndex.set(
-        normalize(seed.cardArchetype),
-        seed
-      );
-
-      for (const alias of seed.aliases) {
-        aliasIndex.set(normalize(alias), seed);
-      }
-    }
-
-    const decksBySeed = new Map<
-      string,
-      DeckForTierList[]
-    >();
-
-    for (const deck of formatDecks) {
-      const seed = resolveDeckSeed(deck, aliasIndex);
-
-      if (!seed) {
-        continue;
-      }
-
-      const current =
-        decksBySeed.get(seed.key) ?? [];
-
-      current.push(deck);
-
-      decksBySeed.set(seed.key, current);
-    }
-
     const archetypes: TierListArchetype[] =
-      seeds
-        .map((seed) => {
-        const seedDecks =
-          decksBySeed.get(seed.key) ?? [];
+      entries.map((entry) => {
+        const normalizedArchetype = normalize(
+          entry.archetype
+        );
 
-        const band =
-          bestBand(
-            seedDecks.map((deck) =>
-              bandFromTier(deck.tier)
-            )
-          ) ?? seed.fallbackTier;
+        const deckCount = formatDecks.filter(
+          (deck) => {
+            const relation =
+              deck.archetype?.name;
 
-        const cardCount =
-          cardCounts.get(seed.cardArchetype) ?? 0;
+            if (
+              relation &&
+              normalize(relation).includes(
+                normalizedArchetype
+              )
+            ) {
+              return true;
+            }
+
+            return normalize(deck.name).includes(
+              normalizedArchetype
+            );
+          }
+        ).length;
 
         const signature =
-          signatures.get(seed.signatureCard);
+          (entry.ygoproId
+            ? cardsById.get(entry.ygoproId)
+            : undefined) ??
+          (entry.cardName
+            ? cardsByName.get(entry.cardName)
+            : undefined);
 
-        const tournamentResults = seedDecks.reduce(
-          (total, deck) =>
-            total + deck.tournamentResults,
-          0
-        );
-
-        const popularity = seedDecks.reduce(
-          (total, deck) => total + deck.popularity,
-          0
-        );
+        const image =
+          getCardImageSrc(signature) ??
+          (entry.ygoproId
+            ? `/cards/${entry.ygoproId}.jpg`
+            : null);
 
         return {
-          key: seed.key,
+          key: entry.id,
 
-          name: seed.name,
+          entryId: entry.id,
 
-          searchTerm: seed.searchTerm,
+          name: entry.archetype,
 
-          tier: band,
+          searchTerm: entry.archetype,
 
-          powerScore: scoreArchetype({
-            band,
-            deckCount: seedDecks.length,
-            tournamentResults,
-            popularity,
-            cardCount,
-          }),
+          tier: BAND_BY_TIER[entry.tier],
 
-          deckCount: seedDecks.length,
+          powerScore: entry.powerScore,
 
-          cardCount,
+          deckCount,
 
-          image:
-            signature?.image ??
-            (signature?.ygoproId
-              ? `/cards/${signature.ygoproId}.jpg`
-              : null),
+          cardCount:
+            cardCounts.get(normalizedArchetype) ??
+            0,
+
+          image,
 
           signatureName:
-            signature?.name ?? null,
+            entry.cardName ??
+            signature?.name ??
+            null,
+
+          notes: entry.notes,
         };
-        })
-        .filter((archetype) =>
-          format === "rush"
-            ? archetype.cardCount > 0 ||
-              archetype.deckCount > 0
-            : true
-        );
+      });
 
     const bands: TierListBand[] = TIER_ORDER.map(
       (key) => ({
@@ -783,7 +304,8 @@ export const getTierList = cache(
 
         archetypes: archetypes
           .filter(
-            (archetype) => archetype.tier === key
+            (archetype) =>
+              archetype.tier === key
           )
           .sort(
             (a, b) =>
@@ -794,11 +316,14 @@ export const getTierList = cache(
       })
     );
 
-    const latestUpdate = formatDecks.reduce(
-      (latest, deck) =>
-        deck.updatedAt.getTime() > latest
-          ? deck.updatedAt.getTime()
-          : latest,
+    const latestUpdate = entries.reduce(
+      (latest, entry) => {
+        const time = new Date(
+          entry.updatedAt
+        ).getTime();
+
+        return time > latest ? time : latest;
+      },
       0
     );
 
@@ -813,11 +338,7 @@ export const getTierList = cache(
 
       totalArchetypes: archetypes.length,
 
-      hasData:
-        formatDecks.length > 0 ||
-        archetypes.some(
-          (archetype) => archetype.cardCount > 0
-        ),
+      hasData: archetypes.length > 0,
 
       bands,
     };
