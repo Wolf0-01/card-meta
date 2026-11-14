@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import GlobalCardSearch from "@/components/search/GlobalCardSearch";
 
+import AdminNavLink from "@/components/auth/AdminNavLink";
+
 import Button from "@/components/ui/Button";
 
 const navigation = [
@@ -58,6 +60,8 @@ export default function Navbar() {
         <div className="flex items-center gap-2 sm:gap-3">
 
           <GlobalCardSearch />
+
+          <AdminNavLink />
 
           <div className="hidden lg:block">
             <Button href="/login">
