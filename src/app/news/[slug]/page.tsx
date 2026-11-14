@@ -17,6 +17,12 @@ import {
 
 import CatalogCardTile from "@/components/cards/CatalogCardTile";
 
+import NewsActions from "@/components/news/NewsActions";
+
+import { getCurrentUser } from "@/lib/auth/currentUser";
+
+import { canManageGuides } from "@/lib/auth/roles";
+
 import { formatDate } from "@/lib/format";
 
 import {
@@ -67,6 +73,8 @@ export default async function NewsArticlePage({
 
   const related = await getRelatedNews(article);
 
+  const user = await getCurrentUser();
+
   return (
     <main
       className="
@@ -87,24 +95,33 @@ export default async function NewsArticlePage({
           space-y-4
         "
       >
-        <Link
-          href="/news"
-          className="
-            inline-flex
-            items-center
-            gap-1
-            text-[9px]
-            font-black
-            uppercase
-            tracking-[0.18em]
-            text-slate-500
-            transition-colors
-            hover:text-blue-300
-          "
-        >
-          <ArrowLeft className="h-3 w-3" />
-          Back to News
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Link
+            href="/news"
+            className="
+              inline-flex
+              items-center
+              gap-1
+              text-[9px]
+              font-black
+              uppercase
+              tracking-[0.18em]
+              text-slate-500
+              transition-colors
+              hover:text-blue-300
+            "
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Back to News
+          </Link>
+
+          {canManageGuides(user) && (
+            <NewsActions
+              articleId={article.id}
+              slug={article.slug}
+            />
+          )}
+        </div>
 
         <header
           className="

@@ -5,14 +5,18 @@ import Link from "next/link";
 import {
   ArrowLeft,
   CalendarDays,
-  Database,
   Layers,
+  Plus,
   Swords,
   Trophy,
   Users,
 } from "lucide-react";
 
 import TournamentResultCard from "@/components/tournaments/TournamentResultCard";
+
+import { getCurrentUser } from "@/lib/auth/currentUser";
+
+import { canManageGuides } from "@/lib/auth/roles";
 
 import {
   formatDate,
@@ -25,10 +29,10 @@ import {
 } from "@/lib/tournaments";
 
 export const metadata: Metadata = {
-  title: "Torneos y Resultados | Card Meta",
+  title: "Tournaments & Results | Card Meta",
 
   description:
-    "Resultados de Meta Weekly y torneos comunitarios de Yu-Gi-Oh! Duel Links. Podios Top 4 y Top 8 conectados con mazos públicos reales de PostgreSQL.",
+    "Yu-Gi-Oh! Duel Links tournament results. Top 4 and Top 8 standings linked to real public deck lists.",
 };
 
 type OrganizerFilter =
@@ -51,7 +55,7 @@ const ORGANIZER_TABS: {
 }[] = [
   {
     key: "all",
-    label: "Todos",
+    label: "All",
     href: "/tournaments",
   },
   {
@@ -61,7 +65,7 @@ const ORGANIZER_TABS: {
   },
   {
     key: "community",
-    label: "Comunidad",
+    label: "Community",
     href: "/tournaments?org=community",
   },
 ];
@@ -88,7 +92,7 @@ function matchesFilter(
   }
 
   if (filter === "community") {
-    return event.organizer === "Comunidad";
+    return event.organizer === "Community";
   }
 
   return true;
@@ -148,7 +152,10 @@ export default async function TournamentsPage({
 
   const filter = resolveFilter(params.org);
 
-  const data = await getTournamentData();
+  const [data, user] = await Promise.all([
+    getTournamentData(),
+    getCurrentUser(),
+  ]);
 
   const events = data.events.filter((event) =>
     matchesFilter(event, filter)
@@ -159,7 +166,7 @@ export default async function TournamentsPage({
   ).length;
 
   const communityCount = data.events.filter(
-    (event) => event.organizer === "Comunidad"
+    (event) => event.organizer === "Community"
   ).length;
 
   const counts: Record<OrganizerFilter, number> = {
@@ -167,6 +174,8 @@ export default async function TournamentsPage({
     "meta-weekly": metaWeeklyCount,
     community: communityCount,
   };
+
+  const hasAnyEvents = data.events.length > 0;
 
   return (
     <main
@@ -215,7 +224,7 @@ export default async function TournamentsPage({
                 "
               >
                 <ArrowLeft className="h-3 w-3" />
-                Inicio
+                Home
               </Link>
 
               <p
@@ -242,7 +251,7 @@ export default async function TournamentsPage({
                   sm:text-3xl
                 "
               >
-                Torneos
+                Tournaments
               </h1>
 
               <p
@@ -254,11 +263,10 @@ export default async function TournamentsPage({
                   text-slate-400
                 "
               >
-                Resultados de Meta Weekly y
-                torneos comunitarios de Speed
-                Duel. Cada podio enlaza la lista
-                pública del jugador cuando está
-                disponible.
+                Meta Weekly and community Speed Duel
+                results. Every podium links the
+                player&apos;s public deck list when it is
+                available.
               </p>
             </div>
 
@@ -271,55 +279,86 @@ export default async function TournamentsPage({
                 sm:items-end
               "
             >
-              <span
-                className="
-                  inline-flex
-                  items-center
-                  gap-1.5
-                  rounded-md
-                  border
-                  border-slate-700/70
-                  bg-[#0B132B]
-                  px-2
-                  py-1
-                  text-[9px]
-                  font-bold
-                  uppercase
-                  tracking-[0.12em]
-                  text-slate-400
-                "
-              >
-                <CalendarDays className="h-3 w-3 text-blue-300" />
+              {canManageGuides(user) && (
+                <Link
+                  href="/tournaments/new"
+                  className="
+                    inline-flex
+                    h-8
+                    items-center
+                    gap-1.5
+                    rounded-lg
+                    border
+                    border-blue-500/40
+                    bg-blue-500/10
+                    px-3
+                    text-[9px]
+                    font-black
+                    uppercase
+                    tracking-[0.14em]
+                    text-blue-200
+                    transition-colors
+                    hover:border-blue-400
+                    hover:bg-blue-500/20
+                    hover:text-white
+                  "
+                >
+                  <Plus className="h-3 w-3" />
+                  Add Tournament
+                </Link>
+              )}
 
-                Último evento{" "}
-                {formatDate(data.updatedAt)}
-              </span>
+              {hasAnyEvents && (
+                <span
+                  className="
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    rounded-md
+                    border
+                    border-slate-700/70
+                    bg-[#0B132B]
+                    px-2
+                    py-1
+                    text-[9px]
+                    font-bold
+                    uppercase
+                    tracking-[0.12em]
+                    text-slate-400
+                  "
+                >
+                  <CalendarDays className="h-3 w-3 text-blue-300" />
+
+                  Last event{" "}
+                  {formatDate(data.updatedAt)}
+                </span>
+              )}
 
               <div className="flex flex-wrap items-center gap-1.5">
                 <Metric
                   value={String(data.events.length)}
-                  label="eventos"
+                  label="events"
                 />
 
                 <Metric
                   value={formatNumber(
                     data.totalPlayers
                   )}
-                  label="jugadores"
+                  label="players"
                 />
 
                 <Metric
                   value={String(
                     data.totalPublicLists
                   )}
-                  label="mazos reales"
+                  label="public decks"
                 />
               </div>
             </div>
           </div>
 
           <section
-            aria-label="Sobre los resultados"
+            aria-label="About the results"
             className="
               rounded-xl
               border
@@ -348,7 +387,7 @@ export default async function TournamentsPage({
                   text-emerald-300
                 "
               >
-                <Database className="h-4 w-4" />
+                <Layers className="h-4 w-4" />
               </span>
 
               <div className="min-w-0 flex-1">
@@ -361,8 +400,7 @@ export default async function TournamentsPage({
                     text-slate-300
                   "
                 >
-                  Podios conectados a mazos
-                  públicos
+                  Standings linked to public decks
                 </p>
 
                 <p
@@ -374,13 +412,11 @@ export default async function TournamentsPage({
                     text-slate-400
                   "
                 >
-                  Las listas exactas se abren
-                  desde PostgreSQL y conservan el
-                  botón de clonado del mazo. Si un
-                  jugador no publicó su deck,
-                  mostramos la lista pública del
-                  arquetipo o el acceso directo a
-                  sus mazos.
+                  When a player publishes their deck,
+                  the placement opens the exact list and
+                  keeps the clone button. If a list is not
+                  public, the placement links to the
+                  archetype explorer instead.
                 </p>
               </div>
 
@@ -400,107 +436,109 @@ export default async function TournamentsPage({
 
                 <Metric
                   value={String(communityCount)}
-                  label="comunidad"
+                  label="community"
                 />
               </div>
             </div>
           </section>
         </header>
 
-        <div
-          className="
-            flex
-            flex-wrap
-            items-center
-            justify-between
-            gap-2
-            border-b
-            border-slate-800
-            pb-2
-          "
-        >
-          <div className="flex flex-wrap items-center gap-1.5">
-            {ORGANIZER_TABS.map((tab) => {
-              const active = tab.key === filter;
+        {hasAnyEvents && (
+          <div
+            className="
+              flex
+              flex-wrap
+              items-center
+              justify-between
+              gap-2
+              border-b
+              border-slate-800
+              pb-2
+            "
+          >
+            <div className="flex flex-wrap items-center gap-1.5">
+              {ORGANIZER_TABS.map((tab) => {
+                const active = tab.key === filter;
 
-              return (
-                <Link
-                  key={tab.key}
-                  href={tab.href}
-                  aria-current={
-                    active ? "page" : undefined
-                  }
-                  className={`
-                    inline-flex
-                    items-center
-                    gap-1.5
-                    rounded-md
-                    border
-                    px-2.5
-                    py-1.5
-                    text-[9px]
-                    font-black
-                    uppercase
-                    tracking-[0.14em]
-                    transition-colors
-                    ${
-                      active
-                        ? "border-blue-400/60 bg-blue-500/15 text-white"
-                        : "border-slate-700/70 bg-[#0B132B] text-slate-400 hover:border-blue-400/40 hover:text-slate-200"
+                return (
+                  <Link
+                    key={tab.key}
+                    href={tab.href}
+                    aria-current={
+                      active ? "page" : undefined
                     }
-                  `}
-                >
-                  {tab.key === "meta-weekly" ? (
-                    <Trophy className="h-3 w-3" />
-                  ) : tab.key === "community" ? (
-                    <Users className="h-3 w-3" />
-                  ) : (
-                    <Swords className="h-3 w-3" />
-                  )}
-
-                  {tab.label}
-
-                  <span
                     className={`
-                      rounded
-                      px-1
-                      text-[8px]
-                      tabular-nums
+                      inline-flex
+                      items-center
+                      gap-1.5
+                      rounded-md
+                      border
+                      px-2.5
+                      py-1.5
+                      text-[9px]
+                      font-black
+                      uppercase
+                      tracking-[0.14em]
+                      transition-colors
                       ${
                         active
-                          ? "bg-white/10 text-white"
-                          : "bg-slate-800 text-slate-500"
+                          ? "border-blue-400/60 bg-blue-500/15 text-white"
+                          : "border-slate-700/70 bg-[#0B132B] text-slate-400 hover:border-blue-400/40 hover:text-slate-200"
                       }
                     `}
                   >
-                    {counts[tab.key]}
-                  </span>
-                </Link>
-              );
-            })}
+                    {tab.key === "meta-weekly" ? (
+                      <Trophy className="h-3 w-3" />
+                    ) : tab.key === "community" ? (
+                      <Users className="h-3 w-3" />
+                    ) : (
+                      <Swords className="h-3 w-3" />
+                    )}
+
+                    {tab.label}
+
+                    <span
+                      className={`
+                        rounded
+                        px-1
+                        text-[8px]
+                        tabular-nums
+                        ${
+                          active
+                            ? "bg-white/10 text-white"
+                            : "bg-slate-800 text-slate-500"
+                        }
+                      `}
+                    >
+                      {counts[tab.key]}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <span
+              className="
+                inline-flex
+                items-center
+                gap-1
+                px-1
+                text-[9px]
+                font-black
+                uppercase
+                tracking-[0.16em]
+                text-slate-500
+              "
+            >
+              <Layers className="h-3 w-3" />
+
+              {events.length}{" "}
+              {events.length === 1
+                ? "event"
+                : "events"}
+            </span>
           </div>
-
-          <span
-            className="
-              inline-flex
-              items-center
-              gap-1
-              px-1
-              text-[9px]
-              font-black
-              uppercase
-              tracking-[0.16em]
-              text-slate-500
-            "
-          >
-            <Layers className="h-3 w-3" />
-
-            {events.length}{" "}
-            {events.length === 1
-              ? "evento"
-              : "eventos"}
-          </span>
-        </div>
+        )}
 
         {events.length === 0 ? (
           <section
@@ -523,42 +561,48 @@ export default async function TournamentsPage({
             <Trophy className="h-8 w-8 text-slate-600" />
 
             <p className="text-sm font-bold text-slate-300">
-              No hay torneos en esta categoría.
+              {hasAnyEvents
+                ? "No tournaments in this category yet."
+                : "No tournaments yet."}
             </p>
 
             <p className="max-w-sm text-xs text-slate-500">
-              Prueba con otro organizador o vuelve
-              al listado completo.
+              {hasAnyEvents
+                ? "Try another organizer or return to the full list."
+                : "The next community tournaments will be published here soon."}
             </p>
 
-            <Link
-              href="/tournaments"
-              className="
-                mt-1
-                inline-flex
-                items-center
-                gap-1
-                text-[10px]
-                font-black
-                uppercase
-                tracking-[0.14em]
-                text-blue-300
-                transition-colors
-                hover:text-blue-200
-              "
-            >
-              Ver todos los torneos
-            </Link>
+            {hasAnyEvents && (
+              <Link
+                href="/tournaments"
+                className="
+                  mt-1
+                  inline-flex
+                  items-center
+                  gap-1
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-[0.14em]
+                  text-blue-300
+                  transition-colors
+                  hover:text-blue-200
+                "
+              >
+                View all tournaments
+              </Link>
+            )}
           </section>
         ) : (
           <section
-            aria-label="Resultados de torneos"
+            aria-label="Tournament results"
             className="space-y-3"
           >
             {events.map((event) => (
               <TournamentResultCard
                 key={event.slug}
                 event={event}
+                canManage={canManageGuides(user)}
               />
             ))}
           </section>

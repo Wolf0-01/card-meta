@@ -1,50 +1,20 @@
 import { cache } from "react";
 
-import { getCardImageSrc } from "@/lib/cards/image";
-
-import { getRecentPublicDecks } from "@/lib/decks";
+import type { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
-import type { MetaDeck } from "@/types/meta";
+export type TournamentOrganizer = string;
 
-export type TournamentOrganizer =
-  | "Meta Weekly"
-  | "Comunidad";
-
-interface TournamentPlacementSeed {
-  place: number;
+export interface TournamentStandingSeed {
+  rank: number;
 
   player: string;
 
   archetype: string;
 
-  signatureCardName: string;
-
-  /**
-   * Identifier de un mazo público real. Solo se usa cuando
-   * la lista del torneo está publicada en PostgreSQL.
-   */
-  deckIdentifier?: string;
-
-  /** Término de búsqueda para abrir el arquetipo. */
-  deckSearchTerm: string;
-}
-
-interface TournamentSeed {
-  slug: string;
-
-  name: string;
-
-  organizer: TournamentOrganizer;
-
-  date: string;
-
-  players: number;
-
-  format: "Speed Duel";
-
-  placements: TournamentPlacementSeed[];
+  /** Deck.id de un mazo público real. */
+  deckId?: string | null;
 }
 
 export interface TournamentSignatureCard {
@@ -69,8 +39,8 @@ export interface TournamentDeckLink {
   author: string | null;
 
   /**
-   * `true` cuando el identifier corresponde exactamente a
-   * la lista publicada por el jugador del podio.
+   * `true` cuando el puesto enlaza exactamente el mazo
+   * publicado por el jugador.
    */
   isExactList: boolean;
 }
@@ -90,6 +60,8 @@ export interface TournamentPlacement {
 }
 
 export interface TournamentEvent {
+  id: string;
+
   slug: string;
 
   name: string;
@@ -100,7 +72,7 @@ export interface TournamentEvent {
 
   players: number;
 
-  format: "Speed Duel";
+  format: string;
 
   placements: TournamentPlacement[];
 
@@ -121,350 +93,102 @@ export interface TournamentData {
   updatedAt: string;
 }
 
-const TOURNAMENT_SEEDS: TournamentSeed[] = [
-  {
-    slug: "meta-weekly-312",
-    name: "Meta Weekly #312",
-    organizer: "Meta Weekly",
-    date: "2026-11-08T18:00:00.000Z",
-    players: 128,
-    format: "Speed Duel",
-    placements: [
-      {
-        place: 1,
-        player: "Kaito",
-        archetype: "Snake-Eye",
-        signatureCardName: "Snake-Eyes Poplar",
-        deckIdentifier: "cmw8obfev000f6cu1uw7cdkec",
-        deckSearchTerm: "Snake-Eye",
-      },
-      {
-        place: 2,
-        player: "Rin",
-        archetype: "Blue-Eyes",
-        signatureCardName: "Blue-Eyes White Dragon",
-        deckSearchTerm: "Blue Eyes",
-      },
-      {
-        place: 3,
-        player: "Dante",
-        archetype: "Dark Magician",
-        signatureCardName: "Dark Magician",
-        deckSearchTerm: "Dark Magician",
-      },
-      {
-        place: 4,
-        player: "Mika",
-        archetype: "Sky Striker",
-        signatureCardName: "Sky Striker Ace - Raye",
-        deckSearchTerm: "Sky Striker",
-      },
-      {
-        place: 5,
-        player: "Sora",
-        archetype: "Salamangreat",
-        signatureCardName: "Salamangreat Gazelle",
-        deckSearchTerm: "Salamangreat",
-      },
-      {
-        place: 6,
-        player: "Leo",
-        archetype: "Elemental HERO",
-        signatureCardName: "Elemental HERO Stratos",
-        deckSearchTerm: "Elemental HERO",
-      },
-      {
-        place: 7,
-        player: "Ivan",
-        archetype: "Blackwing",
-        signatureCardName: "Blackwing - Gale the Whirlwind",
-        deckSearchTerm: "Blackwing",
-      },
-      {
-        place: 8,
-        player: "Hugo",
-        archetype: "Gladiator Beast",
-        signatureCardName: "Gladiator Beast Bestiari",
-        deckSearchTerm: "Gladiator Beast",
-      },
-    ],
-  },
-  {
-    slug: "community-clash-47",
-    name: "Community Clash #47",
-    organizer: "Comunidad",
-    date: "2026-11-02T17:00:00.000Z",
-    players: 64,
-    format: "Speed Duel",
-    placements: [
-      {
-        place: 1,
-        player: "Nova",
-        archetype: "Blue-Eyes",
-        signatureCardName: "Blue-Eyes White Dragon",
-        deckSearchTerm: "Blue Eyes",
-      },
-      {
-        place: 2,
-        player: "Iris",
-        archetype: "Dark Magician",
-        signatureCardName: "Dark Magician",
-        deckSearchTerm: "Dark Magician",
-      },
-      {
-        place: 3,
-        player: "Theo",
-        archetype: "Snake-Eye",
-        signatureCardName: "Snake-Eyes Poplar",
-        deckSearchTerm: "Snake-Eye",
-      },
-      {
-        place: 4,
-        player: "Vera",
-        archetype: "Sky Striker",
-        signatureCardName: "Sky Striker Ace - Raye",
-        deckSearchTerm: "Sky Striker",
-      },
-    ],
-  },
-  {
-    slug: "meta-weekly-311",
-    name: "Meta Weekly #311",
-    organizer: "Meta Weekly",
-    date: "2026-10-26T18:00:00.000Z",
-    players: 112,
-    format: "Speed Duel",
-    placements: [
-      {
-        place: 1,
-        player: "Rin",
-        archetype: "Dark Magician",
-        signatureCardName: "Dark Magician",
-        deckSearchTerm: "Dark Magician",
-      },
-      {
-        place: 2,
-        player: "Kaito",
-        archetype: "Snake-Eye",
-        signatureCardName: "Snake-Eyes Poplar",
-        deckSearchTerm: "Snake-Eye",
-      },
-      {
-        place: 3,
-        player: "Noa",
-        archetype: "Blue-Eyes",
-        signatureCardName: "Blue-Eyes White Dragon",
-        deckSearchTerm: "Blue Eyes",
-      },
-      {
-        place: 4,
-        player: "Gael",
-        archetype: "Salamangreat",
-        signatureCardName: "Salamangreat Gazelle",
-        deckSearchTerm: "Salamangreat",
-      },
-    ],
-  },
-  {
-    slug: "speed-duel-community-cup",
-    name: "Speed Duel Community Cup",
-    organizer: "Comunidad",
-    date: "2026-10-19T16:30:00.000Z",
-    players: 48,
-    format: "Speed Duel",
-    placements: [
-      {
-        place: 1,
-        player: "Dante",
-        archetype: "Sky Striker",
-        signatureCardName: "Sky Striker Ace - Raye",
-        deckSearchTerm: "Sky Striker",
-      },
-      {
-        place: 2,
-        player: "Hugo",
-        archetype: "Gladiator Beast",
-        signatureCardName: "Gladiator Beast Bestiari",
-        deckSearchTerm: "Gladiator Beast",
-      },
-      {
-        place: 3,
-        player: "Leo",
-        archetype: "Elemental HERO",
-        signatureCardName: "Elemental HERO Stratos",
-        deckSearchTerm: "Elemental HERO",
-      },
-      {
-        place: 4,
-        player: "Ivan",
-        archetype: "Blackwing",
-        signatureCardName: "Blackwing - Gale the Whirlwind",
-        deckSearchTerm: "Blackwing",
-      },
-    ],
-  },
-  {
-    slug: "meta-weekly-310",
-    name: "Meta Weekly #310",
-    organizer: "Meta Weekly",
-    date: "2026-10-12T18:00:00.000Z",
-    players: 96,
-    format: "Speed Duel",
-    placements: [
-      {
-        place: 1,
-        player: "Mika",
-        archetype: "Salamangreat",
-        signatureCardName: "Salamangreat Gazelle",
-        deckSearchTerm: "Salamangreat",
-      },
-      {
-        place: 2,
-        player: "Sora",
-        archetype: "Snake-Eye",
-        signatureCardName: "Snake-Eyes Poplar",
-        deckSearchTerm: "Snake-Eye",
-      },
-      {
-        place: 3,
-        player: "Axel",
-        archetype: "Ancient Gear",
-        signatureCardName: "Ancient Gear Golem",
-        deckSearchTerm: "Ancient Gear",
-      },
-      {
-        place: 4,
-        player: "Noa",
-        archetype: "Dark Magician",
-        signatureCardName: "Dark Magician",
-        deckSearchTerm: "Dark Magician",
-      },
-      {
-        place: 5,
-        player: "Vera",
-        archetype: "Blue-Eyes",
-        signatureCardName: "Blue-Eyes White Dragon",
-        deckSearchTerm: "Blue Eyes",
-      },
-      {
-        place: 6,
-        player: "Theo",
-        archetype: "Phantom Knights",
-        signatureCardName:
-          "The Phantom Knights of Rusty Bardiche",
-        deckSearchTerm: "Phantom Knights",
-      },
-      {
-        place: 7,
-        player: "Iris",
-        archetype: "Six Samurai",
-        signatureCardName:
-          "Legendary Six Samurai - Shi En",
-        deckSearchTerm: "Six Samurai",
-      },
-      {
-        place: 8,
-        player: "Gael",
-        archetype: "Noble Knight",
-        signatureCardName: "Noble Knight Medraut",
-        deckSearchTerm: "Noble Knight",
-      },
-    ],
-  },
-  {
-    slug: "community-rookie-league",
-    name: "Community Rookie League",
-    organizer: "Comunidad",
-    date: "2026-10-05T15:00:00.000Z",
-    players: 32,
-    format: "Speed Duel",
-    placements: [
-      {
-        place: 1,
-        player: "Axel",
-        archetype: "Ancient Gear",
-        signatureCardName: "Ancient Gear Golem",
-        deckSearchTerm: "Ancient Gear",
-      },
-      {
-        place: 2,
-        player: "Leo",
-        archetype: "Elemental HERO",
-        signatureCardName: "Elemental HERO Stratos",
-        deckSearchTerm: "Elemental HERO",
-      },
-      {
-        place: 3,
-        player: "Hugo",
-        archetype: "Gladiator Beast",
-        signatureCardName: "Gladiator Beast Bestiari",
-        deckSearchTerm: "Gladiator Beast",
-      },
-      {
-        place: 4,
-        player: "Ivan",
-        archetype: "Blackwing",
-        signatureCardName: "Blackwing - Gale the Whirlwind",
-        deckSearchTerm: "Blackwing",
-      },
-    ],
-  },
-];
-
-function normalize(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "");
-}
-
-function getDeckAuthor(deck: MetaDeck): string | null {
-  return (
-    deck.author?.displayName?.trim() ||
-    deck.author?.username ||
-    null
-  );
-}
-
-function deckMatchesArchetype(
-  deck: MetaDeck,
-  archetype: string
-): boolean {
-  const target = normalize(archetype);
-
-  if (target.length < 4) {
-    return false;
+function asRecord(
+  value: unknown
+): Record<string, unknown> | null {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value)
+  ) {
+    return null;
   }
 
-  const candidates = [
-    deck.name,
-    deck.archetype?.name,
-    deck.archetypeName,
-  ];
+  return value as Record<string, unknown>;
+}
 
-  return candidates.some((candidate) => {
-    if (!candidate) {
-      return false;
-    }
+function parseStanding(
+  value: unknown
+): TournamentStandingSeed | null {
+  const record = asRecord(value);
 
-    const normalized = normalize(candidate);
+  if (!record) {
+    return null;
+  }
 
-    if (normalized.length < 4) {
-      return false;
-    }
+  const player =
+    typeof record.player === "string"
+      ? record.player.trim()
+      : "";
 
-    return (
-      normalized === target ||
-      normalized.includes(target) ||
-      target.includes(normalized)
-    );
-  });
+  const archetype =
+    typeof record.archetype === "string"
+      ? record.archetype.trim()
+      : "";
+
+  const rank =
+    typeof record.rank === "number" &&
+    Number.isFinite(record.rank)
+      ? Math.max(1, Math.floor(record.rank))
+      : 0;
+
+  if (!player || !archetype || rank === 0) {
+    return null;
+  }
+
+  const deckId =
+    typeof record.deckId === "string" &&
+    record.deckId.trim().length > 0
+      ? record.deckId.trim()
+      : null;
+
+  return {
+    rank,
+
+    player,
+
+    archetype,
+
+    deckId,
+  };
+}
+
+export function parseTournamentStandings(
+  value: Prisma.JsonValue
+): TournamentStandingSeed[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map(parseStanding)
+    .filter(
+      (
+        standing
+      ): standing is TournamentStandingSeed =>
+        standing !== null
+    )
+    .sort((a, b) => a.rank - b.rank);
+}
+
+interface PublicDeckRow {
+  id: string;
+
+  name: string;
+
+  slug: string;
+
+  identifier: string;
+
+  author: {
+    username: string;
+
+    displayName: string | null;
+  } | null;
 }
 
 function toDeckLink(
-  deck: MetaDeck,
-  isExactList: boolean
+  deck: PublicDeckRow
 ): TournamentDeckLink {
   return {
     name: deck.name,
@@ -475,143 +199,153 @@ function toDeckLink(
 
     href: `/decks/${deck.slug}/${deck.identifier}`,
 
-    author: getDeckAuthor(deck),
+    author:
+      deck.author?.displayName?.trim() ||
+      deck.author?.username ||
+      null,
 
-    isExactList,
+    isExactList: true,
   };
 }
 
 /**
- * Construye la página de torneos combinando resultados
- * editoriales con los mazos públicos reales de PostgreSQL.
- *
- * Cuando el identifier de la lista está disponible se enlaza
- * la lista exacta. Si no, se ofrece el mazo público del
- * arquetipo como referencia y, en su defecto, la búsqueda
- * del arquetipo en el explorador.
+ * Construye la página de torneos a partir de los resultados
+ * reales guardados en PostgreSQL. Cada puesto puede enlazar
+ * el Deck.id exacto de un mazo público.
  */
 export const getTournamentData = cache(
   async (): Promise<TournamentData> => {
-    const signatureNames = Array.from(
+    const tournaments =
+      await prisma.tournament.findMany({
+        orderBy: {
+          date: "desc",
+        },
+      });
+
+    const standingsBySlug = new Map(
+      tournaments.map((tournament) => [
+        tournament.slug,
+
+        parseTournamentStandings(
+          tournament.standings
+        ),
+      ])
+    );
+
+    const deckIds = Array.from(
       new Set(
-        TOURNAMENT_SEEDS.flatMap((event) =>
-          event.placements.map(
-            (placement) => placement.signatureCardName
+        [...standingsBySlug.values()]
+          .flatMap((standings) =>
+            standings.flatMap((standing) =>
+              standing.deckId
+                ? [standing.deckId]
+                : []
+            )
           )
-        )
       )
     );
 
-    const [publicDecks, signatureCards] =
-      await Promise.all([
-        getRecentPublicDecks(100),
+    const decks =
+      deckIds.length > 0
+        ? await prisma.deck.findMany({
+            where: {
+              id: {
+                in: deckIds,
+              },
 
-        prisma.card.findMany({
-          where: {
-            name: {
-              in: signatureNames,
+              isPublic: true,
             },
-          },
 
-          select: {
-            name: true,
-            slug: true,
-            ygoproId: true,
-            image: true,
-          },
-        }),
-      ]);
+            select: {
+              id: true,
 
-    const signaturesByName = new Map(
-      signatureCards.map((card) => [card.name, card])
+              name: true,
+
+              slug: true,
+
+              identifier: true,
+
+              author: {
+                select: {
+                  username: true,
+
+                  displayName: true,
+                },
+              },
+            },
+          })
+        : [];
+
+    const decksById = new Map(
+      decks.map((deck) => [deck.id, deck])
     );
 
-    const decksByIdentifier = new Map(
-      publicDecks.map((deck) => [deck.identifier, deck])
-    );
+    const events: TournamentEvent[] = tournaments
+      .map((tournament) => {
+        const standings =
+          standingsBySlug.get(tournament.slug) ??
+          [];
 
-    const events = TOURNAMENT_SEEDS.map((seed) => {
-      const placements: TournamentPlacement[] =
-        seed.placements.map((placement) => {
-          const exactDeck = placement.deckIdentifier
-            ? decksByIdentifier.get(
-                placement.deckIdentifier
-              ) ?? null
-            : null;
-
-          const fallbackDeck =
-            !exactDeck && !placement.deckIdentifier
-              ? publicDecks.find((deck) =>
-                  deckMatchesArchetype(
-                    deck,
-                    placement.archetype
-                  )
-                ) ?? null
+        const placements: TournamentPlacement[] =
+          standings.map((standing) => {
+            const deck = standing.deckId
+              ? decksById.get(standing.deckId) ??
+                null
               : null;
 
-          const deck = exactDeck ?? fallbackDeck;
+            return {
+              place: standing.rank,
 
-          const signature = signaturesByName.get(
-            placement.signatureCardName
-          );
+              player: standing.player,
 
-          return {
-            place: placement.place,
+              archetype: standing.archetype,
 
-            player: placement.player,
+              signatureCard: null,
 
-            archetype: placement.archetype,
+              deck: deck ? toDeckLink(deck) : null,
 
-            signatureCard: signature
-              ? {
-                  name: signature.name,
+              archetypeHref: `/decks?q=${encodeURIComponent(
+                standing.archetype
+              )}`,
+            };
+          });
 
-                  slug: signature.slug,
+        if (placements.length === 0) {
+          return null;
+        }
 
-                  ygoproId: signature.ygoproId,
+        return {
+          id: tournament.id,
 
-                  image: getCardImageSrc(signature),
-                }
-              : null,
+          slug: tournament.slug,
 
-            deck: deck
-              ? toDeckLink(deck, Boolean(exactDeck))
-              : null,
+          name: tournament.name,
 
-            archetypeHref: `/decks?q=${encodeURIComponent(
-              placement.deckSearchTerm
-            )}`,
-          };
-        });
+          organizer: tournament.organizer,
 
-      return {
-        slug: seed.slug,
+          date: tournament.date.toISOString(),
 
-        name: seed.name,
+          players: tournament.playerCount,
 
-        organizer: seed.organizer,
+          format: tournament.format,
 
-        date: seed.date,
+          placements,
 
-        players: seed.players,
+          champion: placements[0],
 
-        format: seed.format,
+          topCount: placements.length,
 
-        placements,
-
-        champion: placements[0],
-
-        topCount: placements.length,
-
-        publicListCount: placements.filter(
-          (placement) => placement.deck
-        ).length,
-      };
-    });
-
-    events.sort((a, b) =>
-      b.date.localeCompare(a.date)
-    );
+          publicListCount: placements.filter(
+            (placement) => placement.deck
+          ).length,
+        };
+      })
+      .filter(
+        (
+          event
+        ): event is TournamentEvent =>
+          event !== null
+      );
 
     const uniquePublicDecks = new Set(
       events.flatMap((event) =>
@@ -633,7 +367,9 @@ export const getTournamentData = cache(
 
       totalPublicLists: uniquePublicDecks.size,
 
-      updatedAt: events[0]?.date ?? new Date().toISOString(),
+      updatedAt:
+        events[0]?.date ??
+        new Date().toISOString(),
     };
   }
 );
@@ -641,7 +377,5 @@ export const getTournamentData = cache(
 export function getTournamentOrganizerLabel(
   organizer: TournamentOrganizer
 ): string {
-  return organizer === "Meta Weekly"
-    ? "Meta Weekly"
-    : "Torneo comunitario";
+  return organizer;
 }

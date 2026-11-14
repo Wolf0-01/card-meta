@@ -19,6 +19,16 @@ const guideEditorPagePatterns = [
   /^\/guides\/[^/]+\/edit(?:\/|$)/,
 ];
 
+const newsEditorPagePatterns = [
+  /^\/news\/new(?:\/|$)/,
+  /^\/news\/[^/]+\/edit(?:\/|$)/,
+];
+
+const tournamentEditorPagePatterns = [
+  /^\/tournaments\/new(?:\/|$)/,
+  /^\/tournaments\/[^/]+\/edit(?:\/|$)/,
+];
+
 const adminPagePatterns = [
   /^\/admin(?:\/|$)/,
 ];
@@ -28,6 +38,8 @@ const protectedPagePatterns = [
   /^\/decks\/[^/]+\/edit(?:\/|$)/,
   /^\/decks\/mine(?:\/|$)/,
   ...guideEditorPagePatterns,
+  ...newsEditorPagePatterns,
+  ...tournamentEditorPagePatterns,
   ...adminPagePatterns,
 ];
 
@@ -55,6 +67,24 @@ function isGuideEditorPage(
   return matchesAny(
     pathname,
     guideEditorPagePatterns
+  );
+}
+
+function isNewsEditorPage(
+  pathname: string
+) {
+  return matchesAny(
+    pathname,
+    newsEditorPagePatterns
+  );
+}
+
+function isTournamentEditorPage(
+  pathname: string
+) {
+  return matchesAny(
+    pathname,
+    tournamentEditorPagePatterns
   );
 }
 
@@ -116,6 +146,26 @@ export async function proxy(
     );
   }
 
+  if (
+    isNewsEditorPage(pathname) &&
+    session.role !== "ADMIN" &&
+    session.role !== "EDITOR"
+  ) {
+    return NextResponse.redirect(
+      new URL("/news", request.url)
+    );
+  }
+
+  if (
+    isTournamentEditorPage(pathname) &&
+    session.role !== "ADMIN" &&
+    session.role !== "EDITOR"
+  ) {
+    return NextResponse.redirect(
+      new URL("/tournaments", request.url)
+    );
+  }
+
   return NextResponse.next();
 }
 
@@ -126,6 +176,10 @@ export const config = {
     "/decks/:id/edit/:path*",
     "/guides/new/:path*",
     "/guides/:slug/edit/:path*",
+    "/news/new/:path*",
+    "/news/:slug/edit/:path*",
+    "/tournaments/new/:path*",
+    "/tournaments/:slug/edit/:path*",
     "/admin/:path*",
   ],
 };

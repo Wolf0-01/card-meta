@@ -10,6 +10,8 @@ import {
   Users,
 } from "lucide-react";
 
+import TournamentActions from "@/components/tournaments/TournamentActions";
+
 import {
   formatDate,
   formatNumber,
@@ -22,6 +24,8 @@ import type {
 
 interface TournamentResultCardProps {
   event: TournamentEvent;
+
+  canManage?: boolean;
 }
 
 const PLACE_STYLES: Record<number, string> = {
@@ -32,6 +36,7 @@ const PLACE_STYLES: Record<number, string> = {
 
 export default function TournamentResultCard({
   event,
+  canManage = false,
 }: TournamentResultCardProps) {
   const champion = event.champion;
 
@@ -190,6 +195,13 @@ export default function TournamentResultCard({
             Top {event.topCount}
           </span>
         </div>
+
+        {canManage && (
+          <TournamentActions
+            tournamentId={event.id}
+            slug={event.slug}
+          />
+        )}
       </header>
 
       <div className="space-y-2 p-2.5">
@@ -306,7 +318,7 @@ export default function TournamentResultCard({
               "
             >
               <Crown className="h-2.5 w-2.5" />
-              Campeón
+              Champion
             </p>
 
             <p
@@ -385,9 +397,9 @@ export default function TournamentResultCard({
               title={
                 championDeck
                   ? championDeck.isExactList
-                    ? "Abrir la lista exacta del campeón"
-                    : "Abrir una lista pública del arquetipo"
-                  : "Buscar mazos del arquetipo"
+                    ? "Open the champion's exact list"
+                    : "Open a public list for this archetype"
+                  : "Browse decks for this archetype"
               }
             >
               {championDeck ? (
@@ -398,9 +410,9 @@ export default function TournamentResultCard({
 
               {championDeck
                 ? championDeck.isExactList
-                  ? "Abrir y clonar"
-                  : "Abrir lista"
-                : "Ver arquetipo"}
+                  ? "Open & clone"
+                  : "Open list"
+                : "View archetype"}
             </Link>
 
             <span
@@ -419,10 +431,10 @@ export default function TournamentResultCard({
               `}
             >
               {championDeck?.isExactList
-                ? "Lista pública real"
+                ? "Exact public list"
                 : championDeck
-                  ? "Lista pública del arquetipo"
-                  : "Lista no publicada"}
+                  ? "Public archetype list"
+                  : "List not published"}
             </span>
           </div>
         </div>
@@ -585,13 +597,13 @@ function PodiumRow({
           "
           title={
             placement.deck.isExactList
-              ? "Abrir la lista exacta"
-              : "Abrir una lista pública del arquetipo"
+              ? "Open the exact list"
+              : "Open a public list for this archetype"
           }
         >
           {placement.deck.isExactList
-            ? "Abrir"
-            : "Lista ref."}
+            ? "Open"
+            : "Ref. list"}
 
           <ArrowUpRight className="h-2.5 w-2.5" />
         </Link>
@@ -607,7 +619,7 @@ function PodiumRow({
               text-slate-600
             "
           >
-            Sin lista
+            No list
           </span>
 
           <Link
@@ -622,7 +634,7 @@ function PodiumRow({
               hover:text-blue-200
             "
           >
-            Ver arquetipo
+            View archetype
           </Link>
         </div>
       )}

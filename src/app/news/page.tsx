@@ -7,9 +7,14 @@ import {
   CalendarDays,
   Layers,
   Newspaper,
+  Plus,
 } from "lucide-react";
 
 import NewsCatalog from "@/components/news/NewsCatalog";
+
+import { getCurrentUser } from "@/lib/auth/currentUser";
+
+import { canManageGuides } from "@/lib/auth/roles";
 
 import { formatDate } from "@/lib/format";
 
@@ -18,10 +23,10 @@ import { getNewsArticles } from "@/lib/news";
 import { NEWS_CATEGORIES } from "@/lib/newsCategories";
 
 export const metadata: Metadata = {
-  title: "News, Leaks & Banlist | Card Meta",
+  title: "News & Updates | Card Meta",
 
   description:
-    "News, leaks and banlist analysis for Yu-Gi-Oh! Duel Links. Editorial content with real cards from the catalog and direct access to every article.",
+    "Game updates, events, box reviews and banlist analysis for Yu-Gi-Oh! Duel Links. Editorial content with real cards from the catalog.",
 };
 
 interface MetricProps {
@@ -91,6 +96,8 @@ export default async function NewsPage({
     )?.key ?? "all";
 
   const articles = await getNewsArticles();
+
+  const user = await getCurrentUser();
 
   const latest = articles[0];
 
@@ -168,7 +175,7 @@ export default async function NewsPage({
                   sm:text-3xl
                 "
               >
-                News, Leaks &amp; Banlist
+                News &amp; Updates
               </h1>
 
               <p
@@ -180,9 +187,8 @@ export default async function NewsPage({
                   text-slate-400
                 "
               >
-                Leaks, game news and banlist analysis
-                for Yu-Gi-Oh! Duel Links. Every article
-                links the real cards from the catalog.
+                Game updates, events, box reviews and
+                banlist analysis for Yu-Gi-Oh! Duel Links.
                 Looking for deck guides? Visit the{" "}
                 <Link
                   href="/guides"
@@ -208,6 +214,35 @@ export default async function NewsPage({
                 sm:items-end
               "
             >
+              {canManageGuides(user) && (
+                <Link
+                  href="/news/new"
+                  className="
+                    inline-flex
+                    h-8
+                    items-center
+                    gap-1.5
+                    rounded-lg
+                    border
+                    border-blue-500/40
+                    bg-blue-500/10
+                    px-3
+                    text-[9px]
+                    font-black
+                    uppercase
+                    tracking-[0.14em]
+                    text-blue-200
+                    transition-colors
+                    hover:border-blue-400
+                    hover:bg-blue-500/20
+                    hover:text-white
+                  "
+                >
+                  <Plus className="h-3 w-3" />
+                  New Post
+                </Link>
+              )}
+
               <span
                 className="
                   inline-flex

@@ -225,6 +225,68 @@ model Guide {
   @@index([createdAt])
 }
 
+enum NewsCategory {
+  UPDATES
+  EVENTS
+  BOXES
+  BANLIST
+}
+
+/// Noticia editorial gestionable desde el panel de staff.
+/// El contenido estructurado vive en JSON para conservar el
+/// render actual (tags, cartas destacadas y secciones).
+model NewsArticle {
+  id String @id @default(cuid())
+
+  slug String @unique
+
+  title String
+
+  summary String
+
+  category NewsCategory
+
+  coverUrl String
+
+  author String
+
+  content Json
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([createdAt])
+}
+
+/// Resultado de un torneo real. Los puestos se guardan como
+/// JSON y pueden enlazar opcionalmente un Deck.id publicado.
+model Tournament {
+  id String @id @default(cuid())
+
+  slug String @unique
+
+  name String
+
+  organizer String
+
+  format String @default("Speed Duel")
+
+  playerCount Int @default(0)
+
+  date DateTime
+
+  standings Json
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+  @@index([organizer])
+}
+
 model DeckCard {
   id String @id @default(cuid())
 

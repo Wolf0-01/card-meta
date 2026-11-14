@@ -13,7 +13,8 @@
     "cards:obtain": "tsx scripts/updateObtain.ts",
     "cards:rush": "tsx scripts/syncRushCards.ts",
     "sets:sync": "tsx scripts/syncSetMeta.ts",
-    "guides:seed": "tsx prisma/seedGuides.ts"
+    "guides:seed": "tsx prisma/seedGuides.ts",
+    "news:seed": "tsx prisma/seedNews.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
