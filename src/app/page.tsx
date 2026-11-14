@@ -7,7 +7,7 @@ import {
   Trophy,
 } from "lucide-react";
 
-import PublicDeckCard from "@/components/decks/PublicDeckCard";
+import HomeFeedCard from "@/components/home/HomeFeedCard";
 
 import HomeShowcaseCard from "@/components/home/HomeShowcaseCard";
 
@@ -17,6 +17,8 @@ import {
 } from "@/lib/format";
 
 import { getHomeData } from "@/lib/home";
+
+export const dynamic = "force-dynamic";
 
 const QUICK_LINK_CLASSES = `
   group
@@ -245,7 +247,7 @@ export default async function Home() {
         </section>
 
         <section
-          aria-labelledby="recent-decks"
+          aria-labelledby="latest-updates"
           className="space-y-3"
         >
           <div
@@ -267,11 +269,11 @@ export default async function Home() {
                   text-blue-300
                 "
               >
-                Community
+                Newsroom
               </p>
 
               <h2
-                id="recent-decks"
+                id="latest-updates"
                 className="
                   mt-0.5
                   text-xl
@@ -281,31 +283,52 @@ export default async function Home() {
                   sm:text-2xl
                 "
               >
-                Latest published decks
+                Latest tournaments &amp; updates
               </h2>
             </div>
 
-            <Link
-              href="/decks"
-              className="
-                inline-flex
-                items-center
-                gap-1
-                text-[10px]
-                font-black
-                uppercase
-                tracking-[0.14em]
-                text-blue-300
-                transition-colors
-                hover:text-blue-200
-              "
-            >
-              View all decks
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/tournaments"
+                className="
+                  inline-flex
+                  items-center
+                  gap-1
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-[0.14em]
+                  text-blue-300
+                  transition-colors
+                  hover:text-blue-200
+                "
+              >
+                Tournaments
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+
+              <Link
+                href="/news"
+                className="
+                  inline-flex
+                  items-center
+                  gap-1
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-[0.14em]
+                  text-blue-300
+                  transition-colors
+                  hover:text-blue-200
+                "
+              >
+                News &amp; updates
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </div>
 
-          {data.recentDecks.length === 0 ? (
+          {data.feed.length === 0 ? (
             <div
               className="
                 rounded-xl
@@ -320,7 +343,7 @@ export default async function Home() {
                 text-slate-400
               "
             >
-              No public decks yet.
+              No tournaments or news published yet.
             </div>
           ) : (
             <div
@@ -328,13 +351,12 @@ export default async function Home() {
                 grid
                 grid-cols-1
                 gap-2.5
-                md:grid-cols-2
               "
             >
-              {data.recentDecks.map((deck) => (
-                <PublicDeckCard
-                  key={deck.identifier}
-                  deck={deck}
+              {data.feed.map((item) => (
+                <HomeFeedCard
+                  key={item.id}
+                  item={item}
                 />
               ))}
             </div>
