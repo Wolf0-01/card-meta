@@ -243,34 +243,6 @@ export default async function DecksPage({
                 : "Speed Duel"}
               , agrupados por arquetipo.
             </p>
-
-            <Link
-              href={`/decks/new${formatSuffix}`}
-              className="
-                mt-1
-                inline-flex
-                h-9
-                items-center
-                gap-1.5
-                rounded-lg
-                border
-                border-blue-500/40
-                bg-blue-500/10
-                px-3
-                text-[10px]
-                font-black
-                uppercase
-                tracking-[0.14em]
-                text-blue-200
-                transition-colors
-                hover:border-blue-400
-                hover:bg-blue-500/20
-                hover:text-white
-              "
-            >
-              <Layers className="h-3.5 w-3.5" />
-              Crear mazo
-            </Link>
           </div>
         </header>
 

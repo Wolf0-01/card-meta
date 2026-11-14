@@ -123,7 +123,7 @@ export default async function GuidesPage() {
                 "
               >
                 <Plus className="h-3 w-3" />
-                Nueva Guía
+                New Guide
               </Link>
             )}
           </div>
@@ -166,8 +166,7 @@ export default async function GuidesPage() {
             "
           >
             Deck lists, combo lines, ratios, and matchup
-            plans for Yu-Gi-Oh! Duel Links. Every guide
-            links real cards from the PostgreSQL catalog.
+            plans for Yu-Gi-Oh! Duel Links.
           </p>
 
           <div
