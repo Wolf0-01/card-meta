@@ -113,7 +113,7 @@ text-white
 
 >
 
-🃏 Cartas del Deck
+🃏 Deck cards
 
 </h2>
 

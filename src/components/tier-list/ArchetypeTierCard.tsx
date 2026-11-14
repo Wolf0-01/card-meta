@@ -40,7 +40,7 @@ export default function ArchetypeTierCard({
       )}${
         format === "rush" ? "&format=rush" : ""
       }`}
-      aria-label={`Ver mazos públicos de ${archetype.name}`}
+      aria-label={`View public decks for ${archetype.name}`}
       className="
         group
         flex
@@ -266,7 +266,7 @@ export default function ArchetypeTierCard({
             <b className="tabular-nums text-slate-200">
               {formatNumber(archetype.cardCount)}
             </b>
-            cartas
+            cards
           </span>
 
           <span
@@ -281,7 +281,7 @@ export default function ArchetypeTierCard({
               group-hover:opacity-100
             "
           >
-            Ver listas
+            View lists
 
             <ArrowUpRight className="h-2.5 w-2.5" />
           </span>

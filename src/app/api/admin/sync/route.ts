@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "El cuerpo de la petición no es JSON válido",
+          "The request body is not valid JSON",
       },
       {
         status: 400,
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
   if (!isAdminSyncTask(task)) {
     return NextResponse.json(
       {
-        error: "Tarea de sincronización no válida",
+        error: "Invalid sync task",
       },
       {
         status: 422,
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "No se pudo ejecutar la sincronización",
+          "Could not run the sync",
       },
       {
         status: 500,

@@ -57,7 +57,7 @@ export default function HomeDeckCard({ deck }: Props) {
                 text-foreground-secondary
               "
             >
-              {deck.archetype?.name ?? "Sin Archetype"}
+              {deck.archetype?.name ?? "No Archetype"}
             </p>
 
           </div>
@@ -148,7 +148,7 @@ export default function HomeDeckCard({ deck }: Props) {
             text-primary
           "
         >
-          Ver Deck →
+          View Deck →
         </div>
 
       </Card>

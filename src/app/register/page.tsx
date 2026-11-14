@@ -15,8 +15,8 @@ export default async function RegisterPage() {
 
   return (
     <AuthCard
-      title="Crear cuenta"
-      subtitle="Regístrate para guardar y publicar tus mazos."
+      title="Create account"
+      subtitle="Sign up to save and publish your decks."
     >
       <RegisterForm />
     </AuthCard>

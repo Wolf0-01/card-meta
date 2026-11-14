@@ -196,7 +196,7 @@ export default function DeckActions({
         {menuOpen && (
           <div
             role="menu"
-            aria-label="Compartir mazo"
+            aria-label="Share deck"
             className="
               absolute
               right-0

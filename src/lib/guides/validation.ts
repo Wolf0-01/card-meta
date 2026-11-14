@@ -8,19 +8,19 @@ import {
 const guideCardNameSchema = z
   .string()
   .trim()
-  .min(1, "El nombre de la carta no puede estar vacío")
+  .min(1, "The card name cannot be empty")
   .max(
     160,
-    "El nombre de la carta es demasiado largo"
+    "The card name is too long"
   );
 
 const guideCoverUrlSchema = z
   .string()
   .trim()
-  .min(1, "La portada es obligatoria")
+  .min(1, "The cover is required")
   .max(
     600,
-    "La URL de la portada es demasiado larga"
+    "The cover URL is too long"
   )
   .refine((value) => {
     if (value.startsWith("/")) {
@@ -37,16 +37,16 @@ const guideCoverUrlSchema = z
     } catch {
       return false;
     }
-  }, "La portada debe ser una URL válida o una ruta local");
+  }, "The cover must be a valid URL or a local path");
 
 export const guideSectionSchema = z.object({
   heading: z
     .string()
     .trim()
-    .min(1, "Cada sección necesita un título")
+    .min(1, "Each section needs a heading")
     .max(
       140,
-      "El título de la sección no puede superar 140 caracteres"
+      "The section heading cannot exceed 140 characters"
     ),
 
   paragraphs: z
@@ -54,19 +54,19 @@ export const guideSectionSchema = z.object({
       z
         .string()
         .trim()
-        .min(1, "Los párrafos no pueden estar vacíos")
+        .min(1, "Paragraphs cannot be empty")
         .max(
           8000,
-          "Un párrafo no puede superar 8000 caracteres"
+          "A paragraph cannot exceed 8000 characters"
         )
     )
     .min(
       1,
-      "Cada sección necesita al menos un párrafo"
+      "Each section needs at least one paragraph"
     )
     .max(
       30,
-      "Una sección no puede tener más de 30 párrafos"
+      "A section cannot have more than 30 paragraphs"
     ),
 
   bullets: z
@@ -74,15 +74,15 @@ export const guideSectionSchema = z.object({
       z
         .string()
         .trim()
-        .min(1, "Los puntos clave no pueden estar vacíos")
+        .min(1, "Key points cannot be empty")
         .max(
           600,
-          "Un punto clave no puede superar 600 caracteres"
+          "A key point cannot exceed 600 characters"
         )
     )
     .max(
       40,
-      "Una sección no puede tener más de 40 puntos clave"
+      "A section cannot have more than 40 key points"
     )
     .optional(),
 
@@ -90,7 +90,7 @@ export const guideSectionSchema = z.object({
     .array(guideCardNameSchema)
     .max(
       30,
-      "Una sección no puede tener más de 30 cartas destacadas"
+      "A section cannot have more than 30 featured cards"
     )
     .optional(),
 });
@@ -99,10 +99,10 @@ const guideFields = {
   title: z
     .string()
     .trim()
-    .min(3, "El título necesita al menos 3 caracteres")
+    .min(3, "The title needs at least 3 characters")
     .max(
       160,
-      "El título no puede superar 160 caracteres"
+      "The title cannot exceed 160 characters"
     ),
 
   summary: z
@@ -110,20 +110,20 @@ const guideFields = {
     .trim()
     .min(
       10,
-      "El resumen necesita al menos 10 caracteres"
+      "The summary needs at least 10 characters"
     )
     .max(
       500,
-      "El resumen no puede superar 500 caracteres"
+      "The summary cannot exceed 500 characters"
     ),
 
   author: z
     .string()
     .trim()
-    .min(1, "El autor es obligatorio")
+    .min(1, "The author is required")
     .max(
       80,
-      "El autor no puede superar 80 caracteres"
+      "The author cannot exceed 80 characters"
     ),
 
   coverUrl: guideCoverUrlSchema,
@@ -135,29 +135,29 @@ const guideFields = {
       z
         .string()
         .trim()
-        .min(1, "Los tags no pueden estar vacíos")
+        .min(1, "Tags cannot be empty")
         .max(
           50,
-          "Un tag no puede superar 50 caracteres"
+          "A tag cannot exceed 50 characters"
         )
     )
-    .max(15, "No puedes añadir más de 15 tags")
+    .max(15, "You cannot add more than 15 tags")
     .optional(),
 
   featuredCardNames: z
     .array(guideCardNameSchema)
     .max(
       80,
-      "La guía no puede tener más de 80 cartas destacadas"
+      "The guide cannot have more than 80 featured cards"
     )
     .optional(),
 
   sections: z
     .array(guideSectionSchema)
-    .min(1, "La guía necesita al menos una sección")
+    .min(1, "The guide needs at least one section")
     .max(
       30,
-      "La guía no puede tener más de 30 secciones"
+      "The guide cannot have more than 30 sections"
     ),
 } as const;
 
@@ -169,7 +169,7 @@ export const guideUpdateSchema = z
   .partial()
   .refine(
     (value) => Object.keys(value).length > 0,
-    "No hay cambios para guardar"
+    "There are no changes to save"
   );
 
 export type GuideCreateInput = z.infer<
@@ -199,7 +199,7 @@ export function parseGuideCreate(
   if (!parsed.success) {
     throw new GuideError(
       "VALIDATION",
-      "Revisa los datos de la guía",
+      "Check the guide data",
       toIssues(parsed.error)
     );
   }
@@ -216,7 +216,7 @@ export function parseGuideUpdate(
   if (!parsed.success) {
     throw new GuideError(
       "VALIDATION",
-      "Revisa los datos de la guía",
+      "Check the guide data",
       toIssues(parsed.error)
     );
   }

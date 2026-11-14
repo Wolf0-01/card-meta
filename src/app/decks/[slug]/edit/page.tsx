@@ -15,10 +15,10 @@ import { getDeckForViewer } from "@/lib/decks/service";
 import type { DraftCard } from "@/types/deck-draft";
 
 export const metadata: Metadata = {
-  title: "Editar mazo | Card Meta",
+  title: "Edit deck | Card Meta",
 
   description:
-    "Edita las cartas, la estrategia y la visibilidad de tu mazo de Duel Links.",
+    "Edit the cards, strategy and visibility of your Duel Links deck.",
 };
 
 interface EditDeckPageProps {

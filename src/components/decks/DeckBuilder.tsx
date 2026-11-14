@@ -77,7 +77,7 @@ const [
 deckName,
 setDeckName,
 ] = useState(
-"Nuevo Deck"
+"New Deck"
 );
 
 const [
@@ -255,7 +255,7 @@ new URLSearchParams();
       !response.ok
     ) {
       throw new Error(
-        "No se pudieron cargar las cartas."
+        "Could not load the cards."
       );
     }
 
@@ -507,7 +507,7 @@ try {
     !response.ok
   ) {
     throw new Error(
-      "No se pudo crear el deck."
+      "Could not create the deck."
     );
   }
 
@@ -523,7 +523,7 @@ try {
   );
 
   alert(
-    "No se pudo guardar el deck."
+    "Could not save the deck."
   );
 
   setIsSaving(
@@ -609,8 +609,8 @@ return (
           text-zinc-600
         "
       >
-        No hay cartas
-        en esta zona.
+        No cards
+        in this zone.
       </div>
     ) : (
       <div
@@ -719,14 +719,14 @@ invalid:
 
 const statusLabel = {
 ready:
-"✓ Listo para publicar",
+"✓ Ready to publish",
 
 
 incomplete:
-  "⚠ Deck incompleto",
+  "⚠ Incomplete deck",
 
 invalid:
-  "✕ Deck inválido",
+  "✕ Invalid deck",
 
 };
 
@@ -756,8 +756,8 @@ return ( <section
          text-white
        "
      >
-🃏 Constructor
-de Deck </h1>
+🃏 Deck
+Builder </h1>
 
 
     <p
@@ -766,9 +766,9 @@ de Deck </h1>
         text-zinc-400
       "
     >
-      Construye tu deck
-      competitivo y publícalo
-      en Card Meta.
+      Build your competitive
+      deck and publish it
+      on Card Meta.
     </p>
 
     {detectedArchetype && (
@@ -779,8 +779,8 @@ de Deck </h1>
           text-blue-400
         "
       >
-        Arquetipo
-        detectado:
+        Detected
+        archetype:
 
         <span
           className="
@@ -814,7 +814,7 @@ de Deck </h1>
         )
       }
       placeholder="
-        Nombre del Deck
+        Deck Name
       "
       maxLength={80}
       className="
@@ -843,7 +843,7 @@ de Deck </h1>
     >
       {detectedArchetype ? (
         <>
-          Arquetipo:
+          Archetype:
 
           <span
             className="
@@ -861,7 +861,7 @@ de Deck </h1>
             text-zinc-500
           "
         >
-          Sin detectar
+          Not detected
         </span>
       )}
     </div>
@@ -917,7 +917,7 @@ de Deck </h1>
         >
           {totalDeckCards}
           {" "}
-          cartas en total
+          cards total
         </p>
       </div>
 
@@ -996,7 +996,7 @@ de Deck </h1>
           text-white
         "
       >
-        🔍 Buscar Cartas
+        🔍 Search Cards
       </h2>
 
       <input
@@ -1013,7 +1013,7 @@ de Deck </h1>
           })
         }
         placeholder="
-          Buscar carta...
+          Search card...
         "
         className="
           mb-4
@@ -1037,7 +1037,7 @@ de Deck </h1>
           text-zinc-400
         "
       >
-        Resultados:
+        Results:
 
         <span
           className="
@@ -1121,7 +1121,7 @@ de Deck </h1>
           text-white
         "
       >
-        ⚔️ Deck Actual
+        ⚔️ Current Deck
       </h2>
 
       {renderZone(
@@ -1172,10 +1172,10 @@ de Deck </h1>
     "
   >
     {isSaving
-      ? "Guardando deck..."
+      ? "Saving deck..."
       : validation.isValid
-        ? "💾 Publicar Deck"
-        : "Completa el deck para publicar"}
+        ? "💾 Publish Deck"
+        : "Complete the deck to publish"}
   </button>
 </section>
 
@@ -1213,7 +1213,7 @@ if (
 !cleanName
 ) {
 messages.push(
-"Ingresa un nombre para el deck."
+"Enter a name for the deck."
 );
 }
 
@@ -1221,9 +1221,9 @@ if (
 mainCount < DECK_RULES.mainMin
 ) {
 messages.push(
-`Faltan ${
+`The Main Deck is missing ${
         DECK_RULES.mainMin - mainCount
-      } cartas en el Main Deck.`
+      } cards.`
 );
 }
 
@@ -1231,9 +1231,9 @@ if (
 mainCount > DECK_RULES.mainMax
 ) {
 messages.push(
-`El Main Deck supera el límite por ${
+`The Main Deck exceeds the limit by ${
         mainCount - DECK_RULES.mainMax
-      } cartas.`
+      } cards.`
 );
 }
 
@@ -1241,9 +1241,9 @@ if (
 extraCount > DECK_RULES.extraMax
 ) {
 messages.push(
-`El Extra Deck supera el límite por ${
+`The Extra Deck exceeds the limit by ${
         extraCount - DECK_RULES.extraMax
-      } cartas.`
+      } cards.`
 );
 }
 

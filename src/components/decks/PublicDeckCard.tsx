@@ -47,7 +47,7 @@ export default function PublicDeckCard({
   const author =
     deck.author?.displayName?.trim() ||
     deck.author?.username ||
-    "Anónimo";
+    "Anonymous";
 
   return (
     <Link
@@ -236,7 +236,7 @@ export default function PublicDeckCard({
               text-amber-200
             "
           >
-            {deck.skill ?? "Sin skill equipada"}
+            {deck.skill ?? "No skill equipped"}
           </span>
         </div>
 

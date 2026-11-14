@@ -24,7 +24,7 @@ export function guideErrorResponse(
 
   return NextResponse.json(
     {
-      error: "Error interno del servidor",
+      error: "Internal server error",
     },
     {
       status: 500,
@@ -36,7 +36,7 @@ export function invalidJsonResponse() {
   return NextResponse.json(
     {
       error:
-        "El cuerpo de la petición no es JSON válido",
+        "The request body is not valid JSON",
     },
     {
       status: 400,

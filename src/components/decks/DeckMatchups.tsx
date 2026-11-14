@@ -61,7 +61,7 @@ export default function DeckMatchups({
         </div>
       ) : (
         <p className="mt-4 text-sm text-foreground-muted">
-          No existen estadísticas de enfrentamientos.
+          No matchup statistics available.
         </p>
       )}
 

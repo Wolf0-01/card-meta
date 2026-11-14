@@ -13,10 +13,10 @@ import { formatDate } from "@/lib/format";
 import { getAllSetsWithBanners } from "@/lib/sets";
 
 export const metadata: Metadata = {
-  title: "Todas las expansiones | Card Meta",
+  title: "All expansions | Card Meta",
 
   description:
-    "Explora todas las cajas y expansiones de Yu-Gi-Oh! Duel Links, ordenadas por fecha de lanzamiento.",
+    "Explore all boxes and expansions for Yu-Gi-Oh! Duel Links, ordered by release date.",
 };
 
 export default async function SetsIndexPage() {
@@ -85,10 +85,10 @@ export default async function SetsIndexPage() {
               text-slate-400
             "
           >
-            Todas las cajas y expansiones de
-            Yu-Gi-Oh! Duel Links con banner
-            oficial, de la más reciente a la
-            más antigua.
+            All boxes and expansions for
+            Yu-Gi-Oh! Duel Links with an official
+            banner, from newest to
+            oldest.
           </p>
 
           <p
@@ -114,7 +114,7 @@ export default async function SetsIndexPage() {
             <span className="tabular-nums text-slate-200">
               {sets.length}
             </span>
-            expansiones
+            expansions
           </p>
         </header>
 
@@ -134,7 +134,7 @@ export default async function SetsIndexPage() {
             <Package className="mx-auto h-7 w-7 text-slate-600" />
 
             <p className="mt-2 text-sm font-bold text-slate-300">
-              No hay expansiones con banner.
+              No expansions with a banner.
             </p>
 
             <Link
@@ -151,12 +151,12 @@ export default async function SetsIndexPage() {
                 hover:text-blue-200
               "
             >
-              Ir al catálogo de cartas
+              Go to the card catalog
             </Link>
           </section>
         ) : (
           <section
-            aria-label="Expansiones"
+            aria-label="Expansions"
             className="
               grid
               grid-cols-1

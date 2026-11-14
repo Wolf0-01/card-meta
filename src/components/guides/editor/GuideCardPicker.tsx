@@ -142,7 +142,7 @@ export default function GuideCardPicker({
 
         if (!response.ok) {
           throw new Error(
-            "No se pudieron cargar las cartas."
+            "Could not load the cards."
           );
         }
 
@@ -168,7 +168,7 @@ export default function GuideCardPicker({
         setError(
           loadError instanceof Error
             ? loadError.message
-            : "No se pudieron cargar las cartas."
+            : "Could not load the cards."
         );
       } finally {
         if (!controller.signal.aborted) {
@@ -215,7 +215,7 @@ export default function GuideCardPicker({
             text-slate-400
           "
         >
-          Cartas destacadas de la sección
+          Featured cards in the section
         </p>
 
         <span
@@ -257,8 +257,8 @@ export default function GuideCardPicker({
           onChange={(event) =>
             setSearch(event.target.value)
           }
-          placeholder="Buscar carta para esta sección..."
-          aria-label="Buscar carta para esta sección"
+          placeholder="Search a card for this section..."
+          aria-label="Search a card for this section"
           className="
             h-9
             w-full
@@ -312,8 +312,8 @@ export default function GuideCardPicker({
                 onClick={() =>
                   removeCard(card.name)
                 }
-                aria-label={`Quitar ${card.name}`}
-                title={`Quitar ${card.name}`}
+                aria-label={`Remove ${card.name}`}
+                title={`Remove ${card.name}`}
                 className="
                   absolute
                   right-1
@@ -357,13 +357,13 @@ export default function GuideCardPicker({
 
       {debouncedSearch.length < 2 ? (
         <p className="text-[10px] leading-relaxed text-slate-500">
-          Escribe al menos dos caracteres para buscar
-          en el catálogo y añadir miniaturas reales.
+          Type at least two characters to search
+          the catalog and add real thumbnails.
         </p>
       ) : loading ? (
         <p className="flex items-center gap-1.5 text-[10px] text-slate-500">
           <Loader2 className="h-3 w-3 animate-spin" />
-          Buscando cartas...
+          Searching cards...
         </p>
       ) : error ? (
         <p className="text-[10px] text-red-300">
@@ -371,7 +371,7 @@ export default function GuideCardPicker({
         </p>
       ) : results.length === 0 ? (
         <p className="text-[10px] text-slate-500">
-          No hay cartas que coincidan con “
+          No cards match “
           {debouncedSearch}”.
         </p>
       ) : (
@@ -396,8 +396,8 @@ export default function GuideCardPicker({
                 disabled={alreadySelected}
                 title={
                   alreadySelected
-                    ? `${card.name} ya está añadida`
-                    : `Añadir ${card.name}`
+                    ? `${card.name} is already added`
+                    : `Add ${card.name}`
                 }
                 className="
                   group

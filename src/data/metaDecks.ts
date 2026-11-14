@@ -43,7 +43,7 @@ trend: "up",
 format: "Advanced",
 
 description:
-  "Deck competitivo basado en Blue-Eyes con gran presencia en el meta.",
+  "Competitive Blue-Eyes deck with a strong presence in the meta.",
 
 
 },
@@ -84,7 +84,7 @@ trend: "stable",
 format: "Advanced",
 
 description:
-  "Estrategia de fusión con gran consistencia y presencia competitiva.",
+  "Fusion strategy with high consistency and competitive presence.",
 
 
 },
@@ -129,7 +129,7 @@ trend: "down",
 format: "Advanced",
 
 description:
-  "Deck clásico con soporte moderno y control del campo.",
+  "Classic deck with modern support and field control.",
 
 
 },
@@ -174,7 +174,7 @@ trend: "up",
 format: "Advanced",
 
 description:
-  "Deck agresivo basado en fusiones y ataques explosivos.",
+  "Aggressive deck built around fusions and explosive attacks.",
 
 
 },
@@ -215,7 +215,7 @@ trend: "stable",
 format: "Advanced",
 
 description:
-  "Arquetipo HERO con múltiples líneas de fusión.",
+  "HERO archetype with multiple fusion lines.",
 
 
 },
@@ -260,7 +260,7 @@ trend: "stable",
 format: "Advanced",
 
 description:
-  "Deck alternativo capaz de sorprender en torneos.",
+  "Alternative deck capable of surprising in tournaments.",
 
 
 },

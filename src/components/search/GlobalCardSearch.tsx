@@ -520,7 +520,7 @@ export default function GlobalCardSearch() {
         if (!response.ok) {
           throw new Error(
             data?.error ??
-              "No se pudieron cargar las cartas."
+              "Could not load the cards."
           );
         }
 
@@ -557,7 +557,7 @@ export default function GlobalCardSearch() {
         setCardsError(
           error instanceof Error
             ? error.message
-            : "No se pudieron cargar las cartas."
+            : "Could not load the cards."
         );
       } finally {
         if (!controller.signal.aborted) {
@@ -637,7 +637,7 @@ export default function GlobalCardSearch() {
         if (!response.ok) {
           throw new Error(
             data?.error ??
-              "No se pudieron cargar las habilidades."
+              "Could not load the skills."
           );
         }
 
@@ -681,7 +681,7 @@ export default function GlobalCardSearch() {
         setSkillsError(
           error instanceof Error
             ? error.message
-            : "No se pudieron cargar las habilidades."
+            : "Could not load the skills."
         );
       } finally {
         if (!controller.signal.aborted) {
@@ -809,11 +809,11 @@ export default function GlobalCardSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Abrir buscador de cartas y habilidades"
+        aria-label="Open card and skill search"
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-keyshortcuts="Control+K"
-        title="Buscar cartas y skills (Ctrl+K)"
+        title="Search cards and skills (Ctrl+K)"
         className="
           group
           inline-flex
@@ -870,7 +870,7 @@ export default function GlobalCardSearch() {
           <div
             role="dialog"
             aria-modal="true"
-            aria-label="Buscador global de cartas y habilidades"
+            aria-label="Global card and skill search"
             data-global-search-modal="true"
             onClick={(event) => {
               if (
@@ -1028,7 +1028,7 @@ export default function GlobalCardSearch() {
                             hover:underline
                           "
                         >
-                          Reintentar
+                          Retry
                         </button>
                       </div>
                     ) : cardLoading ? (
@@ -1055,8 +1055,8 @@ export default function GlobalCardSearch() {
                         <Search className="h-6 w-6 text-slate-600" />
 
                         <p>
-                          No se encontraron cartas
-                          con estos filtros.
+                          No cards found
+                          with these filters.
                         </p>
 
                         <button
@@ -1073,7 +1073,7 @@ export default function GlobalCardSearch() {
                             hover:text-blue-200
                           "
                         >
-                          Reiniciar filtros
+                          Reset filters
                         </button>
                       </div>
                     ) : (
@@ -1100,7 +1100,7 @@ export default function GlobalCardSearch() {
                       currentPage={cardPage}
                       totalPages={cardPages}
                       total={cardTotal}
-                      itemLabel="cartas"
+                      itemLabel="cards"
                       onPageChange={(page) => {
                         setCardPage(page);
 
@@ -1196,7 +1196,7 @@ export default function GlobalCardSearch() {
                             hover:underline
                           "
                         >
-                          Reintentar
+                          Retry
                         </button>
                       </div>
                     ) : skillLoading ? (
@@ -1223,9 +1223,9 @@ export default function GlobalCardSearch() {
                         <Search className="h-6 w-6 text-slate-600" />
 
                         <p>
-                          No se encontraron
-                          habilidades con estos
-                          filtros.
+                          No skills found
+                          with these
+                          filters.
                         </p>
 
                         <button
@@ -1242,7 +1242,7 @@ export default function GlobalCardSearch() {
                             hover:text-blue-200
                           "
                         >
-                          Reiniciar filtros
+                          Reset filters
                         </button>
                       </div>
                     ) : (

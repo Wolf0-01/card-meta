@@ -317,7 +317,7 @@ export default async function CardDetailPage({
   const kindLabel =
     kindParts.length > 0
       ? `[${kindParts.join(" / ")}]`
-      : "[Sin clasificar]";
+      : "[Unclassified]";
 
   const levelLabel = isLink
     ? "LINK"
@@ -365,7 +365,7 @@ export default async function CardDetailPage({
           "
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Volver al catálogo
+          Back to catalog
         </Link>
 
         <h1
@@ -464,7 +464,7 @@ export default async function CardDetailPage({
               </span>
             </div>
 
-            {/* Columna derecha: ficha técnica y efecto */}
+            {/* Right column: card details and effect */}
             <div
               className="
                 flex
@@ -530,7 +530,7 @@ export default async function CardDetailPage({
                 "
               >
                 {card.description ??
-                  "Esta carta no tiene descripción registrada."}
+                  "This card has no registered description."}
               </p>
 
               {isMonster && (
@@ -707,7 +707,7 @@ export default async function CardDetailPage({
                       >
                         <Link
                           href={`/articles/sets/${slugifySetName(entry.name)}`}
-                          title={`Ver las cartas de ${entry.name}`}
+                          title={`View the cards in ${entry.name}`}
                           className="
                             group
                             inline-flex
@@ -805,7 +805,7 @@ export default async function CardDetailPage({
         </article>
 
         <CardRelated
-          title="Cartas relacionadas"
+          title="Related cards"
           cards={related}
         />
       </div>

@@ -116,7 +116,7 @@ export default function CatalogHeader({
     >
       <div className="flex items-center justify-between gap-2">
         <nav
-          aria-label="Secciones del catálogo"
+          aria-label="Catalog sections"
           className="
             flex
             items-end
@@ -209,8 +209,8 @@ export default function CatalogHeader({
           type="button"
           aria-label={
             onClose
-              ? "Cerrar buscador"
-              : "Cerrar catálogo"
+              ? "Close search"
+              : "Close catalog"
           }
           onClick={handleClose}
           className="

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: "Admin | Card Meta",
 
   description:
-    "Panel exclusivo de sincronización del catálogo de Card Meta.",
+    "Card Meta catalog sync panel, exclusive to admins.",
 };
 
 export default async function AdminPage() {
@@ -71,7 +71,7 @@ export default async function AdminPage() {
               sm:text-4xl
             "
           >
-            Sincronización
+            Sync
           </h1>
 
           <p
@@ -82,10 +82,10 @@ export default async function AdminPage() {
               text-slate-400
             "
           >
-            Ejecuta las tareas de mantenimiento del catálogo
-            desde el servidor. Los banners marcados con{" "}
+            Run catalog maintenance tasks
+            from the server. Banners marked with{" "}
             <code className="text-amber-200">#manual</code>{" "}
-            se conservan intactos.
+            are kept untouched.
           </p>
 
           <span

@@ -47,7 +47,7 @@ export default function GuideActions({
     }
 
     const confirmed = window.confirm(
-      "¿Eliminar esta guía? Esta acción no se puede deshacer."
+      "Delete this guide? This action cannot be undone."
     );
 
     if (!confirmed) {
@@ -84,7 +84,7 @@ export default function GuideActions({
         throw new Error(
           [
             data?.error ??
-              "No se pudo eliminar la guía.",
+              "Could not delete the guide.",
             issueText,
           ]
             .filter(Boolean)
@@ -99,7 +99,7 @@ export default function GuideActions({
       setError(
         deleteError instanceof Error
           ? deleteError.message
-          : "No se pudo eliminar la guía."
+          : "Could not delete the guide."
       );
 
       setDeleting(false);
@@ -132,7 +132,7 @@ export default function GuideActions({
           "
         >
           <Pencil className="h-3 w-3" />
-          Editar
+          Edit
         </Link>
 
         <button
@@ -169,7 +169,7 @@ export default function GuideActions({
             <Trash2 className="h-3 w-3" />
           )}
 
-          {deleting ? "Eliminando" : "Eliminar"}
+          {deleting ? "Deleting" : "Delete"}
         </button>
       </div>
 

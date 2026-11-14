@@ -88,7 +88,7 @@ hover:shadow-blue-500/10
       group-hover:bg-blue-500
     "
   >
-    Ver deck
+    View deck
   </div>
 </Link>
 

@@ -11,7 +11,7 @@ export async function requireUser(): Promise<AuthUser | null> {
 export function unauthorized() {
   return NextResponse.json(
     {
-      error: "No autenticado",
+      error: "Not authenticated",
     },
     {
       status: 401,
@@ -20,7 +20,7 @@ export function unauthorized() {
 }
 
 export function forbidden(
-  message = "No tienes permiso para realizar esta acción"
+  message = "You do not have permission to perform this action"
 ) {
   return NextResponse.json(
     {

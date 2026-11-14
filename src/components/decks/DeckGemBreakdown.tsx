@@ -431,12 +431,12 @@ export default function DeckGemBreakdown({
             </span>
 
             <span className="text-[10px] font-bold text-foreground-muted">
-              gemas
+              gems
             </span>
           </p>
 
           <p className="text-[9px] text-foreground-muted">
-            máximo estimado · peor escenario
+            estimated maximum · worst case
           </p>
         </div>
       </div>
@@ -460,7 +460,7 @@ export default function DeckGemBreakdown({
               text-foreground-muted
             "
           >
-            Máximo
+            Maximum
           </p>
 
           <p className="text-sm font-black tabular-nums text-amber-300">
@@ -590,9 +590,9 @@ export default function DeckGemBreakdown({
             text-foreground-muted
           "
         >
-          Este mazo no necesita abrir cajas: todas
-          sus cartas son gratuitas o no tienen una
-          caja registrada.
+          This deck does not need to open boxes: all
+          its cards are free or have no
+          registered box.
         </p>
       )}
 
@@ -690,7 +690,7 @@ export default function DeckGemBreakdown({
                       ? card.sources
                           .map(formatFreeSource)
                           .join(" · ")
-                      : "Sin origen registrado"}
+                      : "No registered source"}
                   </p>
                 </div>
 
@@ -726,8 +726,8 @@ export default function DeckGemBreakdown({
             text-amber-300/80
           "
         >
-          Algunas cartas no tienen datos de
-          obtención en el catálogo.
+          Some cards have no acquisition data
+          in the catalog.
         </p>
       )}
 
@@ -748,9 +748,9 @@ export default function DeckGemBreakdown({
         <Info className="mt-0.5 h-3 w-3 shrink-0" />
 
         <span>
-          Estimación basada en vueltas completas y
-          copias garantizadas por caja. No incluye
-          ofertas, Box Chips ni tickets de ensueño.
+          Estimate based on full box cycles and
+          guaranteed copies per box. Does not include
+          sales, Box Chips or dream tickets.
         </span>
       </p>
     </section>

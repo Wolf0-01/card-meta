@@ -268,26 +268,26 @@ export default function GuideEditor({
     const cleanCoverUrl = coverUrl.trim();
 
     if (!cleanTitle) {
-      setError("El título es obligatorio.");
+      setError("The title is required.");
 
       return;
     }
 
     if (!cleanSummary) {
-      setError("El resumen es obligatorio.");
+      setError("The summary is required.");
 
       return;
     }
 
     if (!cleanAuthor) {
-      setError("El autor es obligatorio.");
+      setError("The author is required.");
 
       return;
     }
 
     if (!cleanCoverUrl) {
       setError(
-        "Selecciona un banner o pega una URL de portada."
+        "Select a banner or paste a cover URL."
       );
 
       return;
@@ -328,9 +328,9 @@ export default function GuideEditor({
 
     if (invalidSectionIndex >= 0) {
       setError(
-        `La sección ${
+        `Section ${
           invalidSectionIndex + 1
-        } necesita un título y al menos un párrafo.`
+        } needs a heading and at least one paragraph.`
       );
 
       return;
@@ -403,7 +403,7 @@ export default function GuideEditor({
         throw new Error(
           [
             data?.error ??
-              "No se pudo guardar la guía.",
+              "Could not save the guide.",
             issueText,
           ]
             .filter(Boolean)
@@ -422,7 +422,7 @@ export default function GuideEditor({
       setError(
         saveError instanceof Error
           ? saveError.message
-          : "No se pudo guardar la guía."
+          : "Could not save the guide."
       );
 
       setSaving(false);
@@ -509,8 +509,8 @@ export default function GuideEditor({
             "
           >
             {isEdit
-              ? "Editar guía"
-              : "Nueva guía"}
+              ? "Edit guide"
+              : "New guide"}
           </h1>
 
           <p
@@ -521,9 +521,9 @@ export default function GuideEditor({
               text-slate-400
             "
           >
-            Publica una guía editorial con secciones
-            dinámicas, portada real y cartas destacadas
-            enlazadas al catálogo.
+            Publish an editorial guide with dynamic
+            sections, a real cover and featured cards
+            linked to the catalog.
           </p>
         </header>
 
@@ -578,14 +578,14 @@ export default function GuideEditor({
                   text-slate-200
                 "
               >
-                Datos principales
+                Main details
               </h2>
             </div>
 
             <div className="grid gap-3 lg:grid-cols-2">
               <label className="space-y-0.5 lg:col-span-2">
                 <span className={labelClass}>
-                  Título
+                  Title
                 </span>
 
                 <input
@@ -594,14 +594,14 @@ export default function GuideEditor({
                   onChange={(event) =>
                     setTitle(event.target.value)
                   }
-                  placeholder="Blue-Eyes: guía del formato actual"
+                  placeholder="Blue-Eyes: a guide to the current format"
                   className={inputClass}
                 />
               </label>
 
               <label className="space-y-0.5 lg:col-span-2">
                 <span className={labelClass}>
-                  Resumen corto
+                  Short summary
                 </span>
 
                 <textarea
@@ -610,14 +610,14 @@ export default function GuideEditor({
                   onChange={(event) =>
                     setSummary(event.target.value)
                   }
-                  placeholder="Explica en una o dos frases de qué trata la guía."
+                  placeholder="Explain in one or two sentences what the guide is about."
                   className={textareaClass}
                 />
               </label>
 
               <label className="space-y-0.5">
                 <span className={labelClass}>
-                  Autor
+                  Author
                 </span>
 
                 <input
@@ -626,14 +626,14 @@ export default function GuideEditor({
                   onChange={(event) =>
                     setAuthor(event.target.value)
                   }
-                  placeholder="Tu nombre de autor"
+                  placeholder="Your author name"
                   className={inputClass}
                 />
               </label>
 
               <label className="space-y-0.5">
                 <span className={labelClass}>
-                  Tags (separados por comas)
+                  Tags (comma-separated)
                 </span>
 
                 <input
@@ -707,15 +707,15 @@ export default function GuideEditor({
                     />
 
                     {featured
-                      ? "Aparecerá en Most Popular"
-                      : "Guía normal"}
+                      ? "It will appear in Most Popular"
+                      : "Regular guide"}
                   </span>
                 </div>
               </div>
 
               <div className="space-y-1 lg:col-span-2">
                 <span className={labelClass}>
-                  Portada
+                  Cover
                 </span>
 
                 <div className="flex items-center gap-1.5">
@@ -727,7 +727,7 @@ export default function GuideEditor({
                     onChange={(event) =>
                       setCoverUrl(event.target.value)
                     }
-                    placeholder="https://... o /ruta-local.jpg"
+                    placeholder="https://... or /local-path.jpg"
                     className={inputClass}
                   />
                 </div>
@@ -741,11 +741,11 @@ export default function GuideEditor({
                       );
                     }
                   }}
-                  aria-label="Elegir banner de expansión"
+                  aria-label="Choose expansion banner"
                   className={inputClass}
                 >
                   <option value="">
-                    Elegir banner de expansión...
+                    Choose expansion banner...
                   </option>
 
                   {coverOptions.map((option) => (
@@ -774,7 +774,7 @@ export default function GuideEditor({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={coverUrl}
-                      alt="Vista previa de la portada"
+                      alt="Cover preview"
                       referrerPolicy="no-referrer"
                       className="
                         h-full
@@ -802,7 +802,7 @@ export default function GuideEditor({
                   text-slate-200
                 "
               >
-                Secciones
+                Sections
               </h2>
 
               <span
@@ -848,7 +848,7 @@ export default function GuideEditor({
               "
             >
               <Plus className="h-3.5 w-3.5" />
-              Añadir sección
+              Add section
             </button>
           </div>
 
@@ -906,8 +906,8 @@ export default function GuideEditor({
                           }
                         )
                       }
-                      placeholder="Título de la sección"
-                      aria-label={`Título de la sección ${
+                      placeholder="Section heading"
+                      aria-label={`Section heading ${
                         index + 1
                       }`}
                       className="
@@ -941,13 +941,13 @@ export default function GuideEditor({
                       disabled={
                         sections.length <= 1
                       }
-                      aria-label={`Eliminar sección ${
+                      aria-label={`Remove section ${
                         index + 1
                       }`}
                       title={
                         sections.length <= 1
-                          ? "La guía necesita al menos una sección"
-                          : "Eliminar sección"
+                          ? "The guide needs at least one section"
+                          : "Remove section"
                       }
                       className="
                         flex
@@ -975,7 +975,7 @@ export default function GuideEditor({
                   <div className="mt-3 grid gap-3 lg:grid-cols-2">
                     <label className="space-y-0.5">
                       <span className={labelClass}>
-                        Párrafos
+                        Paragraphs
                       </span>
 
                       <textarea
@@ -991,7 +991,7 @@ export default function GuideEditor({
                           )
                         }
                         placeholder={
-                          "Escribe cada párrafo separado por una línea en blanco.\n\nEl primer párrafo introduce la idea.\n\nEl segundo la desarrolla."
+                          "Write each paragraph separated by a blank line.\n\nThe first paragraph introduces the idea.\n\nThe second develops it."
                         }
                         className={textareaClass}
                       />
@@ -999,7 +999,7 @@ export default function GuideEditor({
 
                     <label className="space-y-0.5">
                       <span className={labelClass}>
-                        Puntos clave (uno por línea)
+                        Key points (one per line)
                       </span>
 
                       <textarea
@@ -1015,7 +1015,7 @@ export default function GuideEditor({
                           )
                         }
                         placeholder={
-                          "Prioriza starters que funcionen solos.\nReserva espacio para interacción.\nAjusta el sideboard al top cut."
+                          "Prioritize starters that work on their own.\nLeave room for interaction.\nAdjust the side deck for the top cut."
                         }
                         className={textareaClass}
                       />
@@ -1058,8 +1058,8 @@ export default function GuideEditor({
             "
           >
             <p className="text-[10px] leading-relaxed text-slate-500">
-              El slug se genera automáticamente desde el
-              título y se mantiene único.
+              The slug is generated automatically from the
+              title and kept unique.
             </p>
 
             <div className="flex items-center gap-2">
@@ -1084,7 +1084,7 @@ export default function GuideEditor({
                   hover:text-white
                 "
               >
-                Cancelar
+                Cancel
               </Link>
 
               <button
@@ -1120,10 +1120,10 @@ export default function GuideEditor({
                 )}
 
                 {saving
-                  ? "Guardando..."
+                  ? "Saving..."
                   : isEdit
-                    ? "Guardar cambios"
-                    : "Publicar guía"}
+                    ? "Save changes"
+                    : "Publish guide"}
               </button>
             </div>
           </div>

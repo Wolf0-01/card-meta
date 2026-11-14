@@ -18,10 +18,10 @@ import { getGuideForEditorBySlug } from "@/lib/guides/service";
 import { getAllSetsWithBanners } from "@/lib/sets";
 
 export const metadata: Metadata = {
-  title: "Editar guía | Card Meta",
+  title: "Edit guide | Card Meta",
 
   description:
-    "Edita el contenido, la portada y las cartas destacadas de una guía.",
+    "Edit the content, cover and featured cards of a guide.",
 };
 
 interface EditGuidePageProps {

@@ -145,7 +145,7 @@ text-zinc-400
 
 >
 
-Cartas del Deck:
+Deck cards:
 
 <strong
 

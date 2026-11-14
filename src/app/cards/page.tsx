@@ -30,10 +30,10 @@ import { queryCards } from "@/lib/queryCards";
 import { querySkills } from "@/lib/skills/search";
 
 export const metadata: Metadata = {
-  title: "Catálogo de cartas | Card Meta",
+  title: "Card catalog | Card Meta",
 
   description:
-    "Explora el catálogo completo de Yu-Gi-Oh! Duel Links con búsqueda, filtros y vista detallada.",
+    "Explore the full Yu-Gi-Oh! Duel Links catalog with search, filters and detailed card pages.",
 };
 
 interface CardsPageProps {
@@ -213,7 +213,7 @@ export default async function CardsPage({
                   <Search className="h-6 w-6 text-slate-600" />
 
                   <p>
-                    No se encontraron cartas
+                    No cards found
                     con estos filtros.
                   </p>
 
@@ -298,7 +298,7 @@ export default async function CardsPage({
                   <Search className="h-6 w-6 text-slate-600" />
 
                   <p>
-                    No se encontraron habilidades
+                    No skills found
                     con estos filtros.
                   </p>
 
@@ -370,8 +370,8 @@ export default async function CardsPage({
             </p>
 
             <p className="max-w-sm text-xs text-slate-500">
-              Esta sección estará disponible
-              próximamente en el catálogo.
+              This section will be available
+              soon in the catalog.
             </p>
 
             <Link
@@ -387,7 +387,7 @@ export default async function CardsPage({
                 hover:text-blue-200
               "
             >
-              Volver a Cards
+              Back to Cards
             </Link>
           </div>
         )}

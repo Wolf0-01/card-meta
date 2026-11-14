@@ -126,18 +126,18 @@ export default function DeleteDeckDialog({
               id="delete-deck-title"
               className="text-base font-black text-foreground"
             >
-              Eliminar mazo
+              Delete deck
             </h2>
 
             <p
               id="delete-deck-description"
               className="mt-1 text-sm leading-6 text-foreground-muted"
             >
-              Vas a eliminar{" "}
+              You are about to delete{" "}
               <strong className="font-bold text-foreground">
                 “{deckName}”
               </strong>
-              . Esta acción no se puede deshacer.
+              . This action cannot be undone.
             </p>
           </div>
         </div>
@@ -182,8 +182,8 @@ export default function DeleteDeckDialog({
             disabled={isDeleting}
           >
             {isDeleting
-              ? "Eliminando..."
-              : "Eliminar mazo"}
+              ? "Deleting..."
+              : "Delete deck"}
           </Button>
         </div>
       </div>

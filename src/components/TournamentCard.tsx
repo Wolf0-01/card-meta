@@ -40,7 +40,7 @@ export default function TournamentCard() {
           text-green-400
         "
       >
-        PRÓXIMO
+        UPCOMING
       </div>
 
 
@@ -52,7 +52,7 @@ export default function TournamentCard() {
           text-white
         "
       >
-        🏆 Torneo 
+        🏆 Tournament
       </h3>
 
 
@@ -63,8 +63,8 @@ export default function TournamentCard() {
           text-zinc-400
         "
       >
-        Competición oficial para jugadores
-        de Duel Links.
+        Official competition for Duel Links
+        players.
       </p>
 
 
@@ -80,11 +80,11 @@ export default function TournamentCard() {
       >
 
         <p>
-          📅 Fecha: Próximamente
+          📅 Date: Coming soon
         </p>
 
         <p>
-          🎴 Formato: Competitivo
+          🎴 Format: Competitive
         </p>
 
       </div>
@@ -102,7 +102,7 @@ export default function TournamentCard() {
           group-hover:text-green-300
         "
       >
-        Ver torneo →
+        View tournament →
       </div>
 
 

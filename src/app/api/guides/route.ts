@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
   if (!canManageGuides(user)) {
     return forbidden(
-      "Necesitas rol EDITOR o ADMIN para gestionar guías"
+      "You need the EDITOR or ADMIN role to manage guides"
     );
   }
 

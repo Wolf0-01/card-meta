@@ -32,8 +32,8 @@ return ( <Link
       text-zinc-400
     "
   >
-    Consulta los decks competitivos
-    organizados por niveles.
+    Check the competitive decks
+    organized by tier.
   </p>
 
   <div
@@ -50,7 +50,7 @@ return ( <Link
       group-hover:bg-blue-500
     "
   >
-    Ver Tier List
+    View Tier List
   </div>
 </Link>
 

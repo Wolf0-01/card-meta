@@ -62,7 +62,7 @@ return ( <main
           mb-4
         "
       >
-        Información del Deck
+        Deck information
       </h2>
 
       <p
@@ -72,7 +72,7 @@ return ( <main
         "
       >
         {deck.description ??
-          "Deck competitivo del meta actual."}
+          "Competitive deck from the current meta."}
       </p>
 
       <div
@@ -95,7 +95,7 @@ return ( <main
               text-zinc-500
             "
           >
-            ARQUETIPO
+            ARCHETYPE
           </p>
 
           <p
@@ -122,7 +122,7 @@ return ( <main
               text-zinc-500
             "
           >
-            POPULARIDAD
+            POPULARITY
           </p>
 
           <p
@@ -148,7 +148,7 @@ return ( <main
               text-zinc-500
             "
           >
-            TOPS TORNEO
+            TOURNAMENT TOPS
           </p>
 
           <p
@@ -174,7 +174,7 @@ return ( <main
               text-zinc-500
             "
           >
-            FORMATO
+            FORMAT
           </p>
 
           <p
@@ -206,7 +206,7 @@ return ( <main
           mb-4
         "
       >
-        Cartas del Deck
+        Deck cards
       </h2>
 
       <DeckCardList
@@ -231,7 +231,7 @@ return ( <main
           mb-4
         "
       >
-        📅 Información Meta
+        📅 Meta information
       </h2>
 
       <div
@@ -254,7 +254,7 @@ return ( <main
               text-zinc-500
             "
           >
-            ACTUALIZADO
+            UPDATED
           </p>
 
           <p
@@ -266,7 +266,7 @@ return ( <main
             {new Date(
               deck.updatedAt
             ).toLocaleDateString(
-              "es-ES"
+              "en-US"
             )}
           </p>
         </div>
@@ -284,7 +284,7 @@ return ( <main
               text-zinc-500
             "
           >
-            TENDENCIA
+            TREND
           </p>
 
           <p
@@ -310,7 +310,7 @@ return ( <main
               text-zinc-500
             "
           >
-            POSICIÓN
+            POSITION
           </p>
 
           <p

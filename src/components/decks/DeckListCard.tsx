@@ -133,7 +133,7 @@ export default function DeckListCard({
             href={`/decks/${deck.slug}/${deck.identifier}`}
           >
             <Button size="sm">
-              Ver Deck
+              View Deck
             </Button>
           </Link>
         </div>

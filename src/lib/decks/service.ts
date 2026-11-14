@@ -243,11 +243,11 @@ async function ensureCardsExist(
   if (missing.length > 0) {
     throw new DeckError(
       "VALIDATION",
-      "Una o más cartas no existen",
+      "One or more cards do not exist",
       missing.slice(0, 10).map((id) => ({
         path: "cards",
 
-        message: `La carta #${id} no existe`,
+        message: `Card #${id} does not exist`,
       }))
     );
   }
@@ -259,7 +259,7 @@ async function ensureCardsExist(
   if (wrongFormat.length > 0) {
     throw new DeckError(
       "VALIDATION",
-      `El mazo contiene cartas que no pertenecen a ${
+      `The deck contains cards that do not belong to ${
         format === "rush"
           ? "Rush Duel"
           : "Speed Duel"
@@ -267,7 +267,7 @@ async function ensureCardsExist(
       wrongFormat.slice(0, 10).map((card) => ({
         path: "cards",
 
-        message: `La carta "${card.name}" no está disponible en ${
+        message: `The card "${card.name}" is not available in ${
           format === "rush"
             ? "Rush Duel"
             : "Speed Duel"
@@ -298,13 +298,13 @@ async function resolveArchetypeId(
   if (!archetype) {
     throw new DeckError(
       "VALIDATION",
-      "El arquetipo indicado no existe",
+      "The specified archetype does not exist",
       [
         {
           path: "archetypeId",
 
           message:
-            "El arquetipo indicado no existe",
+            "The specified archetype does not exist",
         },
       ]
     );
@@ -328,14 +328,14 @@ function deckCardCreateData(
 function notFound() {
   return new DeckError(
     "NOT_FOUND",
-    "El mazo no existe"
+    "The deck does not exist"
   );
 }
 
 function forbidden() {
   return new DeckError(
     "FORBIDDEN",
-    "No tienes permiso para modificar este mazo"
+    "You do not have permission to modify this deck"
   );
 }
 
@@ -612,7 +612,7 @@ export async function getDeckForViewer(
   if (!deck.isPublic && !isOwner) {
     throw new DeckError(
       "FORBIDDEN",
-      "Este mazo es privado"
+      "This deck is private"
     );
   }
 

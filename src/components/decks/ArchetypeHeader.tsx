@@ -115,7 +115,7 @@ export default function ArchetypeHeader({
               "
             >
               {deck.description ??
-                "Deck competitivo"}
+                "Competitive deck"}
             </p>
 
             <div
@@ -172,7 +172,7 @@ export default function ArchetypeHeader({
                   text-zinc-500
                 "
               >
-                Sin imagen
+                No image
               </div>
             )}
           </div>

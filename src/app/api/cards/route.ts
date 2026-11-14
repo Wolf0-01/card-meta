@@ -162,7 +162,7 @@ export async function GET(
     return NextResponse.json(
       {
         error:
-          "Error al obtener las cartas",
+          "Could not load the cards",
       },
       {
         status: 500,

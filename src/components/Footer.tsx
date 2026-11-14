@@ -49,8 +49,8 @@ export default function Footer() {
               text-zinc-400
             "
           >
-            Comunidad de Duel Links para
-            decks, cartas, torneos y meta competitivo.
+            The Duel Links community for
+            decks, cards, tournaments and competitive meta.
           </p>
 
         </div>
@@ -59,7 +59,7 @@ export default function Footer() {
 
 
 
-        {/* Navegación */}
+        {/* Navigation */}
 
         <div>
 
@@ -69,7 +69,7 @@ export default function Footer() {
               text-white
             "
           >
-            Explorar
+            Explore
           </h3>
 
 
@@ -123,7 +123,7 @@ export default function Footer() {
 
 
 
-        {/* Comunidad */}
+        {/* Community */}
 
         <div>
 
@@ -133,7 +133,7 @@ export default function Footer() {
               text-white
             "
           >
-            Comunidad
+            Community
           </h3>
 
 
@@ -143,8 +143,8 @@ export default function Footer() {
               text-zinc-400
             "
           >
-            Mantente actualizado con las
-            novedades del meta.
+            Stay up to date with the
+            latest meta news.
           </p>
 
 
@@ -171,7 +171,7 @@ export default function Footer() {
         "
       >
 
-        © 2026 Card Meta. Todos los derechos reservados.
+        © 2026 Card Meta. All rights reserved.
 
       </div>
 

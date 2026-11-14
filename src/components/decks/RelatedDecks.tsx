@@ -38,7 +38,7 @@ export default function RelatedDecks({
           text-foreground-muted
         "
       >
-        Otros decks que podrían interesarte.
+        Other decks you might be interested in.
       </p>
 
       <div className="mt-6">

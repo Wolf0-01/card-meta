@@ -106,7 +106,7 @@ export default function DeckCard({
             href={`/decks/${slug ?? name.toLowerCase()}`}
             fullWidth
           >
-            Ver Deck
+            View Deck
           </Button>
         </div>
 

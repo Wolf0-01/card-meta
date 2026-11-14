@@ -548,7 +548,7 @@ function SkillTooltip({
                 text-slate-500
               "
             >
-              Cartas asociadas
+              Associated cards
             </p>
 
             <div className="mt-1.5 flex flex-wrap gap-1.5">

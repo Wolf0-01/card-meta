@@ -51,7 +51,7 @@ const SCRIPT_TIMEOUT_MS = 20 * 60 * 1000;
 const TASKS: Record<AdminSyncTask, SyncStep[]> = {
   sets: [
     {
-      label: "Sets y banners (Speed + Rush)",
+      label: "Sets and banners (Speed + Rush)",
 
       script: "scripts/syncSetMeta.ts",
 
@@ -61,28 +61,28 @@ const TASKS: Record<AdminSyncTask, SyncStep[]> = {
 
   cards: [
     {
-      label: "Cartas Speed nuevas",
+      label: "New Speed cards",
 
       script: "scripts/importCards.ts",
 
       args: [],
     },
     {
-      label: "Cartas Rush nuevas",
+      label: "New Rush cards",
 
       script: "scripts/syncRushCards.ts",
 
       args: ["--apply"],
     },
     {
-      label: "Fuentes obtain Speed",
+      label: "Speed obtain sources",
 
       script: "scripts/updateObtain.ts",
 
       args: ["--apply"],
     },
     {
-      label: "Fuentes obtain Rush",
+      label: "Rush obtain sources",
 
       script: "scripts/updateObtain.ts",
 

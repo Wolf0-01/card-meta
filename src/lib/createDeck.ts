@@ -78,7 +78,7 @@ function validateDeck(
   for (const card of cards) {
     if (card.quantity <= 0) {
       throw new Error(
-        `Cantidad inválida para carta ${card.id}`
+        `Invalid quantity for card ${card.id}`
       );
     }
 
@@ -101,7 +101,7 @@ function validateDeck(
     zones.extra > limits.extra
   ) {
     throw new Error(
-      "El deck supera los límites permitidos"
+      "The deck exceeds the allowed limits"
     );
   }
 }
@@ -166,7 +166,7 @@ export async function createDeck(
 ) {
   if (!data.name.trim()) {
     throw new Error(
-      "El deck necesita nombre"
+      "The deck needs a name"
     );
   }
 
@@ -175,7 +175,7 @@ export async function createDeck(
     data.cards.length === 0
   ) {
     throw new Error(
-      "El deck necesita cartas"
+      "The deck needs cards"
     );
   }
 

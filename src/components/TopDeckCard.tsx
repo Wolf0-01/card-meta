@@ -24,8 +24,8 @@ export default function TopDeckCard() {
             text-foreground-secondary
           "
         >
-          Los decks más utilizados y competitivos
-          actualmente.
+          The most played and competitive decks
+          right now.
         </p>
 
         <div className="mt-5">
@@ -33,7 +33,7 @@ export default function TopDeckCard() {
             variant="danger"
             className="pointer-events-none"
           >
-            Ver Top Deck
+            View Top Deck
           </Button>
         </div>
 

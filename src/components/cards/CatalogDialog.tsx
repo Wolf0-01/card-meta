@@ -26,7 +26,7 @@ export default function CatalogDialog({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Catálogo de cartas"
+      aria-label="Card catalog"
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           closeCatalog();

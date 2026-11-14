@@ -52,7 +52,7 @@ export default function NewsCard() {
           text-white
         "
       >
-        📰 Nueva actualización
+        📰 New update
       </h3>
 
 
@@ -63,8 +63,8 @@ export default function NewsCard() {
           text-zinc-400
         "
       >
-        Nuevas cartas llegan al juego y
-        modifican el meta competitivo.
+        New cards arrive in the game and
+        reshape the competitive meta.
       </p>
 
 
@@ -80,7 +80,7 @@ export default function NewsCard() {
           group-hover:text-blue-300
         "
       >
-        Leer noticia →
+        Read article →
       </div>
 
 

@@ -193,7 +193,7 @@ export default function GlobalCatalogControls({
             }
             placeholder="Search cards..."
             maxLength={80}
-            aria-label="Buscar cartas por nombre"
+            aria-label="Search cards by name"
             autoFocus={autoFocus}
             className="
               h-8
@@ -218,7 +218,7 @@ export default function GlobalCatalogControls({
           {search && (
             <button
               type="button"
-              aria-label="Limpiar búsqueda"
+              aria-label="Clear search"
               onClick={() => onSearchChange("")}
               className="
                 absolute
@@ -365,7 +365,7 @@ export default function GlobalCatalogControls({
           {filtersOpen && (
             <div
               role="dialog"
-              aria-label="Filtros del buscador global"
+              aria-label="Global search filters"
               data-global-filter-popover="true"
               className="
                 absolute
@@ -385,7 +385,7 @@ export default function GlobalCatalogControls({
               <div className="grid grid-cols-2 gap-1.5">
                 <label className="block">
                   <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
-                    Tipo
+                    Type
                   </span>
 
                   <select
@@ -413,7 +413,7 @@ export default function GlobalCatalogControls({
 
                 <label className="block">
                   <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
-                    Atributo
+                    Attribute
                   </span>
 
                   <select
@@ -441,7 +441,7 @@ export default function GlobalCatalogControls({
 
                 <label className="block">
                   <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
-                    Rareza
+                    Rarity
                   </span>
 
                   <select
@@ -469,7 +469,7 @@ export default function GlobalCatalogControls({
 
                 <label className="block">
                   <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
-                    Nivel
+                    Level
                   </span>
 
                   <select
@@ -542,7 +542,7 @@ export default function GlobalCatalogControls({
             onChange={(event) =>
               onSortChange(event.target.value)
             }
-            aria-label="Ordenar cartas"
+            aria-label="Sort cards"
             className={`
               ${CARD_CONTROL_CLASSES}
               appearance-none

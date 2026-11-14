@@ -93,7 +93,7 @@ export default function LoginForm({
       if (!response.ok) {
         setError(
           data?.error ??
-            "No se pudo iniciar sesión"
+            "Could not sign in"
         );
 
         setFieldErrors(
@@ -108,7 +108,7 @@ export default function LoginForm({
       router.refresh();
     } catch {
       setError(
-        "No se pudo conectar con el servidor"
+        "Could not connect to the server"
       );
     } finally {
       setLoading(false);
@@ -149,7 +149,7 @@ export default function LoginForm({
             text-foreground-secondary
           "
         >
-          Email o usuario
+          Email or username
         </label>
 
         <Input
@@ -162,7 +162,7 @@ export default function LoginForm({
               event.target.value
             )
           }
-          placeholder="tu@email.com o tu_usuario"
+          placeholder="you@email.com or your_username"
           autoComplete="username"
           autoFocus
           error={Boolean(
@@ -190,7 +190,7 @@ export default function LoginForm({
             text-foreground-secondary
           "
         >
-          Contraseña
+          Password
         </label>
 
         <Input
@@ -226,8 +226,8 @@ export default function LoginForm({
         disabled={loading}
       >
         {loading
-          ? "Iniciando sesión..."
-          : "Iniciar sesión"}
+          ? "Signing in..."
+          : "Sign in"}
       </Button>
 
       <p
@@ -237,7 +237,7 @@ export default function LoginForm({
           text-foreground-muted
         "
       >
-        ¿No tienes cuenta?{" "}
+        Don&apos;t have an account?{" "}
         <Link
           href="/register"
           className="
@@ -246,7 +246,7 @@ export default function LoginForm({
             hover:text-primary-hover
           "
         >
-          Crear una cuenta
+          Create an account
         </Link>
       </p>
     </form>

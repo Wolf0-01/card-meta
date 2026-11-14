@@ -102,8 +102,8 @@ export default function TierBandSection({
           >
             {band.archetypes.length}{" "}
             {band.archetypes.length === 1
-              ? "arquetipo"
-              : "arquetipos"}
+              ? "archetype"
+              : "archetypes"}
           </span>
 
           <p
@@ -127,8 +127,8 @@ export default function TierBandSection({
               text-slate-500
             "
           >
-            Sin arquetipos registrados en este
-            nivel.
+            No archetypes registered in this
+            tier.
           </p>
         ) : (
           <div

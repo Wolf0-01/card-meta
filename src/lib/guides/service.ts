@@ -176,11 +176,11 @@ async function ensureCardsExist(
 
   throw new GuideError(
     "VALIDATION",
-    "Una o más cartas destacadas no existen",
+    "One or more featured cards do not exist",
     missing.slice(0, 10).map((name) => ({
       path: "featuredCardNames",
 
-      message: `La carta "${name}" no existe en el catálogo`,
+      message: `The card "${name}" does not exist in the catalog`,
     }))
   );
 }
@@ -433,7 +433,7 @@ export async function updateGuide(
   if (!existing) {
     throw new GuideError(
       "NOT_FOUND",
-      "La guía no existe"
+      "The guide does not exist"
     );
   }
 
@@ -542,7 +542,7 @@ export async function deleteGuide(
   if (!existing) {
     throw new GuideError(
       "NOT_FOUND",
-      "La guía no existe"
+      "The guide does not exist"
     );
   }
 

@@ -199,7 +199,7 @@ export default function MyDecksGrid({
         DECK_RULES.mainMin
     ) {
       setError(
-        `“${deck.name}” necesita al menos ${DECK_RULES.mainMin} cartas en el Main Deck para publicarse.`
+        `“${deck.name}” needs at least ${DECK_RULES.mainMin} cards in the Main Deck to be published.`
       );
 
       return;
@@ -247,7 +247,7 @@ export default function MyDecksGrid({
         throw new Error(
           getMutationError(
             data,
-            "No se pudo cambiar la visibilidad del mazo."
+            "Could not change the deck visibility."
           )
         );
       }
@@ -286,7 +286,7 @@ export default function MyDecksGrid({
       setError(
         visibilityError instanceof Error
           ? visibilityError.message
-          : "No se pudo cambiar la visibilidad del mazo."
+          : "Could not change the deck visibility."
       );
     } finally {
       setVisibilityBusyId(null);
@@ -340,7 +340,7 @@ export default function MyDecksGrid({
         throw new Error(
           getMutationError(
             data,
-            "No se pudo eliminar el mazo."
+            "Could not delete the deck."
           )
         );
       }
@@ -358,7 +358,7 @@ export default function MyDecksGrid({
       setDeleteError(
         deleteDeckError instanceof Error
           ? deleteDeckError.message
-          : "No se pudo eliminar el mazo."
+          : "Could not delete the deck."
       );
     } finally {
       setIsDeletingDeck(false);
@@ -411,19 +411,19 @@ export default function MyDecksGrid({
           </span>
 
           <h2 className="mt-4 text-lg font-black text-foreground">
-            Todavía no tienes mazos
+            No decks yet
           </h2>
 
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-foreground-muted">
-            Crea tu primer mazo, guárdalo como
-            borrador y publícalo cuando esté
-            completo.
+            Create your first deck, save it as a
+            draft and publish it when it is
+            complete.
           </p>
 
           <div className="mt-6 flex justify-center">
             <Button href="/decks/new">
               <Plus className="mr-1.5 h-4 w-4" />
-              Crear mi primer mazo
+              Create my first deck
             </Button>
           </div>
         </div>
@@ -453,17 +453,17 @@ export default function MyDecksGrid({
   }> = [
     {
       key: "all",
-      label: "Todos",
+      label: "All",
       count: decks.length,
     },
     {
       key: "public",
-      label: "Públicos",
+      label: "Public",
       count: publicCount,
     },
     {
       key: "draft",
-      label: "Borradores",
+      label: "Drafts",
       count: draftCount,
     },
   ];
@@ -495,7 +495,7 @@ export default function MyDecksGrid({
           <button
             type="button"
             onClick={() => setError(null)}
-            aria-label="Cerrar aviso"
+            aria-label="Dismiss notice"
             className="
               shrink-0
               rounded-md
@@ -514,7 +514,7 @@ export default function MyDecksGrid({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div
           role="group"
-          aria-label="Filtrar mazos"
+          aria-label="Filter decks"
           className="flex flex-wrap items-center gap-1.5"
         >
           {filterTabs.map((tab) => {
@@ -572,7 +572,7 @@ export default function MyDecksGrid({
         </div>
 
         <p className="text-[10px] font-semibold uppercase tracking-wide text-foreground-muted">
-          Ordenados por actualización
+          Sorted by last update
         </p>
       </div>
 
@@ -590,13 +590,13 @@ export default function MyDecksGrid({
           "
         >
           <p className="text-sm font-bold text-foreground">
-            No hay mazos en este filtro
+            No decks in this filter
           </p>
 
           <p className="mt-1 text-xs text-foreground-muted">
             {filter === "public"
-              ? "Publica un mazo para verlo aquí."
-              : "Crea un borrador desde el builder para verlo aquí."}
+              ? "Publish a deck to see it here."
+              : "Create a draft in the builder to see it here."}
           </p>
 
           <button
@@ -604,7 +604,7 @@ export default function MyDecksGrid({
             onClick={() => setFilter("all")}
             className="mt-3 text-xs font-semibold text-primary hover:underline"
           >
-            Ver todos los mazos
+            View all decks
           </button>
         </div>
       ) : (
@@ -668,7 +668,7 @@ export default function MyDecksGrid({
 
                         <span className="truncate">
                           {deck.archetype?.name ??
-                            "Mazo personal"}
+                            "Personal deck"}
                         </span>
                       </p>
 
@@ -684,17 +684,17 @@ export default function MyDecksGrid({
                       aria-busy={isUpdating}
                       aria-label={
                         deck.isPublic
-                          ? `${deck.name}: público. Cambiar a privado.`
-                          : `${deck.name}: privado. Cambiar a público.`
+                          ? `${deck.name}: public. Switch to private.`
+                          : `${deck.name}: private. Switch to public.`
                       }
                       title={
                         isUpdating
-                          ? "Actualizando visibilidad..."
+                          ? "Updating visibility..."
                           : deck.isPublic
-                            ? "Hacer privado"
+                            ? "Make private"
                             : cannotPublish
-                              ? `Necesita ${DECK_RULES.mainMin} cartas en el Main Deck para publicarse`
-                              : "Hacer público"
+                              ? `Needs ${DECK_RULES.mainMin} cards in the Main Deck to be published`
+                              : "Make public"
                       }
                       onClick={() =>
                         handleVisibilityToggle(
@@ -773,8 +773,8 @@ export default function MyDecksGrid({
                       )}
 
                       {deck.isPublic
-                        ? "Público"
-                        : "Privado"}
+                        ? "Public"
+                        : "Private"}
                     </button>
                   </div>
 
@@ -819,7 +819,7 @@ export default function MyDecksGrid({
 
                     <span className="truncate text-[11px] font-semibold text-amber-200">
                       {deck.skill?.trim() ||
-                        "Sin skill"}
+                        "No skill"}
                     </span>
                   </div>
 
@@ -868,7 +868,7 @@ export default function MyDecksGrid({
                     "
                   >
                     <p className="text-[10px] text-foreground-muted">
-                      Actualizado el{" "}
+                      Updated on{" "}
                       {formatDate(deck.updatedAt)}
                     </p>
 
@@ -899,8 +899,8 @@ export default function MyDecksGrid({
                       )}
 
                       {deck.isPublic
-                        ? "Publicado"
-                        : "Borrador"}
+                        ? "Published"
+                        : "Draft"}
                     </span>
                   </div>
 
@@ -928,7 +928,7 @@ export default function MyDecksGrid({
                         `}
                       >
                         <Eye className="h-3.5 w-3.5" />
-                        Ver ficha
+                        View deck
                       </Link>
                     )}
 
@@ -945,7 +945,7 @@ export default function MyDecksGrid({
                       `}
                     >
                       <Pencil className="h-3.5 w-3.5" />
-                      Editar
+                      Edit
                     </Link>
 
                     <button
@@ -964,7 +964,7 @@ export default function MyDecksGrid({
                       `}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
-                      Eliminar
+                      Delete
                     </button>
                   </div>
                 </div>

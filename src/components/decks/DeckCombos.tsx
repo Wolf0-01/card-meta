@@ -17,7 +17,7 @@ export default function DeckCombos({
           text-foreground
         "
       >
-        Combos Principales
+        Main Combos
       </h2>
 
       {combos && combos.length > 0 ? (
@@ -42,7 +42,7 @@ export default function DeckCombos({
             text-foreground-muted
           "
         >
-          No hay combos registrados para este deck.
+          No combos registered for this deck.
         </p>
       )}
 

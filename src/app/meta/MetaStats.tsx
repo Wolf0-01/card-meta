@@ -47,13 +47,13 @@ const cards = [
 
 
   {
-    title:"FORMATO",
+    title:"FORMAT",
     value:stats.format
   },
 
 
   {
-    title:"TORNEOS",
+    title:"TOURNAMENTS",
     value:stats.tournaments
   },
 

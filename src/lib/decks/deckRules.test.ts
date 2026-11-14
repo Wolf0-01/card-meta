@@ -194,7 +194,7 @@ describe("validateDeckCards", () => {
           normalizedCards("main", 19),
           true
         ),
-      "al menos 20"
+      "at least 20"
     );
   });
 
@@ -236,7 +236,7 @@ describe("validateDeckCards", () => {
 
     expectDeckError(
       () => validateDeckCards(cards, false),
-      "3 copias"
+      "3 copies"
     );
   });
 });

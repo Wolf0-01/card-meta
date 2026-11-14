@@ -44,8 +44,8 @@ export default function DeckSection({
     : DECK_RULES.extraMax;
 
   const emptyMessage = titleUpper.includes("MAIN")
-    ? "No hay cartas en el Main Deck."
-    : "No hay cartas en el Extra Deck.";
+    ? "No cards in the Main Deck."
+    : "No cards in the Extra Deck.";
 
   return (
     <Card className="p-6">
@@ -79,7 +79,7 @@ export default function DeckSection({
               text-foreground-muted
             "
           >
-            {totalCards} / {maxCards} cartas
+            {totalCards} / {maxCards} cards
           </p>
         </div>
 

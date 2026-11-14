@@ -31,7 +31,7 @@ export default function CardItem({
         quantity: 1,
       });
 
-      alert(`${card.name} añadida al deck`);
+      alert(`${card.name} added to the deck`);
     } catch (error) {
       if (error instanceof Error) {
         alert(error.message);
@@ -105,7 +105,7 @@ export default function CardItem({
           </p>
 
           <p>
-            Rareza: {card.rarity ?? "N/A"}
+            Rarity: {card.rarity ?? "N/A"}
           </p>
         </div>
 
@@ -149,7 +149,7 @@ export default function CardItem({
             hover:bg-primary-hover
           "
         >
-          Añadir al Deck
+          Add to Deck
         </button>
       )}
 

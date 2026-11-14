@@ -108,7 +108,7 @@ export default function SkillCardTile({
         <button
           type="button"
           onClick={() => onAssign(skill)}
-          aria-label={`Asignar ${skill.name} al borrador del Deck Builder`}
+          aria-label={`Assign ${skill.name} to the Deck Builder draft`}
           className={`
             inline-flex
             h-7
@@ -175,12 +175,12 @@ export default function SkillCardTile({
           {expanded ? (
             <>
               <ChevronUp className="h-3 w-3" />
-              Ver menos
+              Show less
             </>
           ) : (
             <>
               <ChevronDown className="h-3 w-3" />
-              Ver más
+              Show more
             </>
           )}
         </button>

@@ -1,12 +1,12 @@
 export const CARD_TYPE_OPTIONS = [
-  { value: "", label: "Todos" },
-  { value: "Monster", label: "Monstruos" },
-  { value: "Spell", label: "Mágicas" },
-  { value: "Trap", label: "Trampas" },
+  { value: "", label: "All" },
+  { value: "Monster", label: "Monsters" },
+  { value: "Spell", label: "Spells" },
+  { value: "Trap", label: "Traps" },
 ] as const;
 
 export const CARD_ATTRIBUTE_OPTIONS = [
-  { value: "", label: "Atributo" },
+  { value: "", label: "Attribute" },
   { value: "DARK", label: "DARK" },
   { value: "LIGHT", label: "LIGHT" },
   { value: "EARTH", label: "EARTH" },
@@ -17,7 +17,7 @@ export const CARD_ATTRIBUTE_OPTIONS = [
 ] as const;
 
 export const CARD_RARITY_OPTIONS = [
-  { value: "", label: "Rareza" },
+  { value: "", label: "Rarity" },
   { value: "UR", label: "UR" },
   { value: "SR", label: "SR" },
   { value: "R", label: "R" },
@@ -25,22 +25,22 @@ export const CARD_RARITY_OPTIONS = [
 ] as const;
 
 export const CARD_LEVEL_OPTIONS = [
-  { value: "", label: "Nivel" },
+  { value: "", label: "Level" },
   ...Array.from(
     { length: 12 },
     (_, index) => ({
       value: String(index + 1),
-      label: `Nivel ${index + 1}`,
+      label: `Level ${index + 1}`,
     })
   ),
 ];
 
 export const CARD_SORT_OPTIONS = [
   { value: "popularity", label: "Popularity" },
-  { value: "name", label: "Nombre (A-Z)" },
+  { value: "name", label: "Name (A-Z)" },
   { value: "attack", label: "ATK" },
   { value: "defense", label: "DEF" },
-  { value: "level", label: "Nivel" },
+  { value: "level", label: "Level" },
 ] as const;
 
 export type CardFilterKey =

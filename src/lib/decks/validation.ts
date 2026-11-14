@@ -22,16 +22,16 @@ export const deckZoneSchema = z.enum([
 export const deckCardInputSchema = z.object({
   id: z.coerce
     .number()
-    .int("El id de la carta debe ser un número entero")
-    .positive("El id de la carta no es válido"),
+    .int("The card id must be an integer")
+    .positive("The card id is not valid"),
 
   quantity: z.coerce
     .number()
-    .int("La cantidad debe ser un número entero")
-    .min(1, "La cantidad mínima es 1")
+    .int("The quantity must be an integer")
+    .min(1, "The minimum quantity is 1")
     .max(
       DECK_RULES.maxCopies,
-      `No puedes usar más de ${DECK_RULES.maxCopies} copias de una carta`
+      `You cannot use more than ${DECK_RULES.maxCopies} copies of a card`
     )
     .optional(),
 
@@ -42,15 +42,15 @@ const deckFields = {
   name: z
     .string()
     .trim()
-    .min(1, "El mazo necesita un nombre")
-    .max(80, "El nombre no puede superar 80 caracteres"),
+    .min(1, "The deck needs a name")
+    .max(80, "The name cannot exceed 80 characters"),
 
   description: z
     .string()
     .trim()
     .max(
       500,
-      "La descripción no puede superar 500 caracteres"
+      "The description cannot exceed 500 characters"
     )
     .nullable()
     .optional(),
@@ -60,7 +60,7 @@ const deckFields = {
     .trim()
     .max(
       120,
-      "La skill no puede superar 120 caracteres"
+      "The skill cannot exceed 120 characters"
     )
     .nullable()
     .optional(),
@@ -68,18 +68,18 @@ const deckFields = {
   format: z
     .string()
     .trim()
-    .min(1, "El formato no puede estar vacío")
+    .min(1, "The format cannot be empty")
     .max(
       40,
-      "El formato no puede superar 40 caracteres"
+      "The format cannot exceed 40 characters"
     )
     .optional(),
 
   archetypeId: z
     .string()
     .trim()
-    .min(1, "El arquetipo no es válido")
-    .max(64, "El arquetipo no es válido")
+    .min(1, "The archetype is not valid")
+    .max(64, "The archetype is not valid")
     .nullable()
     .optional(),
 
@@ -89,7 +89,7 @@ const deckFields = {
     .array(deckCardInputSchema)
     .max(
       400,
-      "El mazo contiene demasiadas entradas de cartas"
+      "The deck contains too many card entries"
     )
     .optional(),
 } as const;
@@ -135,7 +135,7 @@ export function parseDeckCreate(body: unknown) {
   if (!parsed.success) {
     throw new DeckError(
       "VALIDATION",
-      "Revisa los datos del mazo",
+      "Check the deck data",
       toIssues(parsed.error)
     );
   }
@@ -150,7 +150,7 @@ export function parseDeckUpdate(body: unknown) {
   if (!parsed.success) {
     throw new DeckError(
       "VALIDATION",
-      "Revisa los datos del mazo",
+      "Check the deck data",
       toIssues(parsed.error)
     );
   }
@@ -240,7 +240,7 @@ export function validateDeckCards(
       issues.push({
         path: "cards",
 
-        message: `No puedes usar más de ${DECK_RULES.maxCopies} copias de la carta #${cardId} (actual: ${copies})`,
+        message: `You cannot use more than ${DECK_RULES.maxCopies} copies of card #${cardId} (current: ${copies})`,
       });
     }
   }
@@ -249,7 +249,7 @@ export function validateDeckCards(
     issues.push({
       path: "cards",
 
-      message: `El Main Deck no puede superar ${DECK_RULES.mainMax} cartas (actual: ${counts.main})`,
+      message: `The Main Deck cannot exceed ${DECK_RULES.mainMax} cards (current: ${counts.main})`,
     });
   }
 
@@ -258,13 +258,13 @@ export function validateDeckCards(
       path: "cards",
 
       message:
-        "Rush Duel no utiliza Extra Deck: todas las cartas deben estar en el Main Deck",
+        "Rush Duel does not use an Extra Deck: all cards must be in the Main Deck",
     });
   } else if (counts.extra > DECK_RULES.extraMax) {
     issues.push({
       path: "cards",
 
-      message: `El Extra Deck no puede superar ${DECK_RULES.extraMax} cartas (actual: ${counts.extra})`,
+      message: `The Extra Deck cannot exceed ${DECK_RULES.extraMax} cards (current: ${counts.extra})`,
     });
   }
 
@@ -275,14 +275,14 @@ export function validateDeckCards(
     issues.push({
       path: "cards",
 
-      message: `El Main Deck necesita al menos ${DECK_RULES.mainMin} cartas para publicarse (actual: ${counts.main})`,
+      message: `The Main Deck needs at least ${DECK_RULES.mainMin} cards to be published (current: ${counts.main})`,
     });
   }
 
   if (issues.length > 0) {
     throw new DeckError(
       "VALIDATION",
-      "El mazo no cumple las reglas",
+      "The deck does not meet the rules",
       issues
     );
   }

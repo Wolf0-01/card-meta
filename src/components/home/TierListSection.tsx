@@ -24,12 +24,12 @@ decks,
 return ( <Section> <Container>
 <SectionHeader
 title="Tier List"
-subtitle="Los mejores decks competitivos del formato actual."
+subtitle="The best competitive decks in the current format."
 action={ <Button
            href="/tier-list"
            variant="outline"
          >
-Ver Tier List </Button>
+View Tier List </Button>
 }
 />
 

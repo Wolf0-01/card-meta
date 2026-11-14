@@ -407,7 +407,7 @@ zone
 )
 ) {
 throw new Error(
-`${zone.toUpperCase()} Deck lleno`
+`${zone.toUpperCase()} Deck full`
 );
 }
 
@@ -423,11 +423,11 @@ if (
   maxCopies
 ) {
   throw new Error(
-    `Máximo ${maxCopies} copia${
+    `Maximum ${maxCopies} cop${
       maxCopies === 1
-        ? ""
-        : "s"
-    } de esta carta en ${
+        ? "y"
+        : "ies"
+    } of this card in ${
       zone.toUpperCase()
     }`
   );
@@ -576,7 +576,7 @@ to
 )
 ) {
 throw new Error(
-`${to.toUpperCase()} Deck lleno`
+`${to.toUpperCase()} Deck full`
 );
 }
 
@@ -596,14 +596,14 @@ nextQuantity >
 maxCopies
 ) {
 throw new Error(
-`No se puede mover: ${
+`Cannot move: ${
         to.toUpperCase()
-      } permite un máximo de ${
+      } allows a maximum of ${
         maxCopies
-      } copia${
+      } cop${
         maxCopies === 1
-          ? ""
-          : "s"
+          ? "y"
+          : "ies"
       }`
 );
 }

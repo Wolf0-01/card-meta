@@ -94,7 +94,7 @@ export default function AdminSyncPanel() {
             "error" in data &&
             data.error
             ? data.error
-            : "No se pudo ejecutar la sincronización."
+            : "Could not run the sync."
         );
       }
 
@@ -103,7 +103,7 @@ export default function AdminSyncPanel() {
       setError(
         syncError instanceof Error
           ? syncError.message
-          : "No se pudo ejecutar la sincronización."
+          : "Could not run the sync."
       );
     } finally {
       setRunningTask(null);
@@ -157,12 +157,12 @@ export default function AdminSyncPanel() {
                   text-slate-200
                 "
               >
-                Sets y banners
+                Sets and banners
               </h2>
 
               <p className="mt-1 text-[10px] leading-relaxed text-slate-400">
-                Sincroniza SetMeta para Speed y Rush.
-                Respeta los banners con{" "}
+                Sync SetMeta for Speed and Rush.
+                Respects banners marked with{" "}
                 <code className="text-amber-200">
                   #manual
                 </code>
@@ -210,8 +210,8 @@ export default function AdminSyncPanel() {
             )}
 
             {runningTask === "sets"
-              ? "Sincronizando..."
-              : "Sincronizar sets"}
+              ? "Syncing..."
+              : "Sync sets"}
           </button>
         </section>
 
@@ -257,17 +257,17 @@ export default function AdminSyncPanel() {
                   text-slate-200
                 "
               >
-                Cartas y obtención
+                Cards and acquisition
               </h2>
 
               <p className="mt-1 text-[10px] leading-relaxed text-slate-400">
-                Importa cartas Speed nuevas, sincroniza
-                Rush y actualiza las fuentes{" "}
+                Import new Speed cards, sync
+                Rush and update the{" "}
                 <code className="text-amber-200">
                   obtain
                 </code>{" "}
-                de ambos formatos. Puede tardar varios
-                minutos.
+                sources for both formats. It may take
+                several minutes.
               </p>
             </div>
           </div>
@@ -311,8 +311,8 @@ export default function AdminSyncPanel() {
             )}
 
             {runningTask === "cards"
-              ? "Sincronizando..."
-              : "Sincronizar cartas"}
+              ? "Syncing..."
+              : "Sync cards"}
           </button>
         </section>
       </div>
@@ -335,8 +335,8 @@ export default function AdminSyncPanel() {
           "
         >
           <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-300" />
-          Ejecutando la tarea en el servidor. No cierres
-          esta pestaña hasta que termine.
+          Running the task on the server. Do not close
+          this tab until it finishes.
         </p>
       )}
 
@@ -393,7 +393,7 @@ export default function AdminSyncPanel() {
                 "
               >
                 <CheckCircle2 className="h-2.5 w-2.5" />
-                Completado
+                Completed
               </span>
             ) : (
               <span
@@ -415,7 +415,7 @@ export default function AdminSyncPanel() {
                 "
               >
                 <TriangleAlert className="h-2.5 w-2.5" />
-                Finalizó con errores
+                Finished with errors
               </span>
             )}
 
@@ -435,8 +435,8 @@ export default function AdminSyncPanel() {
               "
             >
               {result.task === "sets"
-                ? "Sets y banners"
-                : "Cartas y obtención"}
+                ? "Sets and banners"
+                : "Cards and acquisition"}
             </span>
 
             <span
@@ -462,7 +462,7 @@ export default function AdminSyncPanel() {
                 text-slate-400
               "
             >
-              Resumen
+              Summary
             </p>
 
             <pre
@@ -498,7 +498,7 @@ export default function AdminSyncPanel() {
                 hover:text-slate-200
               "
             >
-              Salida completa
+              Full output
             </summary>
 
             <pre

@@ -22,19 +22,19 @@ const SET_TYPE_LABELS: Record<
   string,
   string
 > = {
-  "Main Box": "Caja principal",
+  "Main Box": "Main Box",
 
-  "Mini Box": "Caja mini",
+  "Mini Box": "Mini Box",
 
-  "Selection Box": "Caja de selección",
+  "Selection Box": "Selection Box",
 
-  "Pickup Box": "Caja pickup",
+  "Pickup Box": "Pickup Box",
 
-  "Structure Deck": "Deck de estructura",
+  "Structure Deck": "Structure Deck",
 
-  "Starter Deck": "Deck de inicio",
+  "Starter Deck": "Starter Deck",
 
-  otherSources: "Otras fuentes",
+  otherSources: "Other sources",
 };
 
 /**
@@ -45,7 +45,7 @@ export function formatSetType(
   type: string | null
 ): string {
   if (!type) {
-    return "Set de Duel Links";
+    return "Duel Links set";
   }
 
   return SET_TYPE_LABELS[type] ?? type;

@@ -58,7 +58,7 @@ export default function CardGrid({
                 text-foreground-secondary
               "
             >
-              {cards.length} cartas
+              {cards.length} cards
             </span>
           )}
         </div>

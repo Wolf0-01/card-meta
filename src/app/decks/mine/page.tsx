@@ -12,10 +12,10 @@ import { getCurrentUser } from "@/lib/auth/currentUser";
 import { listUserDecks } from "@/lib/decks/service";
 
 export const metadata: Metadata = {
-  title: "Mis mazos | Card Meta",
+  title: "My decks | Card Meta",
 
   description:
-    "Gestiona tus mazos guardados y publicados en Card Meta.",
+    "Manage your saved and published decks on Card Meta.",
 };
 
 interface MyDecksPageProps {
@@ -77,7 +77,7 @@ export default async function MyDecksPage({
                 text-primary
               "
             >
-              Mi colección
+              My collection
             </p>
 
             <h1
@@ -87,24 +87,20 @@ export default async function MyDecksPage({
                 text-foreground
               "
             >
-              Mis mazos
+              My decks
             </h1>
 
             <p className="mt-1 text-sm text-foreground-muted">
               {decks.length === 0
-                ? "Guarda borradores y publícalos cuando estén listos."
-                : `${decks.length} mazo${
+                ? "Save drafts and publish them when they are ready."
+                : `${decks.length} deck${
                     decks.length === 1
                       ? ""
                       : "s"
-                  } · ${publicDeckCount} público${
-                    publicDeckCount === 1
-                      ? ""
-                      : "s"
-                  } · ${draftDeckCount} borrador${
+                  } · ${publicDeckCount} public · ${draftDeckCount} draft${
                     draftDeckCount === 1
                       ? ""
-                      : "es"
+                      : "s"
                   }`}
             </p>
           </div>
@@ -114,7 +110,7 @@ export default async function MyDecksPage({
             className="w-full gap-2 sm:w-auto"
           >
             <Plus className="h-4 w-4" />
-            Nuevo mazo
+            New deck
           </Button>
         </header>
 
@@ -134,7 +130,7 @@ export default async function MyDecksPage({
               text-emerald-300
             "
           >
-            Borrador guardado correctamente.
+            Draft saved successfully.
           </div>
         )}
 
@@ -154,7 +150,7 @@ export default async function MyDecksPage({
               text-emerald-300
             "
           >
-            Cambios guardados correctamente.
+            Changes saved successfully.
           </div>
         )}
 

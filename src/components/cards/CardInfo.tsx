@@ -43,7 +43,7 @@ export default function CardInfo({
 
 
       <p className="text-zinc-300 mt-2">
-        Tipo: {type}
+        Type: {type}
       </p>
 
 
@@ -55,13 +55,13 @@ export default function CardInfo({
 
 
             <p className="text-zinc-300">
-              Atributo: {attribute ?? "N/A"}
+              Attribute: {attribute ?? "N/A"}
             </p>
 
 
 
             <p className="text-zinc-300">
-              Rareza: {rarity ?? "N/A"}
+              Rarity: {rarity ?? "N/A"}
             </p>
 
 

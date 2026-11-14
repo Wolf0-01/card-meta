@@ -75,7 +75,7 @@ if(search.length >= 3){
 
       value={value}
 
-      placeholder="Buscar carta..."
+      placeholder="Search card..."
 
       onChange={(e)=>
         setValue(e.target.value)

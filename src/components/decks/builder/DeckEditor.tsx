@@ -169,7 +169,7 @@ return ( <div
         0
       )}
 
-      {" "}cartas
+      {" "}cards
     </p>
 
     <p>

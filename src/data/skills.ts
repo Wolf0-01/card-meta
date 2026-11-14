@@ -7,13 +7,13 @@ export const SKILL_CATEGORY_LABELS: Record<
   SkillCategory,
   string
 > = {
-  robo: "Robo",
-  campo: "Campo",
+  robo: "Draw",
+  campo: "Field",
   ataque: "ATK",
-  fusion: "Fusión",
-  invocacion: "Invocación",
+  fusion: "Fusion",
+  invocacion: "Summon",
   recuperacion: "LP",
-  especial: "Especial",
+  especial: "Special",
 };
 
 /**

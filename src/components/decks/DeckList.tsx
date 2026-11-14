@@ -14,7 +14,7 @@ interface Props {
 
 export default function DeckList({
   decks,
-  emptyMessage = "No hay decks disponibles.",
+  emptyMessage = "No decks available.",
 }: Props) {
   if (decks.length === 0) {
     return (

@@ -384,8 +384,8 @@ export default function DraftZone({
 
           <span className="text-[10px] text-foreground-muted">
             {min
-              ? `${min} mín.`
-              : `${limit} máx.`}
+              ? `${min} min.`
+              : `${limit} max.`}
           </span>
         </div>
 
@@ -457,13 +457,13 @@ export default function DraftZone({
 
             <p className="font-semibold">
               {isDragOver
-                ? `Suelta la carta en ${DECK_ZONE_LABELS[zone]}`
-                : "Arrastra cartas aquí"}
+                ? `Drop the card into ${DECK_ZONE_LABELS[zone]}`
+                : "Drag cards here"}
             </p>
 
             <p className="text-[10px] opacity-80">
-              También puedes hacer clic en el
-              buscador.
+              You can also click in the
+              search panel.
             </p>
           </div>
         ) : zone === "main" ? (

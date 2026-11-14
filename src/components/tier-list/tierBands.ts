@@ -31,7 +31,7 @@ export const TIER_BAND_META: Record<
   "tier-1": {
     label: "Tier 1",
     description:
-      "Los mazos que definen el formato y dominan los torneos.",
+      "Decks that define the format and dominate tournaments.",
     accent: "text-red-300",
     border: "border-red-500/40",
     strip:
@@ -45,7 +45,7 @@ export const TIER_BAND_META: Record<
   "tier-2": {
     label: "Tier 2",
     description:
-      "Competidores sólidos con respuestas claras al meta.",
+      "Solid competitors with clear answers to the meta.",
     accent: "text-orange-300",
     border: "border-orange-500/40",
     strip:
@@ -59,7 +59,7 @@ export const TIER_BAND_META: Record<
   "tier-3": {
     label: "Tier 3",
     description:
-      "Opciones viables que necesitan una buena pilotada.",
+      "Viable options that need good piloting.",
     accent: "text-sky-300",
     border: "border-sky-500/40",
     strip:
@@ -73,7 +73,7 @@ export const TIER_BAND_META: Record<
   "high-potential": {
     label: "High Potential",
     description:
-      "Arquetipos con cartas fuertes que aún no tienen mazos públicos.",
+      "Archetypes with strong cards that do not have public decks yet.",
     accent: "text-purple-300",
     border: "border-purple-500/40",
     strip:

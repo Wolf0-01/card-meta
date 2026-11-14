@@ -1,5 +1,5 @@
 const DATE_FORMATTER = new Intl.DateTimeFormat(
-  "es-ES",
+  "en-US",
   {
     day: "numeric",
     month: "short",
@@ -19,7 +19,7 @@ export function formatDate(
   value: string | Date | null | undefined
 ): string {
   if (!value) {
-    return "Sin fecha";
+    return "No date";
   }
 
   const date =
@@ -28,7 +28,7 @@ export function formatDate(
       : new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "Sin fecha";
+    return "No date";
   }
 
   return DATE_FORMATTER.format(date);

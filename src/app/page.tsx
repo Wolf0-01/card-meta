@@ -96,7 +96,7 @@ export default async function Home() {
                 sm:text-3xl
               "
             >
-              El meta, en un vistazo
+              The meta at a glance
             </h1>
           </div>
 
@@ -109,12 +109,12 @@ export default async function Home() {
               text-slate-500
             "
           >
-            Actualizado {formatDate(new Date())}
+            Updated {formatDate(new Date())}
           </p>
         </header>
 
         <section
-          aria-label="Accesos principales"
+          aria-label="Main sections"
           className="
             grid
             grid-cols-1
@@ -125,7 +125,7 @@ export default async function Home() {
         >
           <HomeShowcaseCard
             title="Tier List"
-            subtitle="El orden competitivo del meta"
+            subtitle="The competitive order of the meta"
             href="/tier-list"
             image={data.tierArt}
           />
@@ -134,7 +134,7 @@ export default async function Home() {
             title="Top Decks: Speed"
             subtitle={`${formatNumber(
               data.speedDeckCount
-            )} mazos Speed`}
+            )} Speed decks`}
             href="/decks?format=speed"
             image={data.speedDeckArt}
           />
@@ -143,14 +143,14 @@ export default async function Home() {
             title="Top Decks: Rush"
             subtitle={`${formatNumber(
               data.rushDeckCount
-            )} mazos Rush`}
+            )} Rush decks`}
             href="/decks?format=rush"
             image={data.rushDeckArt}
           />
 
           <HomeShowcaseCard
             title="Tournaments"
-            subtitle="Resultados y torneos"
+            subtitle="Results and events"
             href="/tournaments"
             image={data.tournamentArt}
           />
@@ -171,7 +171,7 @@ export default async function Home() {
         </section>
 
         <section
-          aria-label="Accesos rápidos"
+          aria-label="Quick links"
           className="
             grid
             grid-cols-1
@@ -267,7 +267,7 @@ export default async function Home() {
                   text-blue-300
                 "
               >
-                Comunidad
+                Community
               </p>
 
               <h2
@@ -281,7 +281,7 @@ export default async function Home() {
                   sm:text-2xl
                 "
               >
-                Últimos mazos publicados
+                Latest published decks
               </h2>
             </div>
 
@@ -300,7 +300,7 @@ export default async function Home() {
                 hover:text-blue-200
               "
             >
-              Ver todos los mazos
+              View all decks
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -320,7 +320,7 @@ export default async function Home() {
                 text-slate-400
               "
             >
-              Todavía no hay mazos públicos.
+              No public decks yet.
             </div>
           ) : (
             <div

@@ -39,14 +39,14 @@ export async function generateMetadata({
 
   if (!set) {
     return {
-      title: "Set no encontrado | Card Meta",
+      title: "Set not found | Card Meta",
     };
   }
 
   return {
-    title: `${set.name} | Cartas de Duel Links | Card Meta`,
+    title: `${set.name} | Duel Links Cards | Card Meta`,
 
-    description: `Explora las ${set.cardCount} cartas disponibles en ${set.name} de Yu-Gi-Oh! Duel Links.`,
+    description: `Explore the ${set.cardCount} cards available in ${set.name} from Yu-Gi-Oh! Duel Links.`,
   };
 }
 
@@ -108,7 +108,7 @@ export default async function CardSetPage({
           "
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Volver al catálogo
+          Back to catalog
         </Link>
 
         <section
@@ -189,9 +189,9 @@ export default async function CardSetPage({
                   text-slate-400
                 "
               >
-                Cartas de Yu-Gi-Oh! Duel Links
-                disponibles en esta caja,
-                agrupadas por rareza.
+                Yu-Gi-Oh! Duel Links cards
+                available in this box,
+                grouped by rarity.
               </p>
             </div>
 
@@ -237,7 +237,7 @@ export default async function CardSetPage({
                     text-slate-500
                   "
                 >
-                  Cartas
+                  Cards
                 </span>
               </span>
             </div>
@@ -391,8 +391,8 @@ export default async function CardSetPage({
                 text-slate-300
               "
             >
-              No hay cartas registradas para
-              este set.
+              No cards registered for
+              this set.
             </p>
 
             <p
@@ -402,8 +402,8 @@ export default async function CardSetPage({
                 text-slate-500
               "
             >
-              Vuelve al catálogo para explorar
-              las demás cartas.
+              Return to the catalog to explore
+              the other cards.
             </p>
           </section>
         ) : (
@@ -464,7 +464,7 @@ export default async function CardSetPage({
                     text-slate-500
                   "
                 >
-                  {group.cards.length} cartas
+                  {group.cards.length} cards
                 </span>
               </div>
 

@@ -100,7 +100,7 @@ export default function RegisterForm() {
       if (!response.ok) {
         setError(
           data?.error ??
-            "No se pudo crear la cuenta"
+            "Could not create the account"
         );
 
         setFieldErrors(
@@ -115,7 +115,7 @@ export default function RegisterForm() {
       router.refresh();
     } catch {
       setError(
-        "No se pudo conectar con el servidor"
+        "Could not connect to the server"
       );
     } finally {
       setLoading(false);
@@ -162,9 +162,9 @@ export default function RegisterForm() {
             text-foreground-secondary
           "
         >
-          Nombre{" "}
+          Name{" "}
           <span className="text-foreground-muted">
-            (opcional)
+            (optional)
           </span>
         </label>
 
@@ -179,7 +179,7 @@ export default function RegisterForm() {
               event.target.value
             )
           }
-          placeholder="Tu nombre"
+          placeholder="Your name"
           autoComplete="name"
           error={Boolean(
             fieldError("name")
@@ -203,7 +203,7 @@ export default function RegisterForm() {
             text-foreground-secondary
           "
         >
-          Nombre de usuario
+          Username
         </label>
 
         <Input
@@ -234,8 +234,8 @@ export default function RegisterForm() {
           </p>
         ) : (
           <p className="text-xs text-foreground-muted">
-            3–24 caracteres: letras, números,
-            guiones y guiones bajos.
+            3–24 characters: letters, numbers,
+            hyphens and underscores.
           </p>
         )}
       </div>
@@ -291,7 +291,7 @@ export default function RegisterForm() {
             text-foreground-secondary
           "
         >
-          Contraseña
+          Password
         </label>
 
         <Input
@@ -305,7 +305,7 @@ export default function RegisterForm() {
               event.target.value
             )
           }
-          placeholder="Mínimo 8 caracteres"
+          placeholder="At least 8 characters"
           autoComplete="new-password"
           error={Boolean(
             fieldError("password")
@@ -332,7 +332,7 @@ export default function RegisterForm() {
             text-foreground-secondary
           "
         >
-          Repite la contraseña
+          Repeat password
         </label>
 
         <Input
@@ -369,8 +369,8 @@ export default function RegisterForm() {
         disabled={loading}
       >
         {loading
-          ? "Creando cuenta..."
-          : "Crear cuenta"}
+          ? "Creating account..."
+          : "Create account"}
       </Button>
 
       <p
@@ -380,7 +380,7 @@ export default function RegisterForm() {
           text-foreground-muted
         "
       >
-        ¿Ya tienes cuenta?{" "}
+        Already have an account?{" "}
         <Link
           href="/login"
           className="
@@ -389,7 +389,7 @@ export default function RegisterForm() {
             hover:text-primary-hover
           "
         >
-          Iniciar sesión
+          Sign in
         </Link>
       </p>
     </form>

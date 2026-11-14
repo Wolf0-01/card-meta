@@ -81,7 +81,7 @@ export default function DeckBuilderHeader({
                   text-zinc-400
                 "
               >
-                Nombre del deck
+                Deck name
               </span>
 
               <input
@@ -239,8 +239,8 @@ export default function DeckBuilderHeader({
               disabled={isSaving}
             >
               {isSaving
-                ? "Guardando..."
-                : "Publicar Deck"}
+                ? "Saving..."
+                : "Publish Deck"}
             </Button>
           </div>
 

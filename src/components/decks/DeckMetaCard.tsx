@@ -224,7 +224,7 @@ line-clamp-2
 
 {deck.description ??
 
-"Deck competitivo del meta actual."}
+"Competitive deck from the current meta."}
 
 </p>
 
@@ -384,7 +384,7 @@ font-semibold
 
 >
 
-Ver Deck →
+View Deck →
 
 </span>
 

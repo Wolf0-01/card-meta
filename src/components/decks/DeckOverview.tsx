@@ -41,7 +41,7 @@ export default function DeckOverview({
         />
 
         <OverviewItem
-          label="Formato"
+          label="Format"
           value={getDuelFormatLabel(
             deck.format
           )}
@@ -56,7 +56,7 @@ export default function DeckOverview({
         />
 
         <OverviewItem
-          label="Cartas"
+          label="Cards"
           value={
             String(
               deck.totalCards ?? 0

@@ -42,7 +42,7 @@ export async function PATCH(
 
   if (!canManageGuides(user)) {
     return forbidden(
-      "Necesitas rol EDITOR o ADMIN para gestionar guías"
+      "You need the EDITOR or ADMIN role to manage guides"
     );
   }
 
@@ -86,7 +86,7 @@ export async function DELETE(
 
   if (!canManageGuides(user)) {
     return forbidden(
-      "Necesitas rol EDITOR o ADMIN para gestionar guías"
+      "You need the EDITOR or ADMIN role to manage guides"
     );
   }
 

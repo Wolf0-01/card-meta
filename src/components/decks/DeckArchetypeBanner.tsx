@@ -94,7 +94,7 @@ export default function DeckArchetypeBanner({
               text-white/60
             "
           >
-            Decklist y guía competitiva
+            Decklist and competitive guide
           </p>
         </div>
       </div>

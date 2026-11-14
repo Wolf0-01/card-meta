@@ -192,7 +192,7 @@ export default function SkillsCatalogControls({
             }
             placeholder="Search skills..."
             maxLength={80}
-            aria-label="Buscar habilidades por nombre o efecto"
+            aria-label="Search skills by name or effect"
             className="
               h-8
               w-full
@@ -216,7 +216,7 @@ export default function SkillsCatalogControls({
           {search && (
             <button
               type="button"
-              aria-label="Limpiar búsqueda"
+              aria-label="Clear search"
               onClick={clearSearch}
               className="
                 absolute
@@ -261,7 +261,7 @@ export default function SkillsCatalogControls({
                 character: event.target.value,
               })
             }
-            aria-label="Filtrar habilidades por personaje"
+            aria-label="Filter skills by character"
             className="
               h-8
               max-w-[9.5rem]
@@ -331,7 +331,7 @@ export default function SkillsCatalogControls({
               text-slate-500
             "
           >
-            Filtros activos
+            Active filters
           </span>
 
           <button
@@ -354,7 +354,7 @@ export default function SkillsCatalogControls({
             "
           >
             <RotateCcw className="h-3 w-3" />
-            Limpiar
+            Clear
           </button>
         </div>
       )}

@@ -59,7 +59,7 @@ function getSecret() {
 
   if (!secret || secret.length < 32) {
     throw new Error(
-      "AUTH_SECRET no está definida o tiene menos de 32 caracteres."
+      "AUTH_SECRET is not defined or has fewer than 32 characters."
     );
   }
 

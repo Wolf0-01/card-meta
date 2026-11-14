@@ -171,7 +171,7 @@ export default function DeckArchetypeCard({
 
       <span
         aria-label={`${count} ${
-          count === 1 ? "mazo" : "mazos"
+          count === 1 ? "deck" : "decks"
         }`}
         className="
           flex

@@ -332,7 +332,7 @@ export default function DeckCard({
               hover:bg-red-500
             "
           >
-            Eliminar
+            Delete
           </button>
 
           {onMove && (

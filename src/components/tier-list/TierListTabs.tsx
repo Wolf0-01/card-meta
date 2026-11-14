@@ -33,7 +33,7 @@ export default function TierListTabs({
 }: TierListTabsProps) {
   return (
     <nav
-      aria-label="Formato de la tier list"
+      aria-label="Tier list format"
       className="
         inline-flex
         items-center

@@ -78,7 +78,7 @@ export default function GlobalSkillsControls({
             }
             placeholder="Search skills..."
             maxLength={80}
-            aria-label="Buscar habilidades por nombre o efecto"
+            aria-label="Search skills by name or effect"
             autoFocus={autoFocus}
             className="
               h-8
@@ -103,7 +103,7 @@ export default function GlobalSkillsControls({
           {search && (
             <button
               type="button"
-              aria-label="Limpiar búsqueda"
+              aria-label="Clear search"
               onClick={() => onSearchChange("")}
               className="
                 absolute
@@ -148,7 +148,7 @@ export default function GlobalSkillsControls({
                 event.target.value
               )
             }
-            aria-label="Filtrar habilidades por personaje"
+            aria-label="Filter skills by character"
             className="
               h-8
               max-w-[9.5rem]
@@ -218,7 +218,7 @@ export default function GlobalSkillsControls({
               text-slate-500
             "
           >
-            Filtros activos
+            Active filters
           </span>
 
           <button
@@ -241,7 +241,7 @@ export default function GlobalSkillsControls({
             "
           >
             <RotateCcw className="h-3 w-3" />
-            Limpiar
+            Clear
           </button>
         </div>
       )}

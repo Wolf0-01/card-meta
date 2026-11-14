@@ -341,7 +341,7 @@ export function validateDraft(
       issues.push({
         path: "cards",
 
-        message: `No puedes usar más de ${DECK_RULES.maxCopies} copias de la carta #${cardId}`,
+        message: `You cannot use more than ${DECK_RULES.maxCopies} copies of card #${cardId}`,
       });
     }
   }
@@ -350,7 +350,7 @@ export function validateDraft(
     issues.push({
       path: "main",
 
-      message: `El Main Deck no puede superar ${DECK_RULES.mainMax} cartas`,
+      message: `The Main Deck cannot exceed ${DECK_RULES.mainMax} cards`,
     });
   }
 
@@ -359,13 +359,13 @@ export function validateDraft(
       path: "extra",
 
       message:
-        "Rush Duel no utiliza Extra Deck: mueve esas cartas al Main Deck",
+        "Rush Duel does not use an Extra Deck: move those cards to the Main Deck",
     });
   } else if (stats.extra > DECK_RULES.extraMax) {
     issues.push({
       path: "extra",
 
-      message: `El Extra Deck no puede superar ${DECK_RULES.extraMax} cartas`,
+      message: `The Extra Deck cannot exceed ${DECK_RULES.extraMax} cards`,
     });
   }
 
@@ -375,7 +375,7 @@ export function validateDraft(
     publishIssues.push({
       path: "main",
 
-      message: `Necesitas al menos ${DECK_RULES.mainMin} cartas en el Main Deck para publicar`,
+      message: `You need at least ${DECK_RULES.mainMin} cards in the Main Deck to publish`,
     });
   }
 

@@ -13,10 +13,10 @@ import type { GuideCoverOption } from "@/lib/guides/editor";
 import { getAllSetsWithBanners } from "@/lib/sets";
 
 export const metadata: Metadata = {
-  title: "Nueva guía | Card Meta",
+  title: "New guide | Card Meta",
 
   description:
-    "Publica una nueva guía editorial con portada real y cartas destacadas.",
+    "Publish a new editorial guide with a real cover and featured cards.",
 };
 
 export default async function NewGuidePage() {

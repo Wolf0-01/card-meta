@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   title: "Top Decks | Card Meta",
 
   description:
-    "Explora los mazos públicos de Yu-Gi-Oh! Duel Links agrupados por arquetipo, con búsqueda y filtro por Skill.",
+    "Explore public Yu-Gi-Oh! Duel Links decks grouped by archetype, with search and Skill filters.",
 };
 
 interface DecksPageProps {
@@ -237,11 +237,11 @@ export default async function DecksPage({
                 text-slate-400
               "
             >
-              Mazos públicos de la comunidad de{" "}
+              Public community decks for{" "}
               {format === "rush"
                 ? "Rush Duel"
                 : "Speed Duel"}
-              , agrupados por arquetipo.
+              , grouped by archetype.
             </p>
           </div>
         </header>
@@ -256,7 +256,7 @@ export default async function DecksPage({
 
         {archetypes.length > 0 && (
           <section
-            aria-label="Arquetipos con mazos públicos"
+            aria-label="Archetypes with public decks"
             className="space-y-2"
           >
             <div
@@ -283,7 +283,7 @@ export default async function DecksPage({
                     text-slate-300
                   "
                 >
-                  Arquetipos
+                  Archetypes
                 </h2>
               </div>
 
@@ -298,15 +298,15 @@ export default async function DecksPage({
               >
                 {archetypes.length}{" "}
                 {archetypes.length === 1
-                  ? "arquetipo"
-                  : "arquetipos"}{" "}
+                  ? "archetype"
+                  : "archetypes"}{" "}
                 ·{" "}
                 <span className="tabular-nums text-slate-300">
                   {formatDeckTotal}
                 </span>{" "}
                 {formatDeckTotal === 1
-                  ? "mazo"
-                  : "mazos"}
+                  ? "deck"
+                  : "decks"}
               </span>
             </div>
 
@@ -365,10 +365,10 @@ export default async function DecksPage({
               "
             >
               {archetype
-                ? `Mazos de ${archetype}`
+                ? `${archetype} Decks`
                 : search
-                  ? `Resultados para "${search}"`
-                  : "Mazos públicos"}
+                  ? `Results for "${search}"`
+                  : "Public decks"}
             </h2>
           </div>
 
@@ -385,8 +385,8 @@ export default async function DecksPage({
               {result.total}
             </span>{" "}
             {result.total === 1
-              ? "mazo"
-              : "mazos"}
+              ? "deck"
+              : "decks"}
           </span>
         </div>
 
@@ -412,18 +412,18 @@ export default async function DecksPage({
 
             <p className="text-sm font-bold text-slate-300">
               {hasFilters
-                ? "Ningún mazo coincide con estos filtros."
+                ? "No deck matches these filters."
                 : format === "rush"
-                  ? "Todavía no hay mazos Rush públicos."
-                  : "Todavía no hay mazos públicos."}
+                  ? "No public Rush decks yet."
+                  : "No public decks yet."}
             </p>
 
             <p className="max-w-sm text-xs text-slate-500">
               {hasFilters
-                ? "Prueba con otro arquetipo, nombre o Skill."
+                ? "Try another archetype, name or Skill."
                 : format === "rush"
-                  ? "Publica el primer mazo Rush de la comunidad."
-                  : "Publica tu primer mazo para que aparezca aquí."}
+                  ? "Publish the community's first Rush deck."
+                  : "Publish your first deck so it shows up here."}
             </p>
 
             <Link
@@ -447,14 +447,14 @@ export default async function DecksPage({
               "
             >
               {hasFilters
-                ? "Reiniciar filtros"
-                : "Crear un mazo"}
+                ? "Reset filters"
+                : "Create a deck"}
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </section>
         ) : (
           <section
-            aria-label="Mazos públicos"
+            aria-label="Public decks"
             className="
               grid
               grid-cols-1
@@ -474,7 +474,7 @@ export default async function DecksPage({
 
         {result.totalPages > 1 && (
           <nav
-            aria-label="Paginación de mazos"
+            aria-label="Deck pagination"
             className="
               flex
               items-center
@@ -511,11 +511,11 @@ export default async function DecksPage({
                 "
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
-                Anterior
+                Previous
               </Link>
             ) : (
               <span className="opacity-40">
-                Anterior
+                Previous
               </span>
             )}
 
@@ -543,12 +543,12 @@ export default async function DecksPage({
                   hover:text-blue-200
                 "
               >
-                Siguiente
+                Next
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             ) : (
               <span className="opacity-40">
-                Siguiente
+                Next
               </span>
             )}
           </nav>

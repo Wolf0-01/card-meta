@@ -40,7 +40,7 @@ export default async function DeckPage({
           "
         >
           <h1 className="text-3xl font-bold">
-            Deck no encontrado
+            Deck not found
           </h1>
         </div>
       </main>

@@ -44,7 +44,7 @@ export default function AuthCard({
             hover:text-primary
           "
         >
-          ← Volver a Card Meta
+          ← Back to Card Meta
         </Link>
 
         <div

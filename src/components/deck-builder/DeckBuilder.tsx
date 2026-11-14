@@ -86,12 +86,12 @@ async function saveDeck() {
   const name = deckName.trim();
 
   if (!name) {
-    setSaveMessage("Pon un nombre al deck.");
+    setSaveMessage("Give the deck a name.");
     return;
   }
 
   if (deck.cards.length === 0) {
-    setSaveMessage("Añade al menos una carta antes de publicar.");
+    setSaveMessage("Add at least one card before publishing.");
     return;
   }
 
@@ -135,12 +135,12 @@ async function saveDeck() {
     if (!response.ok) {
       throw new Error(
         data?.error ??
-          "No se pudo guardar el deck."
+          "Could not save the deck."
       );
     }
 
     setSaveMessage(
-      "Deck publicado correctamente."
+      "Deck published successfully."
     );
 
     if (
@@ -155,7 +155,7 @@ async function saveDeck() {
     setSaveMessage(
       error instanceof Error
         ? error.message
-        : "No se pudo guardar el deck."
+        : "Could not save the deck."
     );
   } finally {
     setIsSaving(false);

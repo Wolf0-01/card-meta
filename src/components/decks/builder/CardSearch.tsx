@@ -59,7 +59,7 @@ export default function CardSearch({
           mb-4
         "
       >
-        Buscar cartas
+        Search cards
       </h2>
 
       <div
@@ -96,7 +96,7 @@ export default function CardSearch({
             rounded
           "
         >
-          Buscar
+          Search
         </button>
       </div>
 

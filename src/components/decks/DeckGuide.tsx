@@ -17,7 +17,7 @@ export default function DeckGuide({
           text-foreground
         "
       >
-        Guía del Deck
+        Deck Guide
       </h2>
 
       <div
@@ -33,7 +33,7 @@ export default function DeckGuide({
           <p>{guide}</p>
         ) : (
           <p>
-            Aún no hay una guía disponible para este deck.
+            No guide is available for this deck yet.
           </p>
         )}
       </div>

@@ -28,7 +28,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "El cuerpo de la petición no es JSON válido",
+          "The request body is not valid JSON",
       },
       {
         status: 400,
@@ -43,7 +43,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "Revisa los datos del formulario",
+          "Check the form data",
 
         fieldErrors: toFieldErrors(
           parsed.error
@@ -88,15 +88,15 @@ export async function POST(
     return NextResponse.json(
       {
         error: emailTaken
-          ? "Ese email ya está registrado"
-          : "Ese nombre de usuario ya está en uso",
+          ? "That email is already registered"
+          : "That username is already in use",
 
         fieldErrors: {
           [emailTaken
             ? "email"
             : "username"]: emailTaken
-            ? "Ese email ya está registrado"
-            : "Ese nombre de usuario ya está en uso",
+            ? "That email is already registered"
+            : "That username is already in use",
         },
       },
       {
@@ -153,7 +153,7 @@ export async function POST(
       return NextResponse.json(
         {
           error:
-            "Ese email o nombre de usuario ya está registrado",
+            "That email or username is already registered",
         },
         {
           status: 409,
@@ -169,7 +169,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "No se pudo crear la cuenta. Inténtalo de nuevo.",
+          "Could not create the account. Try again.",
       },
       {
         status: 500,

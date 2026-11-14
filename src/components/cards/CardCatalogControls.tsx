@@ -23,14 +23,14 @@ import {
 } from "lucide-react";
 
 const TYPE_OPTIONS = [
-  { value: "", label: "Todos" },
-  { value: "Monster", label: "Monstruos" },
-  { value: "Spell", label: "Mágicas" },
-  { value: "Trap", label: "Trampas" },
+  { value: "", label: "All" },
+  { value: "Monster", label: "Monsters" },
+  { value: "Spell", label: "Spells" },
+  { value: "Trap", label: "Traps" },
 ] as const;
 
 const ATTRIBUTE_OPTIONS = [
-  { value: "", label: "Atributo" },
+  { value: "", label: "Attribute" },
   { value: "DARK", label: "DARK" },
   { value: "LIGHT", label: "LIGHT" },
   { value: "EARTH", label: "EARTH" },
@@ -41,7 +41,7 @@ const ATTRIBUTE_OPTIONS = [
 ] as const;
 
 const RARITY_OPTIONS = [
-  { value: "", label: "Rareza" },
+  { value: "", label: "Rarity" },
   { value: "UR", label: "UR" },
   { value: "SR", label: "SR" },
   { value: "R", label: "R" },
@@ -49,22 +49,22 @@ const RARITY_OPTIONS = [
 ] as const;
 
 const LEVEL_OPTIONS = [
-  { value: "", label: "Nivel" },
+  { value: "", label: "Level" },
   ...Array.from(
     { length: 12 },
     (_, index) => ({
       value: String(index + 1),
-      label: `Nivel ${index + 1}`,
+      label: `Level ${index + 1}`,
     })
   ),
 ];
 
 const SORT_OPTIONS = [
   { value: "popularity", label: "Popularity" },
-  { value: "name", label: "Nombre (A-Z)" },
+  { value: "name", label: "Name (A-Z)" },
   { value: "attack", label: "ATK" },
   { value: "defense", label: "DEF" },
-  { value: "level", label: "Nivel" },
+  { value: "level", label: "Level" },
 ] as const;
 
 const controlClasses = `
@@ -348,7 +348,7 @@ export default function CardCatalogControls() {
             }
             placeholder="Search cards..."
             maxLength={80}
-            aria-label="Buscar cartas por nombre"
+            aria-label="Search cards by name"
             className="
               h-8
               w-full
@@ -372,7 +372,7 @@ export default function CardCatalogControls() {
           {search && (
             <button
               type="button"
-              aria-label="Limpiar búsqueda"
+              aria-label="Clear search"
               onClick={clearSearch}
               className="
                 absolute
@@ -524,7 +524,7 @@ export default function CardCatalogControls() {
             {filtersOpen && (
               <div
                 role="dialog"
-                aria-label="Filtros del catálogo"
+                aria-label="Catalog filters"
                 className="
                   absolute
                   left-0
@@ -543,7 +543,7 @@ export default function CardCatalogControls() {
                 <div className="grid grid-cols-2 gap-1.5">
                   <label className="block">
                     <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
-                      Tipo
+                      Type
                     </span>
 
                     <select
@@ -571,7 +571,7 @@ export default function CardCatalogControls() {
 
                   <label className="block">
                     <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
-                      Atributo
+                      Attribute
                     </span>
 
                     <select
@@ -599,7 +599,7 @@ export default function CardCatalogControls() {
 
                   <label className="block">
                     <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
-                      Rareza
+                      Rarity
                     </span>
 
                     <select
@@ -627,7 +627,7 @@ export default function CardCatalogControls() {
 
                   <label className="block">
                     <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
-                      Nivel
+                      Level
                     </span>
 
                     <select
@@ -702,7 +702,7 @@ export default function CardCatalogControls() {
                   sort: event.target.value,
                 })
               }
-              aria-label="Ordenar cartas"
+              aria-label="Sort cards"
               className={`
                 ${controlClasses}
                 appearance-none

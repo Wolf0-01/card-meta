@@ -17,10 +17,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Card Meta | Duel Links Decks, Tier List y Noticias",
+  title: "Card Meta | Duel Links Decks, Tier List and News",
 
   description:
-    "Plataforma de Duel Links con decks competitivos, tier list, cartas, torneos y noticias del meta.",
+    "Duel Links platform with competitive decks, tier list, cards, tournaments and meta news.",
 
   applicationName: "Card Meta",
 

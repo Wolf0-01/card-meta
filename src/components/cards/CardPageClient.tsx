@@ -87,19 +87,19 @@ export default function CardPageClient({
 
               {selectedCard.type && (
                 <p>
-                  Tipo: {selectedCard.type}
+                  Type: {selectedCard.type}
                 </p>
               )}
 
               {selectedCard.attribute && (
                 <p>
-                  Atributo: {selectedCard.attribute}
+                  Attribute: {selectedCard.attribute}
                 </p>
               )}
 
               {selectedCard.level && (
                 <p>
-                  Nivel: {selectedCard.level}
+                  Level: {selectedCard.level}
                 </p>
               )}
             </div>
@@ -118,7 +118,7 @@ export default function CardPageClient({
                 hover:bg-blue-700
               "
             >
-              Cerrar
+              Close
             </button>
           </div>
         </div>

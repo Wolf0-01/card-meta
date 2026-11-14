@@ -44,8 +44,8 @@ export default async function LoginPage({
 
   return (
     <AuthCard
-      title="Iniciar sesión"
-      subtitle="Accede para crear y gestionar tus mazos."
+      title="Sign in"
+      subtitle="Sign in to create and manage your decks."
     >
       <LoginForm
         nextPath={nextPath}

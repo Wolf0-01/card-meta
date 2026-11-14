@@ -224,9 +224,7 @@ export default function MiniCardTile({
       onContextMenu={onContextMenu}
       title={`${card.name}${
         quantity
-          ? ` · ${quantity} copia${
-              quantity === 1 ? "" : "s"
-            }`
+          ? ` · ${quantity} cop${quantity === 1 ? "y" : "ies"}`
           : ""
       }`}
     >
@@ -381,7 +379,7 @@ export default function MiniCardTile({
           >
             <button
               type="button"
-              aria-label={`Quitar una copia de ${card.name}`}
+              aria-label={`Remove one copy of ${card.name}`}
               onClick={(event) => {
                 event.stopPropagation();
 
@@ -410,7 +408,7 @@ export default function MiniCardTile({
 
             <button
               type="button"
-              aria-label={`Eliminar ${card.name} del mazo`}
+              aria-label={`Remove ${card.name} from the deck`}
               onClick={(event) => {
                 event.stopPropagation();
 

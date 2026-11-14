@@ -28,12 +28,12 @@ export default function ImportDeckPanel() {
     <Card className="p-6 space-y-6">
       <div>
         <h2 className="text-2xl font-bold">
-          Importar Deck
+          Import Deck
         </h2>
 
         <p className="mt-2 text-sm text-foreground-muted">
-          Selecciona un archivo .ydk para reconstruir el
-          deck desde la base de datos.
+          Select a .ydk file to rebuild the
+          deck from the database.
         </p>
       </div>
 

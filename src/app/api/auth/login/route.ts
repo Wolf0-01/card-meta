@@ -27,7 +27,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "El cuerpo de la petición no es JSON válido",
+          "The request body is not valid JSON",
       },
       {
         status: 400,
@@ -42,7 +42,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "Revisa los datos del formulario",
+          "Check the form data",
 
         fieldErrors: toFieldErrors(
           parsed.error
@@ -80,7 +80,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "Email, usuario o contraseña incorrectos",
+          "Incorrect email, username or password",
       },
       {
         status: 401,
@@ -98,7 +98,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "Email, usuario o contraseña incorrectos",
+          "Incorrect email, username or password",
       },
       {
         status: 401,

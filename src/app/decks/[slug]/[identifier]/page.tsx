@@ -34,7 +34,7 @@ export async function generateMetadata({
 
   if (!deck) {
     return {
-      title: "Deck no encontrado",
+      title: "Deck not found",
     };
   }
 
@@ -42,7 +42,7 @@ export async function generateMetadata({
     title: `${deck.name} | Card Meta`,
     description:
       deck.description ??
-      `Guía completa del deck ${deck.name}, lista de cartas, estadísticas y estrategia.`,
+      `Full guide to the ${deck.name} deck, card list, stats and strategy.`,
   };
 }
 

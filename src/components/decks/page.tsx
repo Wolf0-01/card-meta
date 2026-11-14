@@ -19,7 +19,7 @@ export default function DecksPage() {
         "
       >
 
-        Mi Deck Duel Links
+        My Duel Links Deck
 
       </h1>
 

@@ -12,15 +12,15 @@ export const usernameSchema = z
   .toLowerCase()
   .min(
     3,
-    "El usuario necesita al menos 3 caracteres"
+    "The username needs at least 3 characters"
   )
   .max(
     24,
-    "El usuario no puede superar 24 caracteres"
+    "The username cannot exceed 24 characters"
   )
   .regex(
     USERNAME_PATTERN,
-    "Solo se permiten letras, números, guiones y guiones bajos"
+    "Only letters, numbers, hyphens and underscores are allowed"
   );
 
 export const emailSchema = z
@@ -29,23 +29,23 @@ export const emailSchema = z
   .toLowerCase()
   .max(
     120,
-    "El email es demasiado largo"
+    "The email is too long"
   )
   .refine(
     (value) =>
       EMAIL_PATTERN.test(value),
-    "Introduce un email válido"
+    "Enter a valid email"
   );
 
 export const passwordSchema = z
   .string()
   .min(
     8,
-    "La contraseña necesita al menos 8 caracteres"
+    "The password needs at least 8 characters"
   )
   .max(
     72,
-    "La contraseña no puede superar 72 caracteres"
+    "The password cannot exceed 72 characters"
   );
 
 export const registerSchema = z
@@ -55,7 +55,7 @@ export const registerSchema = z
       .trim()
       .max(
         60,
-        "El nombre no puede superar 60 caracteres"
+        "The name cannot exceed 60 characters"
       )
       .optional()
       .or(z.literal("")),
@@ -70,7 +70,7 @@ export const registerSchema = z
       .string()
       .min(
         1,
-        "Repite la contraseña"
+        "Repeat the password"
       ),
   })
   .refine(
@@ -81,7 +81,7 @@ export const registerSchema = z
       path: ["confirmPassword"],
 
       message:
-        "Las contraseñas no coinciden",
+        "Passwords do not match",
     }
   );
 
@@ -91,7 +91,7 @@ export const loginSchema = z.object({
     .trim()
     .min(
       1,
-      "Introduce tu email o usuario"
+      "Enter your email or username"
     )
     .max(120),
 
@@ -99,7 +99,7 @@ export const loginSchema = z.object({
     .string()
     .min(
       1,
-      "Introduce tu contraseña"
+      "Enter your password"
     )
     .max(72),
 });

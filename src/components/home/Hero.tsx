@@ -62,8 +62,8 @@ export default function Hero() {
               text-foreground-secondary
             "
           >
-            Explora los mejores decks competitivos, consulta la Tier List,
-            busca cartas y mantente actualizado con el meta de Duel Links.
+            Explore the best competitive decks, check the Tier List,
+            search cards and stay up to date with the Duel Links meta.
           </p>
 
           <div
@@ -77,7 +77,7 @@ export default function Hero() {
           >
 
             <Button href="/decks">
-              Ver Decks
+              View Decks
             </Button>
 
             <Button

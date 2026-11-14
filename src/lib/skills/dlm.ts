@@ -112,16 +112,16 @@ function resolveCharacter(skill: DlmSkill) {
     );
 
   if (names.length === 0) {
-    return "Personaje genérico";
+    return "Generic character";
   }
 
   if (names.length === 1) {
     return names[0];
   }
 
-  return `${names[0]} y ${
+  return `${names[0]} and ${
     names.length - 1
-  } más`;
+  } more`;
 }
 
 function resolveRelatedCards(

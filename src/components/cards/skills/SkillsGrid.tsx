@@ -78,7 +78,7 @@ export default function SkillsGrid({
               hover:text-emerald-100
             "
           >
-            Abrir Deck Builder
+            Open Deck Builder
             <ExternalLink className="h-3 w-3" />
           </Link>
         </div>

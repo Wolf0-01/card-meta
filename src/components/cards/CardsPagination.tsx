@@ -124,7 +124,7 @@ export default function CardsPagination({
       <div className="flex items-center gap-1 overflow-x-auto">
         <button
           type="button"
-          aria-label="Página anterior"
+          aria-label="Previous page"
           onClick={() =>
             goToPage(
               Math.max(current - 1, 1)
@@ -183,7 +183,7 @@ export default function CardsPagination({
               <button
                 key={item}
                 type="button"
-                aria-label={`Página ${item}`}
+                aria-label={`Page ${item}`}
                 aria-current={
                   active ? "page" : undefined
                 }
@@ -217,7 +217,7 @@ export default function CardsPagination({
 
         <button
           type="button"
-          aria-label="Página siguiente"
+          aria-label="Next page"
           onClick={() =>
             goToPage(
               Math.min(current + 1, pages)

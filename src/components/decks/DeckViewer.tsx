@@ -71,7 +71,7 @@ export default function DeckViewer({
   const authorName =
     author?.displayName?.trim() ||
     author?.username ||
-    "Creador anónimo";
+    "Anonymous creator";
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -96,7 +96,7 @@ export default function DeckViewer({
             text-primary
           "
         >
-          Mazo publicado
+          Published deck
         </p>
 
         <h1
@@ -206,7 +206,7 @@ export default function DeckViewer({
 
                 <span className="truncate text-xs font-semibold text-foreground">
                   {deck.skill?.trim() ||
-                    "Sin skill"}
+                    "No skill"}
                 </span>
               </div>
 

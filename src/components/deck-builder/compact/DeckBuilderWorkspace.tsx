@@ -149,7 +149,7 @@ export default function DeckBuilderWorkspace({
   const hint = (() => {
     if (!cleanName) {
       return {
-        text: "Ponle un nombre al mazo para guardarlo.",
+        text: "Give the deck a name to save it.",
         className: "text-amber-300",
       };
     }
@@ -166,14 +166,14 @@ export default function DeckBuilderWorkspace({
       return {
         text:
           missingForPublish === 1
-            ? "Falta 1 carta en el Main Deck para publicar."
-            : `Faltan ${missingForPublish} cartas en el Main Deck para publicar.`,
+            ? "1 more card is needed in the Main Deck to publish."
+            : `${missingForPublish} more cards are needed in the Main Deck to publish.`,
         className: "text-amber-300",
       };
     }
 
     return {
-      text: "Mazo listo para publicar.",
+      text: "Deck ready to publish.",
       className: "text-emerald-300",
     };
   })();
@@ -200,7 +200,7 @@ export default function DeckBuilderWorkspace({
         draft.skill.trim().length > 0)
     ) {
       const confirmed = window.confirm(
-        "Rush Duel no usa el Extra Deck ni las Skills de Speed. Se quitarán las cartas del Extra Deck y la Skill asignada. ¿Continuar?"
+        "Rush Duel does not use the Extra Deck or Speed Skills. Extra Deck cards and the assigned Skill will be removed. Continue?"
       );
 
       if (!confirmed) {
@@ -222,7 +222,7 @@ export default function DeckBuilderWorkspace({
 
     if (!cleanName) {
       setError(
-        "El mazo necesita un nombre para guardarse."
+        "The deck needs a name to be saved."
       );
 
       return;
@@ -323,7 +323,7 @@ export default function DeckBuilderWorkspace({
         throw new Error(
           [
             data?.error ??
-              "No se pudo guardar el mazo.",
+              "Could not save the deck.",
             issueText,
           ]
             .filter(Boolean)
@@ -360,7 +360,7 @@ export default function DeckBuilderWorkspace({
       setError(
         saveError instanceof Error
           ? saveError.message
-          : "No se pudo guardar el mazo."
+          : "Could not save the deck."
       );
 
       setSavingMode(null);
@@ -405,8 +405,8 @@ export default function DeckBuilderWorkspace({
               "
             >
               {isEditing
-                ? "Editar mazo"
-                : "Nuevo mazo"}
+                ? "Edit deck"
+                : "New deck"}
               <span className="ml-2 text-sm font-semibold text-foreground-muted">
                 {draft.format === "rush"
                   ? "Rush Duel"
@@ -416,7 +416,7 @@ export default function DeckBuilderWorkspace({
 
             <div
               role="group"
-              aria-label="Formato del mazo"
+              aria-label="Deck format"
               className="
                 mt-2
                 inline-flex
@@ -494,8 +494,8 @@ export default function DeckBuilderWorkspace({
                   disabled={!canSave}
                 >
                   {savingMode === "draft"
-                    ? "Guardando..."
-                    : "Guardar cambios"}
+                    ? "Saving..."
+                    : "Save changes"}
                 </Button>
 
                 {!initialDeck?.isPublic && (
@@ -509,8 +509,8 @@ export default function DeckBuilderWorkspace({
                     disabled={!canPublish}
                   >
                     {savingMode === "publish"
-                      ? "Publicando..."
-                      : "Publicar mazo"}
+                      ? "Publishing..."
+                      : "Publish deck"}
                   </Button>
                 )}
               </>
@@ -526,8 +526,8 @@ export default function DeckBuilderWorkspace({
                   disabled={!canSave}
                 >
                   {savingMode === "draft"
-                    ? "Guardando..."
-                    : "Guardar borrador"}
+                    ? "Saving..."
+                    : "Save draft"}
                 </Button>
 
                 <Button
@@ -540,8 +540,8 @@ export default function DeckBuilderWorkspace({
                   disabled={!canPublish}
                 >
                   {savingMode === "publish"
-                    ? "Publicando..."
-                    : "Publicar mazo"}
+                    ? "Publishing..."
+                    : "Publish deck"}
                 </Button>
               </>
             )}
@@ -608,7 +608,7 @@ export default function DeckBuilderWorkspace({
             >
               <label className="block">
                 <span className="sr-only">
-                  Nombre del mazo
+                  Deck name
                 </span>
 
                 <input
@@ -618,7 +618,7 @@ export default function DeckBuilderWorkspace({
                       event.target.value
                     )
                   }
-                  placeholder="Nombre del mazo"
+                  placeholder="Deck name"
                   maxLength={80}
                   className="
                     w-full
@@ -644,7 +644,7 @@ export default function DeckBuilderWorkspace({
 
               <label className="block">
                 <span className="sr-only">
-                  Descripción del mazo
+                  Deck description
                 </span>
 
                 <input
@@ -654,7 +654,7 @@ export default function DeckBuilderWorkspace({
                       event.target.value
                     )
                   }
-                  placeholder="Descripción (opcional)"
+                  placeholder="Description (optional)"
                   maxLength={500}
                   className="
                     w-full
@@ -728,9 +728,9 @@ export default function DeckBuilderWorkspace({
                       event.target.value
                     )
                   }
-                  placeholder="Sin skill asignada"
+                  placeholder="No skill assigned"
                   maxLength={120}
-                  aria-label="Skill asignada al mazo"
+                  aria-label="Skill assigned to the deck"
                   className="
                     min-w-0
                     flex-1
@@ -773,9 +773,9 @@ export default function DeckBuilderWorkspace({
                   text-foreground-muted
                 "
               >
-                Rush Duel no utiliza Skills de Speed
-                ni Extra Deck. El mazo se construye
-                únicamente con el Main Deck.
+                Rush Duel does not use Speed Skills
+                or an Extra Deck. The deck is built
+                only with the Main Deck.
               </p>
             )}
 
@@ -843,8 +843,8 @@ export default function DeckBuilderWorkspace({
             >
               <span>
                 {draft.format === "rush"
-                  ? "Clic derecho para quitar una copia"
-                  : "Arrastra las cartas entre zonas · Clic derecho para quitar una copia"}
+                  ? "Right-click to remove one copy"
+                  : "Drag cards between zones · Right-click to remove one copy"}
               </span>
 
               <div className="flex flex-wrap items-center gap-3">
@@ -859,7 +859,7 @@ export default function DeckBuilderWorkspace({
                   onClick={() => {
                     if (
                       window.confirm(
-                        "¿Vaciar el mazo y empezar de nuevo?"
+                        "Clear the deck and start over?"
                       )
                     ) {
                       draft.clearDeck();
@@ -874,7 +874,7 @@ export default function DeckBuilderWorkspace({
                     hover:text-red-300
                   "
                 >
-                  Vaciar mazo
+                  Clear deck
                 </button>
               </div>
             </div>

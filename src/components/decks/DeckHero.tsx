@@ -19,10 +19,10 @@ function formatTitle(name?: string) {
 
 function formatDate(date?: Date | string | null) {
   if (!date) {
-    return "Sin fecha";
+    return "No date";
   }
 
-  return new Date(date).toLocaleDateString("es-ES");
+  return new Date(date).toLocaleDateString("en-US");
 }
 
 export default function DeckHero({
@@ -96,7 +96,7 @@ export default function DeckHero({
             "
           >
             {deck.description ??
-              "Deck competitivo del meta actual."}
+              "Competitive deck from the current meta."}
           </p>
 
           <div
@@ -132,7 +132,7 @@ export default function DeckHero({
         >
 
           <Button>
-            Copiar Deck
+            Copy Deck
           </Button>
 
           <Button variant="outline">

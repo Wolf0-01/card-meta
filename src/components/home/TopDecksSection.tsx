@@ -37,13 +37,13 @@ export default function TopDecksSection({
 
         <SectionHeader
           title="Top Decks"
-          subtitle="Los decks competitivos más utilizados del meta actual."
+          subtitle="The most played competitive decks in the current meta."
           action={
             <Button
               href="/decks"
               variant="outline"
             >
-              Ver todos
+              View all
             </Button>
           }
         />

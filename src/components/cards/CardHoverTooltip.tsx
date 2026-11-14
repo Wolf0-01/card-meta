@@ -206,7 +206,7 @@ export default function CardHoverTooltip({
               "
             >
               <p className="text-[8px] font-bold uppercase tracking-wider text-slate-500">
-                Atributo
+                Attribute
               </p>
 
               <p
@@ -233,7 +233,7 @@ export default function CardHoverTooltip({
               "
             >
               <p className="text-[8px] font-bold uppercase tracking-wider text-slate-500">
-                Nivel
+                Level
               </p>
 
               <p className="mt-0.5 text-[10px] font-black text-amber-300">
@@ -320,7 +320,7 @@ export default function CardHoverTooltip({
             "
           >
             {card.description ??
-              "Sin descripción."}
+              "No description."}
           </p>
         </div>
       </div>

@@ -291,7 +291,7 @@ export default function DeckExplorerControls({
 
   return (
     <section
-      aria-label="Filtros del explorador de mazos"
+      aria-label="Deck explorer filters"
       className="
         rounded-xl
         border
@@ -307,7 +307,7 @@ export default function DeckExplorerControls({
       <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center">
         <div
           role="group"
-          aria-label="Formato de los mazos"
+          aria-label="Deck formats"
           className="
             flex
             shrink-0
@@ -380,9 +380,9 @@ export default function DeckExplorerControls({
                 event.target.value
               )
             }
-            placeholder="Buscar por nombre o arquetipo..."
+            placeholder="Search by name or archetype..."
             maxLength={80}
-            aria-label="Buscar mazos por nombre o arquetipo"
+            aria-label="Search decks by name or archetype"
             className="
               h-8
               w-full
@@ -406,7 +406,7 @@ export default function DeckExplorerControls({
           {search && (
             <button
               type="button"
-              aria-label="Limpiar búsqueda"
+              aria-label="Clear search"
               onClick={() =>
                 handleSearchChange("")
               }
@@ -460,7 +460,7 @@ export default function DeckExplorerControls({
                   event.target.value
                 )
               }
-              aria-label="Filtrar mazos por skill equipada"
+              aria-label="Filter decks by equipped skill"
               className="
                 h-8
                 w-full
@@ -485,7 +485,7 @@ export default function DeckExplorerControls({
               "
             >
               <option value="">
-                Todas las skills
+                All skills
               </option>
 
               {skills.map((name) => (
@@ -563,13 +563,13 @@ export default function DeckExplorerControls({
           <span className="tabular-nums text-slate-200">
             {total}
           </span>{" "}
-          {total === 1 ? "mazo público" : "mazos públicos"}
+          {total === 1 ? "public deck" : "public decks"}
         </span>
 
         {isPending && (
           <span className="inline-flex items-center gap-1 text-blue-300">
             <Loader2 className="h-3 w-3 animate-spin" />
-            Actualizando
+            Updating
           </span>
         )}
       </div>

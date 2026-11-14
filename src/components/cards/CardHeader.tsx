@@ -193,7 +193,7 @@ export default function CardHeader({
             {card.level && (
               <div>
                 <p className="text-zinc-400">
-                  Nivel
+                  Level
                 </p>
 
                 <p
@@ -210,7 +210,7 @@ export default function CardHeader({
             {card.archetype && (
               <div>
                 <p className="text-zinc-400">
-                  Arquetipo
+                  Archetype
                 </p>
 
                 <p
@@ -227,7 +227,7 @@ export default function CardHeader({
             {card.rarity && (
               <div>
                 <p className="text-zinc-400">
-                  Rareza
+                  Rarity
                 </p>
 
                 <p className="font-semibold">

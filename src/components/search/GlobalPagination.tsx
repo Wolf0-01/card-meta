@@ -80,7 +80,7 @@ export default function GlobalPagination({
   currentPage,
   totalPages,
   total,
-  itemLabel = "cartas",
+  itemLabel = "cards",
   onPageChange,
 }: GlobalPaginationProps) {
   const pages = Math.max(totalPages, 1);
@@ -104,7 +104,7 @@ export default function GlobalPagination({
       <div className="flex items-center gap-1 overflow-x-auto">
         <button
           type="button"
-          aria-label="Página anterior"
+          aria-label="Previous page"
           onClick={() =>
             onPageChange(
               Math.max(current - 1, 1)
@@ -163,7 +163,7 @@ export default function GlobalPagination({
               <button
                 key={item}
                 type="button"
-                aria-label={`Página ${item}`}
+                aria-label={`Page ${item}`}
                 aria-current={
                   active ? "page" : undefined
                 }
@@ -197,7 +197,7 @@ export default function GlobalPagination({
 
         <button
           type="button"
-          aria-label="Página siguiente"
+          aria-label="Next page"
           onClick={() =>
             onPageChange(
               Math.min(current + 1, pages)

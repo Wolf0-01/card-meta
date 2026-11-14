@@ -32,11 +32,11 @@ export default function DeckCreatorCard({
   const displayName =
     author?.displayName?.trim() ||
     author?.username ||
-    "Creador anónimo";
+    "Anonymous creator";
 
   const handle = author?.username
     ? `@${author.username}`
-    : "Comunidad";
+    : "Community";
 
   const initials = displayName
     .slice(0, 2)
@@ -61,7 +61,7 @@ export default function DeckCreatorCard({
           text-foreground-muted
         "
       >
-        Ficha técnica
+        Deck details
       </p>
 
       <div className="mt-3 flex items-center gap-3">
@@ -133,13 +133,13 @@ export default function DeckCreatorCard({
           </dt>
 
           <dd className="max-w-[60%] truncate text-right font-semibold text-foreground">
-            {deck.skill?.trim() || "Sin skill"}
+            {deck.skill?.trim() || "No skill"}
           </dd>
         </div>
 
         <div className="flex items-center justify-between gap-3">
           <dt className="text-foreground-muted">
-            Cartas
+            Cards
           </dt>
 
           <dd className="font-semibold text-foreground">

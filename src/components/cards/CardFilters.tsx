@@ -176,7 +176,7 @@ export default function CardFilters() {
             true
           )
         }
-        placeholder="Buscar carta..."
+        placeholder="Search card..."
         className={inputClass}
       />
 
@@ -234,7 +234,7 @@ export default function CardFilters() {
             true
           )
         }
-        placeholder="ATK mínimo"
+        placeholder="ATK min"
         className={inputClass}
       />
 
@@ -248,7 +248,7 @@ export default function CardFilters() {
             true
           )
         }
-        placeholder="ATK máximo"
+        placeholder="ATK max"
         className={inputClass}
       />
 
@@ -262,7 +262,7 @@ export default function CardFilters() {
             true
           )
         }
-        placeholder="DEF mínimo"
+        placeholder="DEF min"
         className={inputClass}
       />
 
@@ -276,7 +276,7 @@ export default function CardFilters() {
             true
           )
         }
-        placeholder="DEF máximo"
+        placeholder="DEF max"
         className={inputClass}
       />
 
@@ -297,7 +297,7 @@ export default function CardFilters() {
           hover:text-red-300
         "
       >
-        Limpiar filtros
+        Clear filters
       </button>
     </div>
   );

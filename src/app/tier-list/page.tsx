@@ -52,7 +52,7 @@ export async function generateMetadata({
     } Duel Tier List | Card Meta`,
 
     description:
-      "Tier List competitiva de Yu-Gi-Oh! Duel Links: Tier 1, Tier 2, Tier 3 y High Potential con mazos públicos reales, Power Ranking y acceso directo a sus listas.",
+      "Competitive Yu-Gi-Oh! Duel Links Tier List: Tier 1, Tier 2, Tier 3 and High Potential with real public decks, Power Ranking and direct access to their lists.",
   };
 }
 
@@ -212,10 +212,10 @@ export default async function TierListPage({
                   text-slate-400
                 "
               >
-                El orden competitivo de Duel Links,
-                con el rendimiento real de los
-                mazos públicos y el pool de cartas
-                de cada arquetipo.
+                The competitive order of Duel Links,
+                with the real performance of public
+                decks and the card pool
+                of each archetype.
               </p>
             </div>
 
@@ -248,7 +248,7 @@ export default async function TierListPage({
               >
                 <CalendarDays className="h-3 w-3 text-blue-300" />
 
-                Actualizado{" "}
+                Updated{" "}
                 {formatDate(data.updatedAt)}
               </span>
 
@@ -257,7 +257,7 @@ export default async function TierListPage({
           </div>
 
           <section
-            aria-label="Metodología de la Tier List"
+            aria-label="Tier List methodology"
             className="
               rounded-xl
               border
@@ -299,7 +299,7 @@ export default async function TierListPage({
                     text-slate-300
                   "
                 >
-                  Metodología
+                  Methodology
                 </p>
 
                 <p
@@ -311,13 +311,13 @@ export default async function TierListPage({
                     text-slate-400
                   "
                 >
-                  La clasificación refleja el
-                  rendimiento en torneos y ladder,
-                  la popularidad del arquetipo y la
-                  profundidad de su pool de cartas.
-                  Los contadores de mazos se
-                  actualizan automáticamente con las
-                  listas públicas de PostgreSQL.
+                  The ranking reflects
+                  tournament and ladder performance,
+                  archetype popularity and the
+                  depth of its card pool.
+                  Deck counters update
+                  automatically with
+                  public lists.
                 </p>
               </div>
 
@@ -335,7 +335,7 @@ export default async function TierListPage({
                   value={formatNumber(
                     data.totalPublicDecks
                   )}
-                  label="mazos"
+                  label="decks"
                 />
 
                 <Metric
@@ -343,7 +343,7 @@ export default async function TierListPage({
                   value={String(
                     data.totalArchetypes
                   )}
-                  label="arquetipos"
+                  label="archetypes"
                 />
               </div>
             </div>
@@ -380,8 +380,8 @@ export default async function TierListPage({
               "
             >
               {format === "rush"
-                ? "Todavía no hay datos Rush"
-                : "Todavía no hay datos competitivos"}
+                ? "No Rush data yet"
+                : "No competitive data yet"}
             </h2>
 
             <p
@@ -393,8 +393,8 @@ export default async function TierListPage({
               "
             >
               {format === "rush"
-                ? "No hay mazos Rush públicos ni arquetipos Rush en el catálogo. En cuanto existan cartas o listas, aparecerán aquí con su Power Ranking."
-                : "Todavía no hay mazos públicos registrados. En cuanto la comunidad publique listas, aparecerán aquí con su Power Ranking y contador automático."}
+                ? "There are no public Rush decks or Rush archetypes in the catalog yet. As soon as cards or lists exist, they will appear here with their Power Ranking."
+                : "No public decks registered yet. As soon as the community publishes lists, they will appear here with their Power Ranking and automatic counter."}
             </p>
 
             <Link
@@ -417,7 +417,7 @@ export default async function TierListPage({
                 hover:text-blue-200
               "
             >
-              Crear un mazo
+              Create a deck
             </Link>
           </section>
         ) : (
@@ -450,8 +450,8 @@ export default async function TierListPage({
           "
         >
           <span>
-            Haz clic en un arquetipo para abrir
-            sus listas públicas y clonarlas en el
+            Click an archetype to open
+            its public lists and clone them in the
             Deck Builder.
           </span>
 
@@ -463,7 +463,7 @@ export default async function TierListPage({
               hover:text-blue-200
             "
           >
-            Explorar todos los mazos
+            Explore all decks
           </Link>
         </footer>
       </div>

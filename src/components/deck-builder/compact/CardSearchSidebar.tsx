@@ -33,26 +33,26 @@ const SKILL_PAGE_SIZE = 8;
 const TYPE_OPTIONS = [
   {
     value: "",
-    label: "Todos",
+    label: "All",
   },
   {
     value: "Monster",
-    label: "Monstruos",
+    label: "Monsters",
   },
   {
     value: "Spell",
-    label: "Mágicas",
+    label: "Spells",
   },
   {
     value: "Trap",
-    label: "Trampas",
+    label: "Traps",
   },
 ] as const;
 
 const ATTRIBUTE_OPTIONS = [
   {
     value: "",
-    label: "Atributo",
+    label: "Attribute",
   },
   {
     value: "DARK",
@@ -312,7 +312,7 @@ export default function CardSearchSidebar({
 
         if (!response.ok) {
           throw new Error(
-            "No se pudieron cargar las cartas."
+            "Could not load the cards."
           );
         }
 
@@ -348,7 +348,7 @@ export default function CardSearchSidebar({
         setError(
           loadError instanceof Error
             ? loadError.message
-            : "No se pudieron cargar las cartas."
+            : "Could not load the cards."
         );
       } finally {
         if (!controller.signal.aborted) {
@@ -413,7 +413,7 @@ export default function CardSearchSidebar({
 
         if (!response.ok) {
           throw new Error(
-            "No se pudieron cargar las habilidades."
+            "Could not load the skills."
           );
         }
 
@@ -455,7 +455,7 @@ export default function CardSearchSidebar({
         setSkillError(
           loadError instanceof Error
             ? loadError.message
-            : "No se pudieron cargar las habilidades."
+            : "Could not load the skills."
         );
       } finally {
         if (!controller.signal.aborted) {
@@ -543,7 +543,7 @@ export default function CardSearchSidebar({
       <header className="space-y-2 border-b border-border p-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm font-black text-foreground">
-            Catálogo{" "}
+            Catalog{" "}
             <span className="text-[10px] font-bold uppercase tracking-wide text-primary">
               {format === "rush" ? "Rush" : "Speed"}
             </span>
@@ -551,8 +551,8 @@ export default function CardSearchSidebar({
 
           <span className="text-[10px] font-semibold text-foreground-muted">
             {isCardsTab
-              ? "Clic para añadir"
-              : "Clic para asignar"}
+              ? "Click to add"
+              : "Click to assign"}
           </span>
         </div>
 
@@ -584,7 +584,7 @@ export default function CardSearchSidebar({
               }
             `}
           >
-            Cartas
+            Cards
           </button>
 
           {format !== "rush" && (
@@ -615,16 +615,16 @@ export default function CardSearchSidebar({
                     event.target.value
                   )
                 }
-                placeholder="Nombre de la carta..."
+                placeholder="Card name..."
                 className={`${fieldClasses} pr-8`}
                 maxLength={80}
-                aria-label="Buscar cartas por nombre"
+                aria-label="Search cards by name"
               />
 
               {search && (
                 <button
                   type="button"
-                  aria-label="Limpiar búsqueda"
+                  aria-label="Clear search"
                   onClick={() => setSearch("")}
                   className="
                     absolute
@@ -658,7 +658,7 @@ export default function CardSearchSidebar({
                   setPage(1);
                 }}
                 className={fieldClasses}
-                aria-label="Filtrar por tipo de carta"
+                aria-label="Filter by card type"
               >
                 {TYPE_OPTIONS.map((option) => (
                   <option
@@ -680,7 +680,7 @@ export default function CardSearchSidebar({
                   setPage(1);
                 }}
                 className={fieldClasses}
-                aria-label="Filtrar por atributo"
+                aria-label="Filter by attribute"
               >
                 {ATTRIBUTE_OPTIONS.map(
                   (option) => (
@@ -698,10 +698,10 @@ export default function CardSearchSidebar({
             <div className="flex items-center justify-between text-[10px] text-foreground-muted">
               <span>
                 {loading
-                  ? "Buscando..."
+                  ? "Searching..."
                   : `${total.toLocaleString(
-                      "es-ES"
-                    )} cartas`}
+                      "en-US"
+                    )} cards`}
               </span>
 
               <button
@@ -722,7 +722,7 @@ export default function CardSearchSidebar({
                   hover:text-primary
                 "
               >
-                Reiniciar filtros
+                Reset filters
               </button>
             </div>
           </>
@@ -736,16 +736,16 @@ export default function CardSearchSidebar({
                     event.target.value
                   )
                 }
-                placeholder="Buscar skill..."
+                placeholder="Search skill..."
                 className={`${fieldClasses} pr-8`}
                 maxLength={80}
-                aria-label="Buscar habilidades por nombre o efecto"
+                aria-label="Search skills by name or effect"
               />
 
               {skillSearch && (
                 <button
                   type="button"
-                  aria-label="Limpiar búsqueda de habilidades"
+                  aria-label="Clear skill search"
                   onClick={() =>
                     setSkillSearch("")
                   }
@@ -782,10 +782,10 @@ export default function CardSearchSidebar({
                 setSkillPage(1);
               }}
               className={fieldClasses}
-              aria-label="Filtrar habilidades por personaje"
+              aria-label="Filter skills by character"
             >
               <option value="">
-                Todos los personajes
+                All characters
               </option>
 
               {skillCharacters.map((name) => (
@@ -798,10 +798,10 @@ export default function CardSearchSidebar({
             <div className="flex items-center justify-between text-[10px] text-foreground-muted">
               <span>
                 {skillsLoading
-                  ? "Buscando..."
+                  ? "Searching..."
                   : `${skillTotal.toLocaleString(
-                      "es-ES"
-                    )} habilidades`}
+                      "en-US"
+                    )} skills`}
               </span>
 
               <button
@@ -820,7 +820,7 @@ export default function CardSearchSidebar({
                   hover:text-primary
                 "
               >
-                Reiniciar filtros
+                Reset filters
               </button>
             </div>
           </>
@@ -881,8 +881,8 @@ export default function CardSearchSidebar({
                   </span>
 
                   <p>
-                    No se encontraron cartas
-                    con estos filtros.
+                    No cards found
+                    with these filters.
                   </p>
                 </div>
               )}
@@ -919,7 +919,7 @@ export default function CardSearchSidebar({
 
             {loading && cards.length > 0 && (
               <p className="py-2 text-center text-[10px] text-foreground-muted">
-                Actualizando resultados...
+                Updating results...
               </p>
             )}
           </>
@@ -969,9 +969,9 @@ export default function CardSearchSidebar({
                   </span>
 
                   <p>
-                    No se encontraron
-                    habilidades con estos
-                    filtros.
+                    No skills found
+                    with these
+                    filters.
                   </p>
                 </div>
               )}
@@ -1003,7 +1003,7 @@ export default function CardSearchSidebar({
             {skillsLoading &&
               skills.length > 0 && (
                 <p className="py-2 text-center text-[10px] text-foreground-muted">
-                  Actualizando habilidades...
+                  Updating skills...
                 </p>
               )}
           </>
@@ -1035,7 +1035,7 @@ export default function CardSearchSidebar({
         </button>
 
         <span className="text-[10px] font-semibold text-foreground-muted">
-          Página {currentPage} de{" "}
+          Page {currentPage} of{" "}
           {currentPages}
         </span>
 

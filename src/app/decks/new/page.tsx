@@ -12,10 +12,10 @@ import {
 import type { DeckDraftSeed } from "@/hooks/useDeckDraft";
 
 export const metadata: Metadata = {
-  title: "Nuevo mazo | Card Meta",
+  title: "New deck | Card Meta",
 
   description:
-    "Construye tu mazo competitivo de Yu-Gi-Oh! con el editor compacto de Card Meta.",
+    "Build your competitive Yu-Gi-Oh! deck with the compact Card Meta editor.",
 };
 
 interface NewDeckPageProps {
