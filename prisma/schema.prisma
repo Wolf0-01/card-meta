@@ -287,6 +287,46 @@ model Tournament {
   @@index([organizer])
 }
 
+enum TierEntryFormat {
+  SPEED
+  RUSH
+}
+
+enum TierEntryTier {
+  TIER_1
+  TIER_2
+  TIER_3
+  HIGH_POTENTIAL
+}
+
+/// Arquetipo real de la Tier List competitiva. El staff lo
+/// mantiene desde /tier-list conforme evoluciona el meta.
+model TierEntry {
+  id String @id @default(cuid())
+
+  format TierEntryFormat @default(SPEED)
+
+  tier TierEntryTier @default(TIER_1)
+
+  archetype String
+
+  cardName String?
+
+  ygoproId Int?
+
+  powerScore Int @default(0)
+
+  notes String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([format, archetype])
+  @@index([format])
+  @@index([tier])
+}
+
 model DeckCard {
   id String @id @default(cuid())
 
