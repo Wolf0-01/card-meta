@@ -1,4 +1,4 @@
-import CardGrid from "./CardGrid";
+import RelatedCardTile from "./RelatedCardTile";
 
 import type { CardPreviewData } from "@/types/CardPreviewData";
 
@@ -31,10 +31,47 @@ export default function CardRelated({
         ${className}
       `}
     >
-      <CardGrid
-        title={title}
-        cards={cards}
-      />
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <h2
+          className="
+            text-2xl
+            font-bold
+            text-white
+          "
+        >
+          {title}
+        </h2>
+
+        <span
+          className="
+            rounded-full
+            bg-[#070D1F]
+            px-3
+            py-1
+            text-xs
+            font-bold
+            text-slate-400
+          "
+        >
+          {cards.length} cards
+        </span>
+      </div>
+
+      <div
+        className="
+          grid
+          grid-cols-[repeat(auto-fill,minmax(115px,115px))]
+          justify-center
+          gap-3
+        "
+      >
+        {cards.map((card) => (
+          <RelatedCardTile
+            key={card.id}
+            card={card}
+          />
+        ))}
+      </div>
     </section>
   );
 }
