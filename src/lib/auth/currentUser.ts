@@ -29,7 +29,7 @@ export interface AuthUser {
 
   avatar: string | null;
 
-  role: "user" | "admin";
+  role: "USER" | "EDITOR" | "ADMIN";
 
   createdAt: Date;
 }

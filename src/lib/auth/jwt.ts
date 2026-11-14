@@ -10,8 +10,39 @@ import {
 } from "./constants";
 
 export type SessionRole =
-  | "user"
-  | "admin";
+  | "USER"
+  | "EDITOR"
+  | "ADMIN";
+
+function normalizeSessionRole(
+  value: unknown
+): SessionRole | null {
+  if (
+    value === "USER" ||
+    value === "EDITOR" ||
+    value === "ADMIN"
+  ) {
+    return value;
+  }
+
+  /*
+   * Compatibilidad con tokens emitidos antes de la
+   * migración de roles.
+   */
+  if (value === "user") {
+    return "USER";
+  }
+
+  if (value === "editor") {
+    return "EDITOR";
+  }
+
+  if (value === "admin") {
+    return "ADMIN";
+  }
+
+  return null;
+}
 
 export interface SessionPayload {
   sub: string;
@@ -70,12 +101,15 @@ export async function verifySessionToken(
         }
       );
 
+    const role = normalizeSessionRole(
+      payload.role
+    );
+
     if (
       typeof payload.sub !== "string" ||
       typeof payload.email !== "string" ||
       typeof payload.username !== "string" ||
-      (payload.role !== "user" &&
-        payload.role !== "admin")
+      !role
     ) {
       return null;
     }
@@ -87,7 +121,7 @@ export async function verifySessionToken(
 
       username: payload.username,
 
-      role: payload.role,
+      role,
     };
   } catch {
     return null;

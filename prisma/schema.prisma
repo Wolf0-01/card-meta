@@ -18,8 +18,9 @@ enum DeckZone {
 }
 
 enum UserRole {
-  user
-  admin
+  USER
+  EDITOR
+  ADMIN
 }
 
 model User {
@@ -37,7 +38,7 @@ model User {
 
   bio String?
 
-  role UserRole @default(user)
+  role UserRole @default(USER)
 
   decks Deck[]
 
