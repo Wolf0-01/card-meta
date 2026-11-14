@@ -17,7 +17,13 @@ import {
 
 import CatalogCardTile from "@/components/cards/CatalogCardTile";
 
+import GuideActions from "@/components/guides/GuideActions";
+
 import GuidePanoramaCard from "@/components/guides/GuidePanoramaCard";
+
+import { getCurrentUser } from "@/lib/auth/currentUser";
+
+import { canManageGuides } from "@/lib/auth/roles";
 
 import { formatDate } from "@/lib/format";
 
@@ -63,9 +69,11 @@ export default async function GuidePage({
     notFound();
   }
 
-  const related = await getRelatedGuides(
-    guide.slug
-  );
+  const [related, user] = await Promise.all([
+    getRelatedGuides(guide.slug),
+
+    getCurrentUser(),
+  ]);
 
   return (
     <main
@@ -87,24 +95,33 @@ export default async function GuidePage({
           space-y-4
         "
       >
-        <Link
-          href="/guides"
-          className="
-            inline-flex
-            items-center
-            gap-1
-            text-[9px]
-            font-black
-            uppercase
-            tracking-[0.18em]
-            text-slate-500
-            transition-colors
-            hover:text-blue-300
-          "
-        >
-          <ArrowLeft className="h-3 w-3" />
-          Back to Guides
-        </Link>
+        <div className="flex items-start justify-between gap-2">
+          <Link
+            href="/guides"
+            className="
+              inline-flex
+              items-center
+              gap-1
+              text-[9px]
+              font-black
+              uppercase
+              tracking-[0.18em]
+              text-slate-500
+              transition-colors
+              hover:text-blue-300
+            "
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Back to Guides
+          </Link>
+
+          {canManageGuides(user) && (
+            <GuideActions
+              guideId={guide.id}
+              slug={guide.slug}
+            />
+          )}
+        </div>
 
         <header
           className="

@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   BookOpen,
   Flame,
+  Plus,
   Sparkles,
   UserRound,
 } from "lucide-react";
@@ -13,6 +14,10 @@ import {
 import GuideCatalog from "@/components/guides/GuideCatalog";
 
 import GuidePanoramaCard from "@/components/guides/GuidePanoramaCard";
+
+import { getCurrentUser } from "@/lib/auth/currentUser";
+
+import { canManageGuides } from "@/lib/auth/roles";
 
 import {
   getFeaturedGuides,
@@ -27,10 +32,12 @@ export const metadata: Metadata = {
 };
 
 export default async function GuidesPage() {
-  const [guides, featured] = await Promise.all([
-    getGuides(),
-    getFeaturedGuides(),
-  ]);
+  const [guides, featured, user] =
+    await Promise.all([
+      getGuides(),
+      getFeaturedGuides(),
+      getCurrentUser(),
+    ]);
 
   const authors = new Set(
     guides.map((guide) => guide.author)
@@ -76,17 +83,50 @@ export default async function GuidesPage() {
             Home
           </Link>
 
-          <span
-            className="
-              text-[9px]
-              font-bold
-              uppercase
-              tracking-[0.16em]
-              text-slate-500
-            "
-          >
-            Card Meta · Editorial
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className="
+                hidden
+                text-[9px]
+                font-bold
+                uppercase
+                tracking-[0.16em]
+                text-slate-500
+                sm:inline
+              "
+            >
+              Card Meta · Editorial
+            </span>
+
+            {canManageGuides(user) && (
+              <Link
+                href="/guides/new"
+                className="
+                  inline-flex
+                  h-8
+                  items-center
+                  gap-1.5
+                  rounded-lg
+                  border
+                  border-blue-500/40
+                  bg-blue-500/10
+                  px-3
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.14em]
+                  text-blue-200
+                  transition-colors
+                  hover:border-blue-400
+                  hover:bg-blue-500/20
+                  hover:text-white
+                "
+              >
+                <Plus className="h-3 w-3" />
+                Nueva Guía
+              </Link>
+            )}
+          </div>
         </div>
 
         <header className="space-y-3 text-center">

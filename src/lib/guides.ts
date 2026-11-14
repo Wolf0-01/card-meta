@@ -14,6 +14,17 @@ export interface GuideSection {
   paragraphs: string[];
 
   bullets?: string[];
+
+  /**
+   * Cartas destacadas dentro de esta sección concreta.
+   * El editor visual las guarda aquí para poder mostrarlas
+   * junto al bloque al que pertenecen.
+   */
+  featuredCardNames?: string[];
+}
+
+export interface GuideSectionDetail extends GuideSection {
+  featuredCards: CardPreviewData[];
 }
 
 export interface GuideContent {
@@ -47,7 +58,7 @@ export interface GuideListItem {
 }
 
 export interface GuideDetail extends GuideListItem {
-  sections: GuideSection[];
+  sections: GuideSectionDetail[];
 
   featuredCards: CardPreviewData[];
 }
@@ -131,6 +142,10 @@ function parseSection(
 
   const bullets = asStringArray(record.bullets);
 
+  const featuredCardNames = asStringArray(
+    record.featuredCardNames
+  );
+
   return {
     heading,
 
@@ -138,6 +153,10 @@ function parseSection(
 
     ...(bullets.length > 0
       ? { bullets }
+      : {}),
+
+    ...(featuredCardNames.length > 0
+      ? { featuredCardNames }
       : {}),
   };
 }
@@ -283,12 +302,25 @@ export const getGuide = cache(
       guide.content
     );
 
+    const sectionCardNames =
+      content.sections.flatMap(
+        (section) =>
+          section.featuredCardNames ?? []
+      );
+
+    const allCardNames = [
+      ...new Set([
+        ...content.featuredCardNames,
+        ...sectionCardNames,
+      ]),
+    ];
+
     const cards =
-      content.featuredCardNames.length > 0
+      allCardNames.length > 0
         ? await prisma.card.findMany({
             where: {
               name: {
-                in: content.featuredCardNames,
+                in: allCardNames,
               },
             },
 
@@ -300,21 +332,46 @@ export const getGuide = cache(
       cards.map((card) => [card.name, card])
     );
 
+    function resolveCard(
+      name: string
+    ): CardPreviewData | null {
+      const card = cardsByName.get(name);
+
+      return card
+        ? mapPrismaCardPreview(card)
+        : null;
+    }
+
     const featuredCards =
       content.featuredCardNames
-        .map((name) => cardsByName.get(name))
+        .map(resolveCard)
         .filter(
           (
             card
-          ): card is (typeof cards)[number] =>
-            Boolean(card)
+          ): card is CardPreviewData =>
+            card !== null
+        );
+
+    const sections: GuideSectionDetail[] =
+      content.sections.map((section) => ({
+        ...section,
+
+        featuredCards: (
+          section.featuredCardNames ?? []
         )
-        .map(mapPrismaCardPreview);
+          .map(resolveCard)
+          .filter(
+            (
+              card
+            ): card is CardPreviewData =>
+              card !== null
+          ),
+      }));
 
     return {
       ...toListItem(guide),
 
-      sections: content.sections,
+      sections,
 
       featuredCards,
     };
