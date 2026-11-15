@@ -10,6 +10,8 @@ import {
   Search,
 } from "lucide-react";
 
+import ArchetypeBreakdown from "@/components/decks/ArchetypeBreakdown";
+
 import DeckArchetypeCard from "@/components/decks/DeckArchetypeCard";
 
 import DeckExplorerControls from "@/components/decks/DeckExplorerControls";
@@ -17,6 +19,7 @@ import DeckExplorerControls from "@/components/decks/DeckExplorerControls";
 import PublicDeckCard from "@/components/decks/PublicDeckCard";
 
 import {
+  findArchetypeBreakdown,
   findPublicDeckArchetypeGroups,
   findPublicDeckExplorer,
 } from "@/services/decks";
@@ -104,7 +107,7 @@ export default async function DecksPage({
       ? Math.floor(parsedPage)
       : 1;
 
-  const [result, archetypes] =
+  const [result, archetypes, breakdown] =
     await Promise.all([
       findPublicDeckExplorer({
         search,
@@ -116,6 +119,13 @@ export default async function DecksPage({
       }),
 
       findPublicDeckArchetypeGroups(format),
+
+      archetype
+        ? findArchetypeBreakdown(
+            format,
+            archetype
+          )
+        : Promise.resolve(null),
     ]);
 
   const hasFilters =
@@ -253,6 +263,10 @@ export default async function DecksPage({
           skills={result.skills}
           total={result.total}
         />
+
+        {breakdown && (
+          <ArchetypeBreakdown breakdown={breakdown} />
+        )}
 
         {archetypes.length > 0 && (
           <section

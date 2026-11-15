@@ -24,8 +24,6 @@ import { DeckCardInfo } from "@/types/deck";
 interface DeckCardItemProps {
   card: DeckCardInfo;
 
-  quantity?: number;
-
   onClick?: () => void;
 
   compact?: boolean;
@@ -35,7 +33,6 @@ interface DeckCardItemProps {
 
 export default function DeckCardItem({
   card,
-  quantity = 1,
   onClick,
   compact = false,
   className = "",
@@ -117,9 +114,7 @@ export default function DeckCardItem({
         onMouseLeave={hideTooltip}
         onFocus={showTooltip}
         onBlur={hideTooltip}
-        title={`${card.name}${
-          quantity > 1 ? ` · x${quantity}` : ""
-        }`}
+        title={card.name}
         className={`
           group
           relative
@@ -168,29 +163,6 @@ export default function DeckCardItem({
               group-hover:scale-105
             "
           />
-
-          {quantity > 1 && (
-            <span
-              className={`
-                absolute
-                bottom-1
-                right-1
-                rounded-md
-                bg-black/85
-                font-black
-                leading-none
-                text-white
-                shadow
-                ${
-                  compact
-                    ? "px-1 py-0.5 text-[9px]"
-                    : "px-1.5 py-1 text-[11px]"
-                }
-              `}
-            >
-              ×{quantity}
-            </span>
-          )}
         </div>
 
         {!compact && card.rarity && (

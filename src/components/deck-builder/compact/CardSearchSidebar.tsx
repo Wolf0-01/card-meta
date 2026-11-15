@@ -97,8 +97,6 @@ interface CardsApiResponse {
 }
 
 interface CardSearchSidebarProps {
-  copiesById: Record<number, number>;
-
   format: DuelFormat;
 
   onAddCard: (
@@ -143,7 +141,6 @@ const tabButtonClasses = `
 `;
 
 export default function CardSearchSidebar({
-  copiesById,
   format,
   onAddCard,
   activeSkill = "",
@@ -899,9 +896,6 @@ export default function CardSearchSidebar({
                   <MiniCardTile
                     key={card.id}
                     card={card}
-                    quantity={
-                      copiesById[card.id]
-                    }
                     onClick={() =>
                       onAddCard(
                         card,

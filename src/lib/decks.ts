@@ -373,6 +373,47 @@ export interface PublicDeckExplorerResult {
   skills: string[];
 }
 
+/**
+ * Condiciones compartidas para localizar los mazos de un
+ * arquetipo: nombre del mazo, relación de arquetipo o
+ * arquetipo de las cartas del Main Deck.
+ */
+function buildArchetypeMatch(
+  term: string
+): Prisma.DeckWhereInput {
+  return {
+    OR: [
+      {
+        name: {
+          contains: term,
+          mode: "insensitive",
+        },
+      },
+      {
+        archetype: {
+          name: {
+            contains: term,
+            mode: "insensitive",
+          },
+        },
+      },
+      {
+        cards: {
+          some: {
+            zone: "main",
+            card: {
+              archetype: {
+                contains: term,
+                mode: "insensitive",
+              },
+            },
+          },
+        },
+      },
+    ],
+  };
+}
+
 export async function getPublicDeckExplorer({
   search,
   skill,
@@ -441,37 +482,9 @@ export async function getPublicDeckExplorer({
   }
 
   if (archetypeTerm) {
-    conditions.push({
-      OR: [
-        {
-          name: {
-            contains: archetypeTerm,
-            mode: "insensitive",
-          },
-        },
-        {
-          archetype: {
-            name: {
-              contains: archetypeTerm,
-              mode: "insensitive",
-            },
-          },
-        },
-        {
-          cards: {
-            some: {
-              zone: "main",
-              card: {
-                archetype: {
-                  contains: archetypeTerm,
-                  mode: "insensitive",
-                },
-              },
-            },
-          },
-        },
-      ],
-    });
+    conditions.push(
+      buildArchetypeMatch(archetypeTerm)
+    );
   }
 
   if (conditions.length > 0) {
@@ -558,6 +571,195 @@ export interface PublicDeckArchetypeGroup {
 
   /** Etiqueta de Tier List cuando el arquetipo está rankeado. */
   tier: string | null;
+}
+
+export interface ArchetypeBreakdownSkill {
+  name: string;
+
+  deckCount: number;
+
+  percentage: number;
+}
+
+export interface ArchetypeBreakdownCard {
+  id: number;
+
+  name: string;
+
+  slug: string;
+
+  image: string | null;
+
+  rarity: string | null;
+
+  deckCount: number;
+
+  percentage: number;
+}
+
+export interface ArchetypeBreakdown {
+  archetype: string;
+
+  deckCount: number;
+
+  topSkill: ArchetypeBreakdownSkill | null;
+
+  coreCards: ArchetypeBreakdownCard[];
+}
+
+const CORE_CARD_LIMIT = 8;
+
+/**
+ * Desglose estadístico de un arquetipo calculado con los
+ * mazos públicos reales de PostgreSQL: la Skill más usada y
+ * las cartas del Main Deck que aparecen en más listas.
+ *
+ * Los porcentajes se recalculan en cada petición, así que el
+ * bloque se actualiza automáticamente al subir más mazos.
+ */
+export async function getArchetypeBreakdown(
+  format: DuelFormat = "speed",
+  archetype = ""
+): Promise<ArchetypeBreakdown | null> {
+  const term = archetype.trim();
+
+  if (!term) {
+    return null;
+  }
+
+  const normalizedFormat =
+    normalizeDuelFormat(format);
+
+  const rows = await findDecks({
+    where: {
+      isPublic: true,
+
+      format: normalizedFormat,
+
+      AND: [buildArchetypeMatch(term)],
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const decks = rows.map(mapPrismaDeck);
+
+  const deckCount = decks.length;
+
+  if (deckCount === 0) {
+    return null;
+  }
+
+  const skillCounts = new Map<string, number>();
+
+  for (const deck of decks) {
+    const skill = deck.skill?.trim();
+
+    if (!skill) {
+      continue;
+    }
+
+    skillCounts.set(
+      skill,
+      (skillCounts.get(skill) ?? 0) + 1
+    );
+  }
+
+  const topSkillEntry = [
+    ...skillCounts.entries(),
+  ].sort(
+    (a, b) =>
+      b[1] - a[1] || a[0].localeCompare(b[0])
+  )[0];
+
+  const topSkill = topSkillEntry
+    ? {
+        name: topSkillEntry[0],
+
+        deckCount: topSkillEntry[1],
+
+        percentage: Math.round(
+          (topSkillEntry[1] / deckCount) * 100
+        ),
+      }
+    : null;
+
+  const cardUsage = new Map<
+    number,
+    {
+      card: MetaDeck["cards"][number]["card"];
+
+      deckCount: number;
+    }
+  >();
+
+  for (const deck of decks) {
+    const seen = new Set<number>();
+
+    for (const deckCard of deck.cards) {
+      if (
+        deckCard.zone !== "main" ||
+        seen.has(deckCard.card.id)
+      ) {
+        continue;
+      }
+
+      seen.add(deckCard.card.id);
+
+      const current = cardUsage.get(
+        deckCard.card.id
+      );
+
+      if (current) {
+        current.deckCount += 1;
+      } else {
+        cardUsage.set(deckCard.card.id, {
+          card: deckCard.card,
+
+          deckCount: 1,
+        });
+      }
+    }
+  }
+
+  const coreCards: ArchetypeBreakdownCard[] = [
+    ...cardUsage.values(),
+  ]
+    .sort(
+      (a, b) =>
+        b.deckCount - a.deckCount ||
+        a.card.name.localeCompare(b.card.name)
+    )
+    .slice(0, CORE_CARD_LIMIT)
+    .map(({ card, deckCount: usage }) => ({
+      id: card.id,
+
+      name: card.name,
+
+      slug: card.slug,
+
+      image: card.image,
+
+      rarity: card.rarity,
+
+      deckCount: usage,
+
+      percentage: Math.round(
+        (usage / deckCount) * 100
+      ),
+    }));
+
+  return {
+    archetype: term,
+
+    deckCount,
+
+    topSkill,
+
+    coreCards,
+  };
 }
 
 const TIER_BAND_LABELS: Record<string, string> = {

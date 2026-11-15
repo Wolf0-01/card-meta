@@ -1,8 +1,8 @@
 "use client";
 
-import DeckCardItem from "./DeckCardItem";
+import DeckCardGrid from "./DeckCardGrid";
 
-import { sortCardsByRarity } from "@/lib/decks/rarityOrder";
+import { sortDeckCards } from "@/lib/decks/rarityOrder";
 
 import type { MetaDeck } from "@/types/meta";
 
@@ -10,6 +10,10 @@ interface Props {
   deck: MetaDeck;
 }
 
+/**
+ * Extra Deck separado del Main Deck únicamente por una línea
+ * sutil, sin encabezados ni divisores internos.
+ */
 export default function DeckExtraDeck({
   deck,
 }: Props) {
@@ -22,45 +26,11 @@ export default function DeckExtraDeck({
     return null;
   }
 
-  const total = extraDeck.reduce(
-    (count, deckCard) =>
-      count + (deckCard.quantity ?? 1),
-    0
-  );
-
   return (
-    <section className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h2
-          className="
-            text-[11px]
-            font-black
-            uppercase
-            tracking-[0.16em]
-            text-foreground-muted
-          "
-        >
-          Extra Deck ({total})
-        </h2>
-      </div>
-
-      <div
-        className="
-          grid
-          grid-cols-[repeat(auto-fill,minmax(72px,1fr))]
-          gap-1.5
-        "
-      >
-        {sortCardsByRarity(extraDeck).map(
-          (deckCard) => (
-            <DeckCardItem
-              key={deckCard.id}
-              card={deckCard.card}
-              quantity={deckCard.quantity}
-            />
-          )
-        )}
-      </div>
+    <section className="mt-4 border-t border-border/70 pt-3">
+      <DeckCardGrid
+        cards={sortDeckCards(extraDeck)}
+      />
     </section>
   );
 }

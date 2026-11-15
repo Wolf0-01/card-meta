@@ -18,7 +18,7 @@ import type {
   DraftCard,
 } from "@/types/deck-draft";
 
-import { sortCardsByRarity } from "@/lib/decks/rarityOrder";
+import { sortDeckCards } from "@/lib/decks/rarityOrder";
 
 import MiniCardTile from "./MiniCardTile";
 
@@ -47,56 +47,6 @@ const ZONE_ACCENTS: Record<
   },
 };
 
-type MainGroupKey =
-  | "monsters"
-  | "spells"
-  | "traps"
-  | "other";
-
-const MAIN_GROUP_ORDER: MainGroupKey[] = [
-  "monsters",
-  "spells",
-  "traps",
-  "other",
-];
-
-const MAIN_GROUP_LABELS: Record<
-  MainGroupKey,
-  string
-> = {
-  monsters: "Monsters",
-  spells: "Spells",
-  traps: "Traps",
-  other: "Other",
-};
-
-function getMainGroupKey(
-  card: DraftCard
-): MainGroupKey {
-  const type = card.card.type.toLowerCase();
-
-  if (type.includes("monster")) {
-    return "monsters";
-  }
-
-  if (type.includes("spell")) {
-    return "spells";
-  }
-
-  if (type.includes("trap")) {
-    return "traps";
-  }
-
-  return "other";
-}
-
-function countCopies(cards: DraftCard[]) {
-  return cards.reduce(
-    (total, card) => total + card.quantity,
-    0
-  );
-}
-
 interface DraftZoneProps {
   zone: DeckZone;
 
@@ -124,10 +74,8 @@ interface DraftZoneProps {
     zone: DeckZone
   ) => void;
 
-  onRemoveAll: (
-    cardId: number,
-    zone: DeckZone
-  ) => void;
+  /** Oculta el título de la zona dejando el contador. */
+  showTitle?: boolean;
 
   scrollable?: boolean;
 }
@@ -162,7 +110,7 @@ export default function DraftZone({
   onAddCard,
   onMoveCard,
   onRemoveOne,
-  onRemoveAll,
+  showTitle = true,
   scrollable = false,
 }: DraftZoneProps) {
   const [isDragOver, setIsDragOver] =
@@ -175,47 +123,35 @@ export default function DraftZone({
     100
   );
 
-  const mainGroups = MAIN_GROUP_ORDER.map(
-    (key) => {
-      const groupCards = sortCardsByRarity(
-        cards.filter(
-          (card) =>
-            getMainGroupKey(card) === key
-        )
-      );
+  const sortedCards = sortDeckCards(cards);
 
-      return {
-        key,
-
-        label: MAIN_GROUP_LABELS[key],
-
-        cards: groupCards,
-
-        total: countCopies(groupCards),
-      };
-    }
-  ).filter((group) => group.cards.length > 0);
-
+  /*
+   * Cada copia se pinta como una miniatura independiente:
+   * un mazo con 3 copias muestra 3 cartas seguidas y sin
+   * badges ×1/×2/×3.
+   */
   function renderTile(card: DraftCard) {
-    return (
-      <MiniCardTile
-        key={`${zone}-${card.id}`}
-        card={card.card}
-        mode="deck"
-        quantity={card.quantity}
-        draftZone={zone}
-        onRemoveOne={() =>
-          onRemoveOne(card.id, zone)
-        }
-        onRemoveAll={() =>
-          onRemoveAll(card.id, zone)
-        }
-        onContextMenu={(event) => {
-          event.preventDefault();
+    return Array.from(
+      { length: Math.max(card.quantity, 1) },
+      (_, copyIndex) => (
+        <MiniCardTile
+          key={`${zone}-${card.id}-${copyIndex}`}
+          card={card.card}
+          mode="deck"
+          draftZone={zone}
+          onAddOne={() =>
+            onAddCard(card.card, zone)
+          }
+          onRemoveOne={() =>
+            onRemoveOne(card.id, zone)
+          }
+          onContextMenu={(event) => {
+            event.preventDefault();
 
-          onRemoveOne(card.id, zone);
-        }}
-      />
+            onRemoveOne(card.id, zone);
+          }}
+        />
+      )
     );
   }
 
@@ -224,7 +160,7 @@ export default function DraftZone({
    * verticales; el Extra Deck se expande horizontalmente
    * aprovechando todo el ancho disponible.
    */
-  function renderGrid(groupCards: DraftCard[]) {
+  function renderGrid(gridCards: DraftCard[]) {
     const gridClasses =
       zone === "main"
         ? `
@@ -241,9 +177,7 @@ export default function DraftZone({
 
     return (
       <div className={gridClasses}>
-        {sortCardsByRarity(groupCards).map(
-          renderTile
-        )}
+        {gridCards.map(renderTile)}
       </div>
     );
   }
@@ -378,9 +312,11 @@ export default function DraftZone({
             className={`h-2 w-2 rounded-full ${accent.dot}`}
           />
 
-          <h2 className="truncate text-xs font-black uppercase tracking-wide text-foreground">
-            {DECK_ZONE_LABELS[zone]}
-          </h2>
+          {showTitle && (
+            <h2 className="truncate text-xs font-black uppercase tracking-wide text-foreground">
+              {DECK_ZONE_LABELS[zone]}
+            </h2>
+          )}
 
           <span className="text-[10px] text-foreground-muted">
             {min
@@ -466,26 +402,8 @@ export default function DraftZone({
               search panel.
             </p>
           </div>
-        ) : zone === "main" ? (
-          <div className="space-y-3">
-            {mainGroups.map((group) => (
-              <div key={group.key}>
-                <div className="mb-1.5 flex items-center justify-between">
-                  <span className="text-[9px] font-black uppercase tracking-[0.16em] text-foreground-muted">
-                    {group.label}
-                  </span>
-
-                  <span className="text-[9px] font-bold tabular-nums text-foreground-muted">
-                    {group.total}
-                  </span>
-                </div>
-
-                {renderGrid(group.cards)}
-              </div>
-            ))}
-          </div>
         ) : (
-          renderGrid(cards)
+          renderGrid(sortedCards)
         )}
       </div>
     </section>

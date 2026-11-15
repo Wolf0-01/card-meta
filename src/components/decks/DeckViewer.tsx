@@ -225,9 +225,7 @@ export default function DeckViewer({
 
             <DeckMainDeck deck={deck} />
 
-            <div className="mt-5">
-              <DeckExtraDeck deck={deck} />
-            </div>
+            <DeckExtraDeck deck={deck} />
 
             <footer
               className="

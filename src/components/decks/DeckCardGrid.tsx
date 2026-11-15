@@ -5,13 +5,15 @@ import DeckCardItem from "./DeckCardItem";
 import type { DeckCard } from "@/types/deck";
 
 interface DeckCardGridProps {
-  title: string;
-
   cards: DeckCard[];
 }
 
+/**
+ * Cuadrícula continua de 5 columnas al estilo de Duel Links
+ * Meta. Cada copia se expande como una miniatura propia, de
+ * modo que un mazo con 3 copias muestra 3 cartas seguidas.
+ */
 export default function DeckCardGrid({
-  title,
   cards,
 }: DeckCardGridProps) {
   if (cards.length === 0) {
@@ -19,37 +21,30 @@ export default function DeckCardGrid({
   }
 
   return (
-    <section className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h2
-          className="
-            text-[11px]
-            font-black
-            uppercase
-            tracking-[0.16em]
-            text-foreground-muted
-          "
-        >
-          {title}
-        </h2>
-      </div>
-
-      <div
-        className="
-          grid
-          grid-cols-[repeat(5,minmax(0,72px))]
-          justify-center
-          gap-1.5
-        "
-      >
-        {cards.map((deckCard) => (
-          <DeckCardItem
-            key={deckCard.id}
-            card={deckCard.card}
-            quantity={deckCard.quantity}
-          />
-        ))}
-      </div>
-    </section>
+    <div
+      className="
+        grid
+        grid-cols-[repeat(5,minmax(0,72px))]
+        justify-center
+        gap-1.5
+      "
+    >
+      {cards.map((deckCard) =>
+        Array.from(
+          {
+            length: Math.max(
+              deckCard.quantity,
+              1
+            ),
+          },
+          (_, copyIndex) => (
+            <DeckCardItem
+              key={`${deckCard.id}-${copyIndex}`}
+              card={deckCard.card}
+            />
+          )
+        )
+      )}
+    </div>
   );
 }

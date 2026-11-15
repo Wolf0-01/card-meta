@@ -33,8 +33,6 @@ interface MiniCardTileProps {
 
   mode?: "search" | "deck";
 
-  quantity?: number;
-
   draggable?: boolean;
 
   draftZone?: DeckZone;
@@ -45,9 +43,9 @@ interface MiniCardTileProps {
     event: MouseEvent<HTMLDivElement>
   ) => void;
 
-  onRemoveOne?: () => void;
+  onAddOne?: () => void;
 
-  onRemoveAll?: () => void;
+  onRemoveOne?: () => void;
 
   className?: string;
 }
@@ -67,13 +65,12 @@ function getLevelLabel(card: CardPreviewData) {
 export default function MiniCardTile({
   card,
   mode = "search",
-  quantity,
   draggable = true,
   draftZone,
   onClick,
   onContextMenu,
+  onAddOne,
   onRemoveOne,
-  onRemoveAll,
   className = "",
 }: MiniCardTileProps) {
   const [failed, setFailed] =
@@ -222,11 +219,7 @@ export default function MiniCardTile({
         onClick ? handleKeyDown : undefined
       }
       onContextMenu={onContextMenu}
-      title={`${card.name}${
-        quantity
-          ? ` · ${quantity} cop${quantity === 1 ? "y" : "ies"}`
-          : ""
-      }`}
+      title={card.name}
     >
       <div
         className="
@@ -304,28 +297,6 @@ export default function MiniCardTile({
           </span>
         )}
 
-        {typeof quantity === "number" &&
-          quantity > 0 && (
-            <span
-              className="
-                absolute
-                bottom-1
-                right-1
-                rounded-full
-                bg-emerald-500
-                px-1.5
-                py-0.5
-                text-[10px]
-                font-black
-                leading-none
-                text-emerald-950
-                shadow-[0_0_10px_rgba(16,185,129,0.65)]
-              "
-            >
-              x{quantity}
-            </span>
-          )}
-
         {!isDeck && (
           <span
             className="
@@ -363,79 +334,71 @@ export default function MiniCardTile({
             </span>
           </span>
         )}
+      </div>
 
-        {isDeck && (
-          <div
+      {isDeck && (
+        <div className="mt-1 flex items-center gap-1">
+          <button
+            type="button"
+            aria-label={`Remove one copy of ${card.name}`}
+            onClick={(event) => {
+              event.stopPropagation();
+
+              onRemoveOne?.();
+            }}
             className="
-              absolute
-              bottom-1
-              left-1
               flex
-              gap-1
-              opacity-0
-              transition
-              group-hover:opacity-100
+              h-5
+              flex-1
+              items-center
+              justify-center
+              rounded
+              border
+              border-border
+              bg-surface
+              text-[11px]
+              font-black
+              leading-none
+              text-foreground-muted
+              transition-colors
+              hover:border-amber-400/70
+              hover:text-amber-300
             "
           >
-            <button
-              type="button"
-              aria-label={`Remove one copy of ${card.name}`}
-              onClick={(event) => {
-                event.stopPropagation();
+            −
+          </button>
 
-                onRemoveOne?.();
-              }}
-              className="
-                flex
-                h-5
-                w-5
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-white/20
-                bg-black/80
-                text-xs
-                font-bold
-                text-white
-                transition-colors
-                hover:bg-amber-500
-                hover:text-amber-950
-              "
-            >
-              −
-            </button>
+          <button
+            type="button"
+            aria-label={`Add one copy of ${card.name}`}
+            onClick={(event) => {
+              event.stopPropagation();
 
-            <button
-              type="button"
-              aria-label={`Remove ${card.name} from the deck`}
-              onClick={(event) => {
-                event.stopPropagation();
-
-                onRemoveAll?.();
-              }}
-              className="
-                flex
-                h-5
-                w-5
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-white/20
-                bg-black/80
-                text-xs
-                font-bold
-                text-white
-                transition-colors
-                hover:bg-red-600
-              "
-            >
-              ×
-            </button>
-          </div>
-        )}
-      </div>
+              onAddOne?.();
+            }}
+            className="
+              flex
+              h-5
+              flex-1
+              items-center
+              justify-center
+              rounded
+              border
+              border-border
+              bg-surface
+              text-[11px]
+              font-black
+              leading-none
+              text-foreground-muted
+              transition-colors
+              hover:border-emerald-400/70
+              hover:text-emerald-300
+            "
+          >
+            +
+          </button>
+        </div>
+      )}
 
       {!isDeck && (
         <p

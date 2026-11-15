@@ -32,6 +32,7 @@ export {
 } from "./meta";
 
 export {
+  findArchetypeBreakdown,
   findPublicDeckArchetypeGroups,
   findPublicDeckExplorer,
   findRecentPublicDecks,

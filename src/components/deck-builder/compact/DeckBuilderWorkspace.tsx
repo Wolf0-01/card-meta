@@ -105,18 +105,6 @@ export default function DeckBuilderWorkspace({
     [draft.cards]
   );
 
-  const copiesById = useMemo(() => {
-    const copies: Record<number, number> = {};
-
-    for (const card of draft.cards) {
-      copies[card.id] =
-        (copies[card.id] ?? 0) +
-        card.quantity;
-    }
-
-    return copies;
-  }, [draft.cards]);
-
   const missingForPublish = Math.max(
     DECK_RULES.mainMin - draft.stats.main,
     0
@@ -582,7 +570,6 @@ export default function DeckBuilderWorkspace({
           "
         >
           <CardSearchSidebar
-            copiesById={copiesById}
             format={draft.format}
             onAddCard={handleAddCard}
             activeSkill={draft.skill}
@@ -788,16 +775,6 @@ export default function DeckBuilderWorkspace({
               onAddCard={handleAddCard}
               onMoveCard={draft.moveCard}
               onRemoveOne={draft.removeCard}
-              onRemoveAll={(
-                cardId,
-                zone
-              ) =>
-                draft.setQuantity(
-                  cardId,
-                  zone,
-                  0
-                )
-              }
               scrollable
             />
 
@@ -810,16 +787,7 @@ export default function DeckBuilderWorkspace({
                 onAddCard={handleAddCard}
                 onMoveCard={draft.moveCard}
                 onRemoveOne={draft.removeCard}
-                onRemoveAll={(
-                  cardId,
-                  zone
-                ) =>
-                  draft.setQuantity(
-                    cardId,
-                    zone,
-                    0
-                  )
-                }
+                showTitle={false}
               />
             )}
 

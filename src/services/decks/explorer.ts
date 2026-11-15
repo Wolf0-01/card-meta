@@ -1,4 +1,5 @@
 import {
+  getArchetypeBreakdown,
   getPublicDeckArchetypeGroups,
   getPublicDeckExplorer,
   getRecentPublicDecks,
@@ -17,6 +18,16 @@ export async function findPublicDeckArchetypeGroups(
   format: DuelFormat = "speed"
 ) {
   return getPublicDeckArchetypeGroups(format);
+}
+
+export async function findArchetypeBreakdown(
+  format: DuelFormat = "speed",
+  archetype = ""
+) {
+  return getArchetypeBreakdown(
+    format,
+    archetype
+  );
 }
 
 export async function findRecentPublicDecks(
