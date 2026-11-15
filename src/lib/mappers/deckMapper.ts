@@ -34,7 +34,7 @@ export type PrismaDeckWithRelations =
           id: true;
           username: true;
           displayName: true;
-          avatar: true;
+          avatarUrl: true;
         };
       };
       cards: {

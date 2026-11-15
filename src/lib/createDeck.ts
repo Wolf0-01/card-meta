@@ -290,7 +290,7 @@ export async function createDeck(
             id: true,
             username: true,
             displayName: true,
-            avatar: true,
+            avatarUrl: true,
           },
         },
 

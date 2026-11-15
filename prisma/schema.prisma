@@ -34,7 +34,12 @@ model User {
 
   displayName String?
 
-  avatar String?
+  avatarUrl String?
+
+  /**
+   * Orden preferido del catálogo: "rarity" | "name" | "level" | "attack".
+   */
+  defaultCardSort String @default("rarity")
 
   bio String?
 

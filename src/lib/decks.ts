@@ -26,7 +26,7 @@ const deckInclude = Prisma.validator<Prisma.DeckInclude>()({
       id: true,
       username: true,
       displayName: true,
-      avatar: true,
+      avatarUrl: true,
     },
   },
 
@@ -874,6 +874,28 @@ export async function getRecentPublicDecks(
     },
 
     take: Math.max(Math.floor(limit), 1),
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return decks.map(mapPrismaDeck);
+}
+
+/**
+ * Mazos públicos creados por un jugador concreto, usados en
+ * su perfil público (/user/[username]).
+ */
+export async function getPublicDecksByAuthor(
+  authorId: string
+) {
+  const decks = await findDecks({
+    where: {
+      isPublic: true,
+
+      authorId,
+    },
 
     orderBy: {
       createdAt: "desc",

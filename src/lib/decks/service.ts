@@ -47,7 +47,7 @@ const userDeckInclude = {
       id: true,
       username: true,
       displayName: true,
-      avatar: true,
+      avatarUrl: true,
     },
   },
 
@@ -86,7 +86,7 @@ export interface UserDeckAuthorDTO {
 
   displayName: string | null;
 
-  avatar: string | null;
+  avatarUrl: string | null;
 }
 
 export interface UserDeckDTO {

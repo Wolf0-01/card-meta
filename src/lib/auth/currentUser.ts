@@ -11,7 +11,9 @@ export const publicUserSelect = {
 
   displayName: true,
 
-  avatar: true,
+  avatarUrl: true,
+
+  defaultCardSort: true,
 
   role: true,
 
@@ -27,7 +29,9 @@ export interface AuthUser {
 
   displayName: string | null;
 
-  avatar: string | null;
+  avatarUrl: string | null;
+
+  defaultCardSort: string;
 
   role: "USER" | "EDITOR" | "ADMIN";
 

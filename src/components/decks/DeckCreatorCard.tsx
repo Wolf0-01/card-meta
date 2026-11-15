@@ -83,11 +83,11 @@ export default function DeckCreatorCard({
             text-foreground-secondary
           "
         >
-          {author?.avatar ? (
+          {author?.avatarUrl ? (
             // El avatar puede ser una URL externa del proveedor de auth.
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={author.avatar}
+              src={author.avatarUrl}
               alt={displayName}
               className="h-full w-full object-cover"
             />

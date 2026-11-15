@@ -2,9 +2,7 @@ import Link from "next/link";
 
 import GlobalCardSearch from "@/components/search/GlobalCardSearch";
 
-import AdminNavLink from "@/components/auth/AdminNavLink";
-
-import Button from "@/components/ui/Button";
+import UserMenu from "@/components/auth/UserMenu";
 
 const navigation = [
   { href: "/decks", label: "Decks" },
@@ -61,13 +59,7 @@ export default function Navbar() {
 
           <GlobalCardSearch />
 
-          <AdminNavLink />
-
-          <div className="hidden lg:block">
-            <Button href="/login">
-              Login
-            </Button>
-          </div>
+          <UserMenu />
 
         </div>
 

@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import DeckActions from "./DeckActions";
 import DeckArchetypeBanner from "./DeckArchetypeBanner";
 import DeckCombos from "./DeckCombos";
@@ -124,9 +126,23 @@ export default function DeckViewer({
           "
         >
           from{" "}
-          <span className="font-semibold text-foreground-secondary">
-            {authorName}
-          </span>{" "}
+          {author?.username ? (
+            <Link
+              href={`/user/${author.username}`}
+              className="
+                font-semibold
+                text-foreground-secondary
+                transition-colors
+                hover:text-primary
+              "
+            >
+              {authorName}
+            </Link>
+          ) : (
+            <span className="font-semibold text-foreground-secondary">
+              {authorName}
+            </span>
+          )}{" "}
           on {formatDeckDate(deck.createdAt)}
         </p>
       </header>

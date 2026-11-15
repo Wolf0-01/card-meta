@@ -37,7 +37,7 @@ export interface DeckAuthor {
 
   displayName: string | null;
 
-  avatar: string | null;
+  avatarUrl: string | null;
 }
 
 // =================================
