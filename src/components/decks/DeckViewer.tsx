@@ -28,6 +28,12 @@ interface Props {
   gemEstimate: DeckGemEstimate;
 
   relatedDecks?: MetaDeck[];
+
+  /**
+   * Muestra el bloque lateral "Deck details" solo al
+   * propietario del mazo. Los visitantes no lo ven.
+   */
+  isOwner?: boolean;
 }
 
 function countQuantity(
@@ -44,6 +50,7 @@ export default function DeckViewer({
   deck,
   gemEstimate,
   relatedDecks = [],
+  isOwner = false,
 }: Props) {
   const cards = deck.cards ?? [];
 
@@ -87,18 +94,6 @@ export default function DeckViewer({
           text-center
         "
       >
-        <p
-          className="
-            text-[10px]
-            font-bold
-            uppercase
-            tracking-[0.22em]
-            text-primary
-          "
-        >
-          Published deck
-        </p>
-
         <h1
           className="
             text-2xl
@@ -259,7 +254,9 @@ export default function DeckViewer({
         <aside className="space-y-4 lg:sticky lg:top-6">
           <DeckArchetypeBanner deck={deck} />
 
-          <DeckCreatorCard deck={deck} />
+          {isOwner && (
+            <DeckCreatorCard deck={deck} />
+          )}
 
           <DeckGemBreakdown
             estimate={gemEstimate}

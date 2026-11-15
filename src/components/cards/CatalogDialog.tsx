@@ -40,10 +40,9 @@ export default function CatalogDialog({
         items-center
         justify-center
         overflow-hidden
-        bg-[#050914]/80
+        bg-black/55
         p-3
         text-slate-100
-        backdrop-blur-md
         sm:p-6
       "
     >

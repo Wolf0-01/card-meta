@@ -888,10 +888,9 @@ export default function GlobalCardSearch() {
               items-center
               justify-center
               overflow-hidden
-              bg-[#050914]/80
+              bg-black/55
               p-3
               text-slate-100
-              backdrop-blur-md
             "
           >
             <section

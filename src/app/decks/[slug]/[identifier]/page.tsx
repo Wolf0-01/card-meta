@@ -83,6 +83,10 @@ export default async function DeckPage({
         <DeckViewer
           deck={deck}
           gemEstimate={gemEstimate}
+          isOwner={
+            Boolean(user) &&
+            user?.id === deck.authorId
+          }
         />
       </Container>
     </main>
