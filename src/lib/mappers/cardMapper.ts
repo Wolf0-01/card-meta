@@ -2,6 +2,8 @@ import type { Card as PrismaCard } from "@prisma/client";
 
 import { normalizeDuelFormat } from "@/lib/duelFormat";
 
+import { normalizeBanlistStatus } from "@/lib/banlist";
+
 import type {
   Card,
   CardObtainEntry,
@@ -81,6 +83,10 @@ export function mapPrismaCard(
 
     type: card.type ?? "",
 
+    banlistStatus: normalizeBanlistStatus(
+      card.banlistStatus
+    ),
+
     linkMarkers: Array.isArray(card.linkMarkers)
       ? (card.linkMarkers as LinkMarker[])
       : null,
@@ -96,17 +102,23 @@ export function mapPrismaCard(
 export function mapPrismaCardPreview(
   card: Omit<
     CardPreviewData,
-    "linkMarkers" | "format"
+    "linkMarkers" | "format" | "banlistStatus"
   > & {
     format: string;
 
     linkMarkers: unknown;
+
+    banlistStatus?: unknown;
   }
 ): CardPreviewData {
   return {
     ...card,
 
     format: normalizeDuelFormat(card.format),
+
+    banlistStatus: normalizeBanlistStatus(
+      card.banlistStatus
+    ),
 
     linkMarkers: Array.isArray(card.linkMarkers)
       ? (card.linkMarkers as LinkMarker[])

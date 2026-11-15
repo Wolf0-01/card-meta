@@ -2,6 +2,7 @@
 
 import CardPreview from "./CardPreview";
 import CardBadge from "./CardBadge";
+import BanlistBadge from "./BanlistBadge";
 
 import type {
   CardPreviewData,
@@ -95,6 +96,11 @@ export default function CardItem({
             gap-1
           "
         >
+          <BanlistBadge
+            status={card.banlistStatus}
+            size="sm"
+          />
+
           {card.rarity && (
             <CardBadge
               variant="rarity"

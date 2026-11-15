@@ -174,6 +174,9 @@ card.id,
     rarity:
       card.rarity,
 
+    banlistStatus:
+      card.banlistStatus ?? null,
+
     frameType:
       card.frameType,
 

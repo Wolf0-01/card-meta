@@ -5,6 +5,11 @@ import type { CardPreviewData } from "@/types/CardPreviewData";
 import type { DeckZone } from "@/types/deck";
 import type { DraftCard } from "@/types/deck-draft";
 
+import {
+  getBanlistMaxCopies,
+  normalizeBanlistStatus,
+} from "@/lib/banlist";
+
 import { validateDraft } from "./draft";
 import { DeckError } from "./errors";
 import { DECK_RULES } from "./rules";
@@ -81,6 +86,43 @@ describe("DECK_RULES (Duel Links)", () => {
   });
 });
 
+describe("banlist (Duel Links)", () => {
+  it("normaliza los estados que devuelve la API de DLM", () => {
+    assert.equal(
+      normalizeBanlistStatus("Forbidden"),
+      "forbidden"
+    );
+
+    assert.equal(
+      normalizeBanlistStatus("Limited 1"),
+      "limited1"
+    );
+
+    assert.equal(
+      normalizeBanlistStatus("Limited 2"),
+      "limited2"
+    );
+
+    assert.equal(
+      normalizeBanlistStatus("Limited 3"),
+      "limited3"
+    );
+
+    assert.equal(
+      normalizeBanlistStatus(null),
+      null
+    );
+  });
+
+  it("traduce el estado a un máximo de copias", () => {
+    assert.equal(getBanlistMaxCopies(null), 3);
+    assert.equal(getBanlistMaxCopies("forbidden"), 0);
+    assert.equal(getBanlistMaxCopies("limited1"), 1);
+    assert.equal(getBanlistMaxCopies("limited2"), 2);
+    assert.equal(getBanlistMaxCopies("limited3"), 3);
+  });
+});
+
 describe("validateDraft", () => {
   it("permite guardar un borrador con 19 cartas pero no publicarlo", () => {
     const result = validateDraft(
@@ -154,6 +196,46 @@ describe("validateDraft", () => {
     assert.ok(
       result.issues.some((issue) =>
         issue.message.includes("3")
+      )
+    );
+  });
+
+  it("rechaza cartas Forbidden y Limited 1 en el borrador", () => {
+    const forbidden = validateDraft([
+      {
+        id: 700,
+        quantity: 1,
+        zone: "main",
+        card: {
+          id: 700,
+          banlistStatus: "forbidden",
+        } as unknown as CardPreviewData,
+      },
+    ]);
+
+    assert.equal(forbidden.canSave, false);
+    assert.ok(
+      forbidden.issues.some((issue) =>
+        issue.message.includes("Forbidden")
+      )
+    );
+
+    const limited = validateDraft([
+      {
+        id: 701,
+        quantity: 2,
+        zone: "main",
+        card: {
+          id: 701,
+          banlistStatus: "limited1",
+        } as unknown as CardPreviewData,
+      },
+    ]);
+
+    assert.equal(limited.canSave, false);
+    assert.ok(
+      limited.issues.some((issue) =>
+        issue.message.includes("Limited 1")
       )
     );
   });
@@ -238,5 +320,58 @@ describe("validateDeckCards", () => {
       () => validateDeckCards(cards, false),
       "3 copies"
     );
+  });
+
+  it("rechaza una carta Forbidden en el mazo", () => {
+    const cards: NormalizedDeckCard[] = [
+      ...normalizedCards("main", 19),
+      {
+        cardId: 500,
+        quantity: 1,
+        zone: "main",
+        banlistStatus: "forbidden",
+      },
+    ];
+
+    expectDeckError(
+      () => validateDeckCards(cards, false),
+      "Forbidden"
+    );
+  });
+
+  it("rechaza 2 copias de una carta Limited 1", () => {
+    const cards: NormalizedDeckCard[] = [
+      ...normalizedCards("main", 18),
+      {
+        cardId: 500,
+        quantity: 2,
+        zone: "main",
+        banlistStatus: "limited1",
+      },
+    ];
+
+    expectDeckError(
+      () => validateDeckCards(cards, false),
+      "Limited 1"
+    );
+  });
+
+  it("permite 2 copias de una carta Limited 2", () => {
+    const cards: NormalizedDeckCard[] = [
+      ...normalizedCards("main", 18),
+      {
+        cardId: 500,
+        quantity: 2,
+        zone: "main",
+        banlistStatus: "limited2",
+      },
+    ];
+
+    const counts = validateDeckCards(
+      cards,
+      false
+    );
+
+    assert.equal(counts.main, 20);
   });
 });

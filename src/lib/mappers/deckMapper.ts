@@ -6,6 +6,8 @@ import type {
 
 import { normalizeDuelFormat } from "@/lib/duelFormat";
 
+import { normalizeBanlistStatus } from "@/lib/banlist";
+
 import type { LinkMarker } from "@/types/card";
 import type {
   DeckCard,
@@ -84,6 +86,10 @@ defense: card.defense,
 
 rarity: card.rarity,
 
+banlistStatus: normalizeBanlistStatus(
+  card.banlistStatus
+),
+
 frameType: card.frameType,
 
 scale: card.scale,
@@ -159,6 +165,10 @@ card: {
 
   rarity:
     deckCard.card.rarity,
+
+  banlistStatus: normalizeBanlistStatus(
+    deckCard.card.banlistStatus
+  ),
 
   frameType:
     deckCard.card.frameType,

@@ -92,6 +92,8 @@ const FEATURED_CARD_SELECT = {
 
   rarity: true,
 
+  banlistStatus: true,
+
   archetype: true,
 
   level: true,

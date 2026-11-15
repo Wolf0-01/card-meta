@@ -81,6 +81,12 @@ model Card {
 
   rarity String?
 
+  /**
+   * Estado en la banlist de Duel Links (Speed Duel).
+   * Valores normalizados: "forbidden" | "limited1" | "limited2" | "limited3".
+   */
+  banlistStatus String?
+
   image String?
 
   description String?
@@ -106,6 +112,7 @@ model Card {
   @@index([name])
   @@index([type])
   @@index([format])
+  @@index([banlistStatus])
 }
 
 model SetMeta {

@@ -1,5 +1,11 @@
 import type { DuelFormat } from "@/lib/duelFormat";
 
+import {
+  getBanlistLabel,
+  getBanlistMaxCopies,
+  type BanlistStatus,
+} from "@/lib/banlist";
+
 import type { CardPreviewData } from "@/types/CardPreviewData";
 
 import type { DeckZone } from "@/types/deck";
@@ -103,7 +109,7 @@ export function addDraftCard(
 
   if (
     getDraftCardCopies(cards, card.id) >=
-    DECK_RULES.maxCopies
+    getBanlistMaxCopies(card.banlistStatus)
   ) {
     return cards;
   }
@@ -193,13 +199,16 @@ export function setDraftCardQuantity(
     current.quantity;
 
   const maxQuantity = Math.min(
-    DECK_RULES.maxCopies -
-      copiesInOtherZones,
+    getBanlistMaxCopies(
+      current.card.banlistStatus
+    ) - copiesInOtherZones,
 
     DECK_ZONE_LIMITS[zone] -
       totalInOtherCards,
 
-    DECK_RULES.maxCopies
+    getBanlistMaxCopies(
+      current.card.banlistStatus
+    )
   );
 
   const nextQuantity = Math.max(
@@ -325,23 +334,59 @@ export function validateDraft(
     number
   >();
 
+  const statusByCard = new Map<
+    number,
+    BanlistStatus | null
+  >();
+
   for (const card of cards) {
     copiesByCard.set(
       card.id,
       (copiesByCard.get(card.id) ?? 0) +
         card.quantity
     );
+
+    if (!statusByCard.has(card.id)) {
+      statusByCard.set(
+        card.id,
+        card.card.banlistStatus ?? null
+      );
+    }
   }
 
   for (const [
     cardId,
     copies,
   ] of copiesByCard) {
-    if (copies > DECK_RULES.maxCopies) {
+    const status =
+      statusByCard.get(cardId) ?? null;
+
+    const maxCopies =
+      getBanlistMaxCopies(status);
+
+    if (maxCopies === 0) {
       issues.push({
         path: "cards",
 
-        message: `You cannot use more than ${DECK_RULES.maxCopies} copies of card #${cardId}`,
+        message: `The card #${cardId} is Forbidden in Duel Links`,
+      });
+
+      continue;
+    }
+
+    if (copies > maxCopies) {
+      issues.push({
+        path: "cards",
+
+        message: status
+          ? `You cannot use more than ${maxCopies} ${
+              maxCopies === 1
+                ? "copy"
+                : "copies"
+            } of card #${cardId} (${getBanlistLabel(
+              status
+            )})`
+          : `You cannot use more than ${maxCopies} copies of card #${cardId}`,
       });
     }
   }

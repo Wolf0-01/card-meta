@@ -75,6 +75,8 @@ const setCardsSelect =
 
     rarity: true,
 
+    banlistStatus: true,
+
     archetype: true,
 
     level: true,

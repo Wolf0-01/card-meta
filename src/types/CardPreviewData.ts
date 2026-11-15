@@ -1,5 +1,7 @@
 import type { DuelFormat } from "@/lib/duelFormat";
 
+import type { BanlistStatus } from "@/lib/banlist";
+
 import type {
 LinkMarker,
 } from "./card";
@@ -24,6 +26,9 @@ attribute: string | null;
 race: string | null;
 
 rarity: string | null;
+
+/** Estado en la banlist de Duel Links, si está limitada. */
+banlistStatus?: BanlistStatus | null;
 
 archetype: string | null;
 

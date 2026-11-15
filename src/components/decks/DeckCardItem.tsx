@@ -19,6 +19,8 @@ import {
   RARITY_STYLES,
 } from "@/components/cards/cardRarity";
 
+import BanlistBadge from "@/components/cards/BanlistBadge";
+
 import { DeckCardInfo } from "@/types/deck";
 
 interface DeckCardItemProps {
@@ -163,6 +165,15 @@ export default function DeckCardItem({
               group-hover:scale-105
             "
           />
+
+          {card.banlistStatus && (
+            <span className="absolute left-1 top-1 z-10">
+              <BanlistBadge
+                status={card.banlistStatus}
+                size="sm"
+              />
+            </span>
+          )}
         </div>
 
         {!compact && card.rarity && (

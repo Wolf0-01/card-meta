@@ -14,6 +14,8 @@ import {
   getAttributeColor,
 } from "@/lib/cardColors";
 
+import BanlistBadge from "./BanlistBadge";
+
 import type {
   CardPreviewData,
 } from "@/types/CardPreviewData";
@@ -162,6 +164,13 @@ export default function CardHoverTooltip({
             onError={() => setFailed(true)}
             className="object-contain"
           />
+
+          <span className="absolute left-1.5 top-1.5 z-10">
+            <BanlistBadge
+              status={card.banlistStatus}
+              size="md"
+            />
+          </span>
         </div>
 
         <div className="min-w-0 flex-1 space-y-2">

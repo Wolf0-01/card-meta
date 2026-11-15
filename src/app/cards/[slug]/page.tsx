@@ -38,6 +38,7 @@ import {
 
 import CardDetailImage from "@/components/cards/CardDetailImage";
 import CardRelated from "@/components/cards/CardRelated";
+import BanlistBadge from "@/components/cards/BanlistBadge";
 
 import {
   normalizeRarity,
@@ -205,6 +206,8 @@ export default async function CardDetailPage({
               race: true,
 
               rarity: true,
+
+              banlistStatus: true,
 
               archetype: true,
 
@@ -440,15 +443,24 @@ export default async function CardDetailPage({
                   image={card.image}
                   name={card.name}
                 />
+
+                {card.banlistStatus && (
+                  <span className="absolute left-2 top-2 z-20">
+                    <BanlistBadge
+                      status={card.banlistStatus}
+                      size="lg"
+                    />
+                  </span>
+                )}
               </div>
 
               <span
                 className={`
                   absolute
+                  bottom-0
                   left-0
-                  top-0
                   z-20
-                  rounded-br-xl
+                  rounded-tr-xl
                   px-2.5
                   py-1
                   text-[11px]

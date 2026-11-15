@@ -152,21 +152,7 @@ export default function DeckArchetypeCard({
           >
             {tier}
           </span>
-        ) : (
-          <span
-            className="
-              mt-1
-              block
-              text-[8px]
-              font-bold
-              uppercase
-              tracking-[0.14em]
-              text-slate-500
-            "
-          >
-            Archetype
-          </span>
-        )}
+        ) : null}
       </span>
 
       <span

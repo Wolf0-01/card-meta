@@ -5,6 +5,11 @@ import {
   type DuelFormat,
 } from "@/lib/duelFormat";
 
+import {
+  normalizeBanlistStatus,
+  type BanlistStatus,
+} from "@/lib/banlist";
+
 import { prisma } from "@/lib/prisma";
 
 import {
@@ -209,13 +214,13 @@ function mapUserDeck(
 async function ensureCardsExist(
   cards: NormalizedDeckCard[],
   format: DuelFormat
-) {
+): Promise<Map<number, BanlistStatus | null>> {
   const uniqueIds = [
     ...new Set(cards.map((card) => card.cardId)),
   ];
 
   if (uniqueIds.length === 0) {
-    return;
+    return new Map();
   }
 
   const found = await prisma.card.findMany({
@@ -229,6 +234,7 @@ async function ensureCardsExist(
       id: true,
       name: true,
       format: true,
+      banlistStatus: true,
     },
   });
 
@@ -275,6 +281,13 @@ async function ensureCardsExist(
       }))
     );
   }
+
+  return new Map(
+    found.map((card) => [
+      card.id,
+      normalizeBanlistStatus(card.banlistStatus),
+    ])
+  );
 }
 
 async function resolveArchetypeId(
@@ -339,6 +352,18 @@ function forbidden() {
   );
 }
 
+function withBanlistStatus(
+  cards: NormalizedDeckCard[],
+  banlistByCard: Map<number, BanlistStatus | null>
+): NormalizedDeckCard[] {
+  return cards.map((card) => ({
+    ...card,
+
+    banlistStatus:
+      banlistByCard.get(card.cardId) ?? null,
+  }));
+}
+
 // ======================================
 // CREATE
 // ======================================
@@ -359,13 +384,16 @@ export async function createUserDeck(
     input.format
   );
 
-  validateDeckCards(
+  const banlistByCard = await ensureCardsExist(
     cards,
-    isPublic,
     format
   );
 
-  await ensureCardsExist(cards, format);
+  validateDeckCards(
+    withBanlistStatus(cards, banlistByCard),
+    isPublic,
+    format
+  );
 
   const archetypeId = await resolveArchetypeId(
     input.archetypeId
@@ -477,13 +505,16 @@ export async function updateUserDeck(
     patch.format ?? existing.format
   );
 
-  validateDeckCards(
+  const banlistByCard = await ensureCardsExist(
     cards,
-    isPublic,
     format
   );
 
-  await ensureCardsExist(cards, format);
+  validateDeckCards(
+    withBanlistStatus(cards, banlistByCard),
+    isPublic,
+    format
+  );
 
   const archetypeId =
     patch.archetypeId !== undefined

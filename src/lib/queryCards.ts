@@ -265,6 +265,8 @@ const cardSelect =
 
     rarity: true,
 
+    banlistStatus: true,
+
     attack: true,
     defense: true,
 

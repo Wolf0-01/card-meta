@@ -18,6 +18,8 @@ import CardHoverTooltip, {
   type TooltipAnchor,
 } from "@/components/cards/CardHoverTooltip";
 
+import BanlistBadge from "@/components/cards/BanlistBadge";
+
 import type { CardPreviewData } from "@/types/CardPreviewData";
 
 import type { DeckZone } from "@/types/deck";
@@ -294,6 +296,15 @@ export default function MiniCardTile({
             "
           >
             {levelLabel}
+          </span>
+        )}
+
+        {card.banlistStatus && (
+          <span className="absolute left-1 top-1 z-10">
+            <BanlistBadge
+              status={card.banlistStatus}
+              size="sm"
+            />
           </span>
         )}
 

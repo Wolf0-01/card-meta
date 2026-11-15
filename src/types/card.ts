@@ -1,5 +1,7 @@
 import type { DuelFormat } from "@/lib/duelFormat";
 
+import type { BanlistStatus } from "@/lib/banlist";
+
 /**
  * Posiciones posibles de las flechas de un Link Monster.
  */
@@ -65,6 +67,9 @@ export interface Card {
   defense: number | null;
 
   rarity: string | null;
+
+  /** Estado en la banlist de Duel Links, si está limitada. */
+  banlistStatus: BanlistStatus | null;
 
   image: string | null;
 

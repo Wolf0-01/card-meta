@@ -2,6 +2,12 @@ import { z } from "zod";
 
 import type { DuelFormat } from "@/lib/duelFormat";
 
+import {
+  getBanlistLabel,
+  getBanlistMaxCopies,
+  type BanlistStatus,
+} from "@/lib/banlist";
+
 import type { DeckZone } from "@/types/deck";
 
 import {
@@ -112,6 +118,9 @@ export interface NormalizedDeckCard {
   cardId: number;
   quantity: number;
   zone: DeckZone;
+
+  /** Estado de banlist resuelto desde la base de datos. */
+  banlistStatus?: BanlistStatus | null;
 }
 
 export interface DeckCounts {
@@ -224,23 +233,59 @@ export function validateDeckCards(
     number
   >();
 
+  const statusByCard = new Map<
+    number,
+    BanlistStatus | null
+  >();
+
   for (const card of cards) {
     copiesByCard.set(
       card.cardId,
       (copiesByCard.get(card.cardId) ??
         0) + card.quantity
     );
+
+    if (!statusByCard.has(card.cardId)) {
+      statusByCard.set(
+        card.cardId,
+        card.banlistStatus ?? null
+      );
+    }
   }
 
   for (const [
     cardId,
     copies,
   ] of copiesByCard) {
-    if (copies > DECK_RULES.maxCopies) {
+    const status =
+      statusByCard.get(cardId) ?? null;
+
+    const maxCopies =
+      getBanlistMaxCopies(status);
+
+    if (maxCopies === 0) {
       issues.push({
         path: "cards",
 
-        message: `You cannot use more than ${DECK_RULES.maxCopies} copies of card #${cardId} (current: ${copies})`,
+        message: `The card #${cardId} is Forbidden in Duel Links`,
+      });
+
+      continue;
+    }
+
+    if (copies > maxCopies) {
+      issues.push({
+        path: "cards",
+
+        message: status
+          ? `You cannot use more than ${maxCopies} ${
+              maxCopies === 1
+                ? "copy"
+                : "copies"
+            } of card #${cardId} (${getBanlistLabel(
+              status
+            )})`
+          : `You cannot use more than ${maxCopies} copies of card #${cardId} (current: ${copies})`,
       });
     }
   }

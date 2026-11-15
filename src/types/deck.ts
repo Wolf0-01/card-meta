@@ -25,6 +25,7 @@ Card,
 | "attack"
 | "defense"
 | "rarity"
+| "banlistStatus"
 | "frameType"
 | "scale"
 | "linkRating"
