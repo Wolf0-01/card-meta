@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import Image from "next/image";
 
+import { useCardArtwork } from "@/components/cards/CardArtworkContext";
+
 interface CardDetailImageProps {
   ygoproId: number | null;
 
@@ -15,21 +17,32 @@ interface CardDetailImageProps {
 /**
  * Imagen principal de la carta.
  *
- * Prioriza el archivo local `/cards/{ygoproId}.jpg` y cae
- * en cascada a `card.image` y al placeholder del catálogo.
+ * Para el arte por defecto prioriza el archivo local
+ * `/cards/{ygoproId}.jpg` y cae en cascada a `card.image` y
+ * al placeholder del catálogo. Cuando se selecciona un arte
+ * alternativo en la galería muestra esa imagen.
  */
 export default function CardDetailImage({
   ygoproId,
   image,
   name,
 }: CardDetailImageProps) {
+  const artwork = useCardArtwork();
+
+  const selected = artwork?.selected;
+
+  const isDefault = selected?.isDefault ?? true;
+
+  const selectedImage =
+    selected?.image ?? image;
+
   const sources = Array.from(
     new Set(
       [
-        ygoproId
+        isDefault && ygoproId
           ? `/cards/${ygoproId}.jpg`
           : null,
-        image,
+        selectedImage,
         "/cards/default.jpg",
       ].filter(
         (value): value is string =>
@@ -38,7 +51,24 @@ export default function CardDetailImage({
     )
   );
 
-  const [index, setIndex] = useState(0);
+  const selectedId =
+    selected?.id ?? "default";
+
+  /*
+   * El índice de respaldo se reinicia al cambiar de arte sin
+   * usar un efecto: solo se conserva mientras el arte
+   * seleccionado sea el mismo.
+   */
+  const [fallback, setFallback] = useState({
+    artId: selectedId,
+
+    index: 0,
+  });
+
+  const index =
+    fallback.artId === selectedId
+      ? fallback.index
+      : 0;
 
   const src =
     sources[
@@ -62,15 +92,17 @@ export default function CardDetailImage({
         fill
         priority
         sizes="(min-width: 768px) 240px, 60vw"
-        unoptimized={index > 0}
+        unoptimized={index > 0 || !isDefault}
         draggable={false}
         onError={() =>
-          setIndex((current) =>
-            Math.min(
-              current + 1,
+          setFallback({
+            artId: selectedId,
+
+            index: Math.min(
+              index + 1,
               sources.length - 1
-            )
-          )
+            ),
+          })
         }
         className="object-cover"
       />
