@@ -287,6 +287,41 @@ const cardSelect =
     updatedAt: true,
   });
 
+/**
+ * Máximo de coincidencias que se ordenan en memoria para
+ * priorizar los nombres exactos y los que empiezan por la
+ * búsqueda. Por encima de este umbral se usa el orden de
+ * la base de datos para no cargar demasiadas filas.
+ */
+const SEARCH_PRIORITY_MAX = 500;
+
+function getSearchRank(
+  name: string,
+  search: string
+): number {
+  const normalizedName = name
+    .trim()
+    .toLowerCase();
+
+  const needle = search
+    .trim()
+    .toLowerCase();
+
+  if (!needle) {
+    return 2;
+  }
+
+  if (normalizedName === needle) {
+    return 0;
+  }
+
+  if (normalizedName.startsWith(needle)) {
+    return 1;
+  }
+
+  return 2;
+}
+
 function shuffleCards<T>(
   cards: T[],
   limit: number
@@ -336,20 +371,68 @@ export async function queryCards(
     direction
   );
 
-  const [cards, total] =
-    await Promise.all([
-      prisma.card.findMany({
+  const total = await prisma.card.count({
+    where,
+  });
+
+  const searchTerm = options.search?.trim() ?? "";
+
+  /*
+   * Las coincidencias exactas y las que empiezan por el
+   * término se muestran primero, conservando el orden
+   * elegido dentro de cada grupo. Se pagina en memoria
+   * para que el orden sea consistente entre páginas.
+   */
+  if (
+    !random &&
+    searchTerm.length > 0 &&
+    total > 0 &&
+    total <= SEARCH_PRIORITY_MAX
+  ) {
+    const matching =
+      await prisma.card.findMany({
         where,
-        skip: random ? undefined : skip,
-        take: pageSize,
+        take: SEARCH_PRIORITY_MAX,
         orderBy,
         select: cardSelect,
-      }),
+      });
 
-      prisma.card.count({
-        where,
-      }),
-    ]);
+    const ordered = matching
+      .map((card) => ({
+        card,
+        rank: getSearchRank(
+          card.name,
+          searchTerm
+        ),
+      }))
+      .sort((a, b) => a.rank - b.rank)
+      .map(({ card }) => card);
+
+    const pageCards = ordered.slice(
+      skip,
+      skip + pageSize
+    );
+
+    return {
+      cards: pageCards.map(mapPrismaCard),
+
+      total,
+
+      page: currentPage,
+
+      pageSize,
+
+      pages: Math.ceil(total / pageSize),
+    };
+  }
+
+  const cards = await prisma.card.findMany({
+    where,
+    skip: random ? undefined : skip,
+    take: pageSize,
+    orderBy,
+    select: cardSelect,
+  });
 
   let finalCards: Card[] =
     cards.map(mapPrismaCard);

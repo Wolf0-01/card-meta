@@ -5,6 +5,8 @@ import {
 
 import Link from "next/link";
 
+import Image from "next/image";
+
 import {
   ArrowLeft,
   BookOpen,
@@ -172,6 +174,25 @@ export default async function CardDetailPage({
 
   const card =
     mapPrismaCard(prismaCard);
+
+  const altArts =
+    await prisma.cardAltArt.findMany({
+      where: {
+        cardId: prismaCard.id,
+      },
+
+      orderBy: [
+        { isDefault: "desc" },
+        { createdAt: "asc" },
+      ],
+
+      select: {
+        id: true,
+        dlmId: true,
+        image: true,
+        isDefault: true,
+      },
+    });
 
   const related: CardPreviewData[] =
     card.archetype
@@ -827,6 +848,100 @@ export default async function CardDetailPage({
             </div>
           </div>
         </article>
+
+        {altArts.length > 0 && (
+          <section
+            className="
+              rounded-2xl
+              border
+              border-slate-700/60
+              bg-[#0B132B]
+              p-5
+              sm:p-6
+            "
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2
+                className="
+                  text-[11px]
+                  font-black
+                  uppercase
+                  tracking-[0.2em]
+                  text-slate-300
+                "
+              >
+                Artworks
+              </h2>
+
+              <span className="text-[11px] font-semibold text-slate-500">
+                {altArts.length}{" "}
+                {altArts.length === 1
+                  ? "version"
+                  : "versions"}{" "}
+                available
+              </span>
+            </div>
+
+            <ul
+              className="
+                mt-3
+                grid
+                grid-cols-2
+                gap-3
+                sm:grid-cols-3
+                md:grid-cols-4
+              "
+            >
+              {altArts.map((art, index) => (
+                <li key={art.id}>
+                  <figure>
+                    <div
+                      className="
+                        relative
+                        aspect-[59/86]
+                        overflow-hidden
+                        rounded-lg
+                        border
+                        border-slate-600/70
+                        bg-slate-900
+                      "
+                    >
+                      <Image
+                        src={art.image}
+                        alt={
+                          art.isDefault
+                            ? card.name
+                            : `${card.name} alternate art ${index}`
+                        }
+                        fill
+                        sizes="(min-width: 768px) 180px, 45vw"
+                        draggable={false}
+                        className="object-cover"
+                      />
+                    </div>
+
+                    <figcaption
+                      className="
+                        mt-1.5
+                        truncate
+                        text-center
+                        text-[10px]
+                        font-semibold
+                        uppercase
+                        tracking-[0.12em]
+                        text-slate-500
+                      "
+                    >
+                      {art.isDefault
+                        ? "Default art"
+                        : `Alternate art ${index}`}
+                    </figcaption>
+                  </figure>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <CardRelated
           title="Related cards"

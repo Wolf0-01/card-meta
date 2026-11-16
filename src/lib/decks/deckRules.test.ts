@@ -8,9 +8,14 @@ import type { DraftCard } from "@/types/deck-draft";
 import {
   getBanlistMaxCopies,
   normalizeBanlistStatus,
+  type BanlistStatus,
 } from "@/lib/banlist";
 
-import { validateDraft } from "./draft";
+import {
+  addDraftCard,
+  getDraftAddIssue,
+  validateDraft,
+} from "./draft";
 import { DeckError } from "./errors";
 import { DECK_RULES } from "./rules";
 import {
@@ -59,6 +64,17 @@ function expectDeckError(
       issue.message.includes(expectedText)
     );
   });
+}
+
+function previewCard(
+  id: number,
+  banlistStatus?: BanlistStatus | null
+): CardPreviewData {
+  return {
+    id,
+    name: `Card ${id}`,
+    banlistStatus,
+  } as unknown as CardPreviewData;
 }
 
 describe("DECK_RULES (Duel Links)", () => {
@@ -373,5 +389,186 @@ describe("validateDeckCards", () => {
     );
 
     assert.equal(counts.main, 20);
+  });
+});
+
+describe("banlist compartida por grupo", () => {
+  it("suma las copias Limited 1 de Main y Extra", () => {
+    const result = validateDraft([
+      {
+        id: 1,
+        quantity: 1,
+        zone: "main",
+        card: previewCard(1, "limited1"),
+      },
+      {
+        id: 2,
+        quantity: 1,
+        zone: "extra",
+        card: previewCard(2, "limited1"),
+      },
+    ]);
+
+    assert.equal(result.canSave, false);
+
+    assert.ok(
+      result.issues.some((issue) =>
+        issue.message.includes(
+          "only 1 card total from the Limited 1 list"
+        )
+      )
+    );
+  });
+
+  it("permite completar el cupo Limited 2 y bloquea el exceso", () => {
+    const allowed = validateDraft([
+      {
+        id: 1,
+        quantity: 1,
+        zone: "main",
+        card: previewCard(1, "limited2"),
+      },
+      {
+        id: 2,
+        quantity: 1,
+        zone: "extra",
+        card: previewCard(2, "limited2"),
+      },
+    ]);
+
+    assert.equal(allowed.canSave, true);
+
+    const exceeded = validateDraft([
+      {
+        id: 1,
+        quantity: 1,
+        zone: "main",
+        card: previewCard(1, "limited2"),
+      },
+      {
+        id: 2,
+        quantity: 1,
+        zone: "extra",
+        card: previewCard(2, "limited2"),
+      },
+      {
+        id: 3,
+        quantity: 1,
+        zone: "main",
+        card: previewCard(3, "limited2"),
+      },
+    ]);
+
+    assert.equal(exceeded.canSave, false);
+
+    assert.ok(
+      exceeded.issues.some((issue) =>
+        issue.message.includes(
+          "only 2 cards total from the Limited 2 list"
+        )
+      )
+    );
+  });
+
+  it("bloquea añadir Limited 1 cuando el cupo compartido está lleno", () => {
+    const cards = addDraftCard(
+      [],
+      previewCard(1, "limited1"),
+      "main"
+    );
+
+    assert.equal(cards.length, 1);
+
+    const issue = getDraftAddIssue(
+      cards,
+      previewCard(2, "limited1"),
+      "extra"
+    );
+
+    assert.ok(
+      issue?.includes(
+        "only 1 card total from the Limited 1 list"
+      )
+    );
+
+    assert.deepEqual(
+      addDraftCard(
+        cards,
+        previewCard(2, "limited1"),
+        "extra"
+      ),
+      cards
+    );
+  });
+
+  it("permite añadir dos Limited 2 distintas y bloquea la tercera", () => {
+    const first = addDraftCard(
+      [],
+      previewCard(1, "limited2"),
+      "main"
+    );
+
+    const second = addDraftCard(
+      first,
+      previewCard(2, "limited2"),
+      "extra"
+    );
+
+    assert.equal(second.length, 2);
+
+    const issue = getDraftAddIssue(
+      second,
+      previewCard(3, "limited2"),
+      "main"
+    );
+
+    assert.ok(
+      issue?.includes(
+        "only 2 cards total from the Limited 2 list"
+      )
+    );
+  });
+
+  it("bloquea añadir una carta Forbidden", () => {
+    const issue = getDraftAddIssue(
+      [],
+      previewCard(9, "forbidden"),
+      "main"
+    );
+
+    assert.ok(issue?.includes("Forbidden"));
+
+    assert.equal(
+      addDraftCard(
+        [],
+        previewCard(9, "forbidden"),
+        "main"
+      ).length,
+      0
+    );
+  });
+
+  it("aplica el cupo compartido en el servidor", () => {
+    expectDeckError(
+      () =>
+        validateDeckCards(
+          [
+            {
+              cardId: 1,
+              quantity: 1,
+              zone: "main",
+              banlistStatus: "limited1",
+            },
+            {
+              cardId: 2,
+              quantity: 1,
+              zone: "extra",
+              banlistStatus: "limited1",
+            },
+          ],
+          false
+        ),
+      "only 1 card total from the Limited 1 list"
+    );
   });
 });

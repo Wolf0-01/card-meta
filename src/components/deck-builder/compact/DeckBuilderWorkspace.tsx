@@ -92,6 +92,10 @@ export default function DeckBuilderWorkspace({
     string | null
   >(null);
 
+  const [notice, setNotice] = useState<
+    string | null
+  >(null);
+
   const cardsByZone = useMemo(
     () => ({
       main: draft.cards.filter(
@@ -170,7 +174,9 @@ export default function DeckBuilderWorkspace({
     card: CardPreviewData,
     zone?: DeckZone
   ) {
-    draft.addCard(card, zone);
+    const issue = draft.addCard(card, zone);
+
+    setNotice(issue);
 
     setError(null);
   }
@@ -554,6 +560,48 @@ export default function DeckBuilderWorkspace({
             "
           >
             {error}
+          </div>
+        )}
+
+        {notice && (
+          <div
+            role="status"
+            className="
+              mb-4
+              mx-auto
+              flex
+              max-w-[1000px]
+              items-start
+              justify-between
+              gap-3
+              rounded-xl
+              border
+              border-amber-500/40
+              bg-amber-500/10
+              px-3
+              py-2
+              text-xs
+              text-amber-100
+            "
+          >
+            <p className="min-w-0">{notice}</p>
+
+            <button
+              type="button"
+              onClick={() => setNotice(null)}
+              aria-label="Dismiss notice"
+              className="
+                shrink-0
+                rounded
+                px-1
+                font-black
+                text-amber-300
+                transition-colors
+                hover:text-white
+              "
+            >
+              ×
+            </button>
           </div>
         )}
 

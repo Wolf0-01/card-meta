@@ -90,3 +90,37 @@ export function getBanlistLabel(
       return "Limited 3";
   }
 }
+
+/**
+ * Estados que comparten un cupo global en Duel Links:
+ * todas las cartas de un mismo grupo suman entre sí,
+ * sin importar la zona (Main o Extra).
+ */
+export const BANLIST_GROUP_STATUSES: BanlistStatus[] =
+  [
+    "forbidden",
+    "limited1",
+    "limited2",
+    "limited3",
+  ];
+
+/**
+ * Explica en inglés el cupo compartido de un grupo de
+ * la banlist, para mostrarlo al usuario cuando una
+ * acción supera el límite.
+ */
+export function describeBanlistGroupLimit(
+  status: BanlistStatus
+): string {
+  const limit = getBanlistMaxCopies(status);
+
+  const label = getBanlistLabel(status);
+
+  if (limit === 0) {
+    return "Forbidden cards cannot be used in Duel Links decks";
+  }
+
+  return `Duel Links allows only ${limit} ${
+    limit === 1 ? "card" : "cards"
+  } total from the ${label} list`;
+}

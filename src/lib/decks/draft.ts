@@ -1,6 +1,8 @@
 import type { DuelFormat } from "@/lib/duelFormat";
 
 import {
+  BANLIST_GROUP_STATUSES,
+  describeBanlistGroupLimit,
   getBanlistLabel,
   getBanlistMaxCopies,
   type BanlistStatus,
@@ -46,6 +48,36 @@ export function getDraftCardCopies(
         : total,
     0
   );
+}
+
+/**
+ * Suma las copias de todas las cartas que comparten un
+ * mismo grupo de la banlist, sumando Main y Extra. En
+ * Duel Links el cupo es global por grupo, no por carta.
+ */
+export function getDraftBanlistGroupTotal(
+  cards: DraftCard[],
+  status: BanlistStatus,
+  exclude?: {
+    cardId: number;
+    zone: DeckZone;
+  }
+): number {
+  return cards.reduce((total, card) => {
+    if (card.card.banlistStatus !== status) {
+      return total;
+    }
+
+    if (
+      exclude &&
+      card.id === exclude.cardId &&
+      card.zone === exclude.zone
+    ) {
+      return total;
+    }
+
+    return total + card.quantity;
+  }, 0);
 }
 
 export function getDraftStats(
@@ -96,6 +128,152 @@ export function getDefaultDraftZone(
   return "main";
 }
 
+function describeDraftZoneLimit(
+  zone: DeckZone
+): string {
+  return zone === "extra"
+    ? `The Extra Deck cannot exceed ${DECK_ZONE_LIMITS.extra} cards`
+    : `The Main Deck cannot exceed ${DECK_ZONE_LIMITS.main} cards`;
+}
+
+function describeDraftCardLimit(
+  card: CardPreviewData,
+  maxCopies: number
+): string {
+  return `${card.name}: you cannot use more than ${maxCopies} ${
+    maxCopies === 1 ? "copy" : "copies"
+  } of the same card`;
+}
+
+/**
+ * Explica por qué no se puede añadir una carta al
+ * borrador. Devuelve `null` cuando la acción es válida.
+ */
+export function getDraftAddIssue(
+  cards: DraftCard[],
+  card: CardPreviewData,
+  zone?: DeckZone,
+  format: DuelFormat = "speed"
+): string | null {
+  const targetZone =
+    format === "rush"
+      ? "main"
+      : zone ?? getDefaultDraftZone(card, format);
+
+  const status = card.banlistStatus ?? null;
+
+  const maxCopies = getBanlistMaxCopies(status);
+
+  if (maxCopies === 0) {
+    return `${card.name} is Forbidden in Duel Links decks`;
+  }
+
+  if (status) {
+    const groupTotal =
+      getDraftBanlistGroupTotal(cards, status);
+
+    if (groupTotal + 1 > maxCopies) {
+      return `${card.name}: ${describeBanlistGroupLimit(
+        status
+      )}`;
+    }
+  }
+
+  if (
+    getDraftCardCopies(cards, card.id) >=
+    maxCopies
+  ) {
+    return describeDraftCardLimit(
+      card,
+      maxCopies
+    );
+  }
+
+  if (
+    getDraftZoneTotal(cards, targetZone) >=
+    DECK_ZONE_LIMITS[targetZone]
+  ) {
+    return describeDraftZoneLimit(targetZone);
+  }
+
+  return null;
+}
+
+/**
+ * Explica por qué no se puede subir la cantidad de una
+ * carta ya presente en el borrador. Devuelve `null`
+ * cuando la cantidad solicitada es válida (o menor).
+ */
+export function getDraftQuantityIssue(
+  cards: DraftCard[],
+  cardId: number,
+  zone: DeckZone,
+  quantity: number
+): string | null {
+  const current = cards.find(
+    (card) =>
+      card.id === cardId &&
+      card.zone === zone
+  );
+
+  if (!current) {
+    return null;
+  }
+
+  const requested = Math.floor(quantity);
+
+  if (requested <= current.quantity) {
+    return null;
+  }
+
+  const status =
+    current.card.banlistStatus ?? null;
+
+  const maxCopies = getBanlistMaxCopies(status);
+
+  const copiesInOtherZones =
+    getDraftCardCopies(cards, cardId) -
+    current.quantity;
+
+  if (requested + copiesInOtherZones > maxCopies) {
+    return describeDraftCardLimit(
+      current.card,
+      maxCopies
+    );
+  }
+
+  if (status) {
+    const groupInOtherCards =
+      getDraftBanlistGroupTotal(
+        cards,
+        status,
+        {
+          cardId,
+          zone,
+        }
+      );
+
+    if (requested + groupInOtherCards > maxCopies) {
+      return `${current.card.name}: ${describeBanlistGroupLimit(
+        status
+      )}`;
+    }
+  }
+
+  const totalInOtherCards =
+    getDraftZoneTotal(cards, zone) -
+    current.quantity;
+
+  if (
+    requested + totalInOtherCards >
+    DECK_ZONE_LIMITS[zone]
+  ) {
+    return describeDraftZoneLimit(zone);
+  }
+
+  return null;
+}
+
 export function addDraftCard(
   cards: DraftCard[],
   card: CardPreviewData,
@@ -107,17 +285,7 @@ export function addDraftCard(
       ? "main"
       : zone ?? getDefaultDraftZone(card);
 
-  if (
-    getDraftCardCopies(cards, card.id) >=
-    getBanlistMaxCopies(card.banlistStatus)
-  ) {
-    return cards;
-  }
-
-  if (
-    getDraftZoneTotal(cards, targetZone) >=
-    DECK_ZONE_LIMITS[targetZone]
-  ) {
+  if (getDraftAddIssue(cards, card, zone, format)) {
     return cards;
   }
 
@@ -198,16 +366,29 @@ export function setDraftCardQuantity(
     getDraftZoneTotal(cards, zone) -
     current.quantity;
 
-  const maxQuantity = Math.min(
-    getBanlistMaxCopies(
-      current.card.banlistStatus
-    ) - copiesInOtherZones,
+  const status =
+    current.card.banlistStatus ?? null;
 
-    DECK_ZONE_LIMITS[zone] -
-      totalInOtherCards,
+  const maxCopies = getBanlistMaxCopies(status);
 
-    getBanlistMaxCopies(
-      current.card.banlistStatus
+  const groupInOtherCards = status
+    ? getDraftBanlistGroupTotal(
+        cards,
+        status,
+        {
+          cardId,
+          zone,
+        }
+      )
+    : 0;
+
+  const maxQuantity = Math.max(
+    0,
+    Math.min(
+      maxCopies - copiesInOtherZones,
+      maxCopies - groupInOtherCards,
+      DECK_ZONE_LIMITS[zone] -
+        totalInOtherCards
     )
   );
 
@@ -339,6 +520,10 @@ export function validateDraft(
     BanlistStatus | null
   >();
 
+  const statusesWithCardIssue = new Set<
+    BanlistStatus
+  >();
+
   for (const card of cards) {
     copiesByCard.set(
       card.id,
@@ -371,6 +556,10 @@ export function validateDraft(
         message: `The card #${cardId} is Forbidden in Duel Links`,
       });
 
+      if (status) {
+        statusesWithCardIssue.add(status);
+      }
+
       continue;
     }
 
@@ -387,6 +576,41 @@ export function validateDraft(
               status
             )})`
           : `You cannot use more than ${maxCopies} copies of card #${cardId}`,
+      });
+
+      if (status) {
+        statusesWithCardIssue.add(status);
+      }
+    }
+  }
+
+  /*
+   * Duel Links comparte el cupo entre todas las cartas de
+   * un mismo grupo de la banlist (Main + Extra). Solo se
+   * avisa del grupo cuando ninguna carta concreta lo
+   * explica ya, para no duplicar mensajes.
+   */
+  for (const status of BANLIST_GROUP_STATUSES) {
+    if (
+      status === "forbidden" ||
+      statusesWithCardIssue.has(status)
+    ) {
+      continue;
+    }
+
+    const groupTotal =
+      getDraftBanlistGroupTotal(cards, status);
+
+    const maxCopies =
+      getBanlistMaxCopies(status);
+
+    if (groupTotal > maxCopies) {
+      issues.push({
+        path: "cards",
+
+        message: `${describeBanlistGroupLimit(
+          status
+        )} (current: ${groupTotal})`,
       });
     }
   }

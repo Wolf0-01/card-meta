@@ -21,6 +21,8 @@ import type { DraftCard } from "@/types/deck-draft";
 import {
   addDraftCard,
   clearDraftCards,
+  getDraftAddIssue,
+  getDraftQuantityIssue,
   getDraftStats,
   moveDraftCard,
   removeDraftCard,
@@ -310,7 +312,18 @@ export default function useDeckDraft({
   function addCard(
     card: CardPreviewData,
     zone?: DeckZone
-  ) {
+  ): string | null {
+    const issue = getDraftAddIssue(
+      cards,
+      card,
+      zone,
+      format
+    );
+
+    if (issue) {
+      return issue;
+    }
+
     setCards((current) =>
       addDraftCard(
         current,
@@ -319,6 +332,8 @@ export default function useDeckDraft({
         format
       )
     );
+
+    return null;
   }
 
   function removeCard(
@@ -338,7 +353,18 @@ export default function useDeckDraft({
     cardId: number,
     zone: DeckZone,
     quantity: number
-  ) {
+  ): string | null {
+    const issue = getDraftQuantityIssue(
+      cards,
+      cardId,
+      zone,
+      quantity
+    );
+
+    if (issue) {
+      return issue;
+    }
+
     setCards((current) =>
       setDraftCardQuantity(
         current,
@@ -347,6 +373,8 @@ export default function useDeckDraft({
         quantity
       )
     );
+
+    return null;
   }
 
   function moveCard(

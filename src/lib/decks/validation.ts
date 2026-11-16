@@ -3,6 +3,8 @@ import { z } from "zod";
 import type { DuelFormat } from "@/lib/duelFormat";
 
 import {
+  BANLIST_GROUP_STATUSES,
+  describeBanlistGroupLimit,
   getBanlistLabel,
   getBanlistMaxCopies,
   type BanlistStatus,
@@ -118,6 +120,9 @@ export interface NormalizedDeckCard {
   cardId: number;
   quantity: number;
   zone: DeckZone;
+
+  /** Nombre resuelto desde la base de datos (para avisos). */
+  name?: string | null;
 
   /** Estado de banlist resuelto desde la base de datos. */
   banlistStatus?: BanlistStatus | null;
@@ -238,6 +243,15 @@ export function validateDeckCards(
     BanlistStatus | null
   >();
 
+  const nameByCard = new Map<
+    number,
+    string | null
+  >();
+
+  const statusesWithCardIssue = new Set<
+    BanlistStatus
+  >();
+
   for (const card of cards) {
     copiesByCard.set(
       card.cardId,
@@ -251,6 +265,13 @@ export function validateDeckCards(
         card.banlistStatus ?? null
       );
     }
+
+    if (!nameByCard.has(card.cardId)) {
+      nameByCard.set(
+        card.cardId,
+        card.name ?? null
+      );
+    }
   }
 
   for (const [
@@ -260,6 +281,13 @@ export function validateDeckCards(
     const status =
       statusByCard.get(cardId) ?? null;
 
+    const name =
+      nameByCard.get(cardId) ?? null;
+
+    const label = name
+      ? `"${name}"`
+      : `#${cardId}`;
+
     const maxCopies =
       getBanlistMaxCopies(status);
 
@@ -267,8 +295,12 @@ export function validateDeckCards(
       issues.push({
         path: "cards",
 
-        message: `The card #${cardId} is Forbidden in Duel Links`,
+        message: `The card ${label} is Forbidden in Duel Links`,
       });
+
+      if (status) {
+        statusesWithCardIssue.add(status);
+      }
 
       continue;
     }
@@ -282,10 +314,63 @@ export function validateDeckCards(
               maxCopies === 1
                 ? "copy"
                 : "copies"
-            } of card #${cardId} (${getBanlistLabel(
+            } of card ${label} (${getBanlistLabel(
               status
             )})`
-          : `You cannot use more than ${maxCopies} copies of card #${cardId} (current: ${copies})`,
+          : `You cannot use more than ${maxCopies} copies of card ${label} (current: ${copies})`,
+      });
+
+      if (status) {
+        statusesWithCardIssue.add(status);
+      }
+    }
+  }
+
+  /*
+   * Cupo global por grupo de la banlist: todas las cartas
+   * de un mismo grupo suman entre Main y Extra.
+   */
+  const groupTotals = new Map<
+    BanlistStatus,
+    number
+  >();
+
+  for (const card of cards) {
+    const status =
+      card.banlistStatus ?? null;
+
+    if (!status) {
+      continue;
+    }
+
+    groupTotals.set(
+      status,
+      (groupTotals.get(status) ?? 0) +
+        card.quantity
+    );
+  }
+
+  for (const status of BANLIST_GROUP_STATUSES) {
+    if (
+      status === "forbidden" ||
+      statusesWithCardIssue.has(status)
+    ) {
+      continue;
+    }
+
+    const groupTotal =
+      groupTotals.get(status) ?? 0;
+
+    const maxCopies =
+      getBanlistMaxCopies(status);
+
+    if (groupTotal > maxCopies) {
+      issues.push({
+        path: "cards",
+
+        message: `${describeBanlistGroupLimit(
+          status
+        )} (current: ${groupTotal})`,
       });
     }
   }

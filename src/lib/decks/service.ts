@@ -211,10 +211,15 @@ function mapUserDeck(
   };
 }
 
+interface ResolvedCardInfo {
+  banlistStatus: BanlistStatus | null;
+  name: string;
+}
+
 async function ensureCardsExist(
   cards: NormalizedDeckCard[],
   format: DuelFormat
-): Promise<Map<number, BanlistStatus | null>> {
+): Promise<Map<number, ResolvedCardInfo>> {
   const uniqueIds = [
     ...new Set(cards.map((card) => card.cardId)),
   ];
@@ -285,7 +290,12 @@ async function ensureCardsExist(
   return new Map(
     found.map((card) => [
       card.id,
-      normalizeBanlistStatus(card.banlistStatus),
+      {
+        banlistStatus: normalizeBanlistStatus(
+          card.banlistStatus
+        ),
+        name: card.name,
+      },
     ])
   );
 }
@@ -354,14 +364,22 @@ function forbidden() {
 
 function withBanlistStatus(
   cards: NormalizedDeckCard[],
-  banlistByCard: Map<number, BanlistStatus | null>
+  banlistByCard: Map<number, ResolvedCardInfo>
 ): NormalizedDeckCard[] {
-  return cards.map((card) => ({
-    ...card,
+  return cards.map((card) => {
+    const info = banlistByCard.get(
+      card.cardId
+    );
 
-    banlistStatus:
-      banlistByCard.get(card.cardId) ?? null,
-  }));
+    return {
+      ...card,
+
+      banlistStatus:
+        info?.banlistStatus ?? null,
+
+      name: info?.name ?? null,
+    };
+  });
 }
 
 // ======================================

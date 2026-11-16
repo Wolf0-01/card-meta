@@ -109,10 +109,40 @@ model Card {
 
   deckCards DeckCard[]
 
+  altArts CardAltArt[]
+
   @@index([name])
   @@index([type])
   @@index([format])
   @@index([banlistStatus])
+}
+
+/// Artes alternativos oficiales de una carta, importados
+/// desde Duel Links Meta. La imagen base sigue viviendo en
+/// `Card.image`; aquí se guardan todas las variantes.
+model CardAltArt {
+  id String @id @default(cuid())
+
+  cardId Int
+
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  /// Identificador del arte en Duel Links Meta.
+  dlmId String @unique
+
+  /// Konami ID del arte (varias variantes pueden compartirlo).
+  konamiId String?
+
+  image String
+
+  /// `true` para el arte base de la carta.
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@index([cardId])
 }
 
 model SetMeta {
