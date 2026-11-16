@@ -74,6 +74,8 @@ export interface TournamentEvent {
 
   format: string;
 
+  bannerUrl: string | null;
+
   placements: TournamentPlacement[];
 
   champion: TournamentPlacement;
@@ -328,6 +330,8 @@ export const getTournamentData = cache(
           players: tournament.playerCount,
 
           format: tournament.format,
+
+          bannerUrl: tournament.bannerUrl,
 
           placements,
 

@@ -62,17 +62,48 @@ export default function TournamentResultCard({
     >
       <header
         className="
-          flex
-          flex-wrap
-          items-center
-          gap-2
+          overflow-hidden
           border-b
           border-slate-700/50
           bg-[#0A1128]
-          px-3
-          py-2.5
         "
       >
+        {event.bannerUrl && (
+          <div className="relative h-24 w-full overflow-hidden bg-slate-900">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={event.bannerUrl}
+              alt={`${event.name} banner`}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              className="h-full w-full object-cover"
+            />
+
+            <span
+              aria-hidden
+              className="
+                pointer-events-none
+                absolute
+                inset-0
+                bg-gradient-to-t
+                from-[#0A1128]
+                via-[#0A1128]/30
+                to-transparent
+              "
+            />
+          </div>
+        )}
+
+        <div
+          className="
+            flex
+            flex-wrap
+            items-center
+            gap-2
+            px-3
+            py-2.5
+          "
+        >
         <span
           aria-hidden
           className="
@@ -202,6 +233,7 @@ export default function TournamentResultCard({
             slug={event.slug}
           />
         )}
+        </div>
       </header>
 
       <div className="space-y-2 p-2.5">

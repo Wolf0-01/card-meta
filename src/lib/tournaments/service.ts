@@ -273,10 +273,42 @@ function toEditorData(
       .toISOString()
       .slice(0, 10),
 
+    bannerUrl: tournament.bannerUrl ?? "",
+
     standings: parseEditorStandings(
       tournament.standings
     ),
   };
+}
+
+/**
+ * Banners ya usados en otros torneos, para reutilizarlos
+ * desde el editor sin tener que pegar la URL otra vez.
+ */
+export async function getTournamentBannerOptions(): Promise<
+  string[]
+> {
+  const rows = await prisma.tournament.findMany({
+    where: {
+      bannerUrl: {
+        not: null,
+      },
+    },
+
+    select: {
+      bannerUrl: true,
+    },
+
+    distinct: ["bannerUrl"],
+
+    orderBy: {
+      bannerUrl: "asc",
+    },
+  });
+
+  return rows.flatMap((row) =>
+    row.bannerUrl ? [row.bannerUrl] : []
+  );
 }
 
 export async function getTournamentDeckOptions(): Promise<
@@ -367,6 +399,8 @@ export async function createTournament(
 
       date: parseDate(input.date),
 
+      bannerUrl: input.bannerUrl?.trim() || null,
+
       standings: buildStandings(standings),
     },
 
@@ -445,6 +479,11 @@ export async function updateTournament(
       date: patch.date
         ? parseDate(patch.date)
         : existing.date,
+
+      bannerUrl:
+        patch.bannerUrl === undefined
+          ? existing.bannerUrl
+          : patch.bannerUrl?.trim() || null,
 
       standings: standings
         ? buildStandings(standings)

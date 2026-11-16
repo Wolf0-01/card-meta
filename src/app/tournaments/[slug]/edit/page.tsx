@@ -12,6 +12,7 @@ import { getCurrentUser } from "@/lib/auth/currentUser";
 import { canManageGuides } from "@/lib/auth/roles";
 
 import {
+  getTournamentBannerOptions,
   getTournamentDeckOptions,
   getTournamentForEditorBySlug,
 } from "@/lib/tournaments/service";
@@ -46,12 +47,17 @@ export default async function EditTournamentPage({
     redirect("/tournaments");
   }
 
-  const [tournament, deckOptions] =
-    await Promise.all([
-      getTournamentForEditorBySlug(slug),
+  const [
+    tournament,
+    deckOptions,
+    bannerOptions,
+  ] = await Promise.all([
+    getTournamentForEditorBySlug(slug),
 
-      getTournamentDeckOptions(),
-    ]);
+    getTournamentDeckOptions(),
+
+    getTournamentBannerOptions(),
+  ]);
 
   if (!tournament) {
     notFound();
@@ -62,6 +68,7 @@ export default async function EditTournamentPage({
       mode="edit"
       initialTournament={tournament}
       deckOptions={deckOptions}
+      bannerOptions={bannerOptions}
     />
   );
 }

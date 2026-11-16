@@ -8,7 +8,10 @@ import { getCurrentUser } from "@/lib/auth/currentUser";
 
 import { canManageGuides } from "@/lib/auth/roles";
 
-import { getTournamentDeckOptions } from "@/lib/tournaments/service";
+import {
+  getTournamentBannerOptions,
+  getTournamentDeckOptions,
+} from "@/lib/tournaments/service";
 
 export const metadata: Metadata = {
   title: "Add Tournament | Card Meta",
@@ -28,13 +31,18 @@ export default async function NewTournamentPage() {
     redirect("/tournaments");
   }
 
-  const deckOptions =
-    await getTournamentDeckOptions();
+  const [deckOptions, bannerOptions] =
+    await Promise.all([
+      getTournamentDeckOptions(),
+
+      getTournamentBannerOptions(),
+    ]);
 
   return (
     <TournamentEditor
       mode="create"
       deckOptions={deckOptions}
+      bannerOptions={bannerOptions}
     />
   );
 }

@@ -23,6 +23,8 @@ export interface TournamentEditorData {
 
   date: string;
 
+  bannerUrl: string;
+
   standings: TournamentEditorStanding[];
 }
 

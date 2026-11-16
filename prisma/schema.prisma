@@ -319,6 +319,9 @@ model Tournament {
 
   date DateTime
 
+  /// Banner opcional mostrado en la cabecera de la tarjeta del torneo.
+  bannerUrl String?
+
   standings Json
 
   createdAt DateTime @default(now())

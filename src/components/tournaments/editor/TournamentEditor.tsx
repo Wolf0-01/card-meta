@@ -86,6 +86,8 @@ interface TournamentEditorProps {
   initialTournament?: TournamentEditorData;
 
   deckOptions: TournamentDeckOption[];
+
+  bannerOptions: string[];
 }
 
 function todayIsoDate() {
@@ -129,6 +131,7 @@ export default function TournamentEditor({
   mode,
   initialTournament,
   deckOptions,
+  bannerOptions,
 }: TournamentEditorProps) {
   const router = useRouter();
 
@@ -152,6 +155,11 @@ export default function TournamentEditor({
   const [date, setDate] = useState(
     initialTournament?.date ?? todayIsoDate()
   );
+
+  const [bannerUrl, setBannerUrl] =
+    useState(
+      initialTournament?.bannerUrl ?? ""
+    );
 
   const [standings, setStandings] = useState<
     DraftStanding[]
@@ -311,6 +319,8 @@ export default function TournamentEditor({
 
             date,
 
+            bannerUrl: bannerUrl.trim(),
+
             standings: payloadStandings,
           }),
         }
@@ -395,18 +405,6 @@ export default function TournamentEditor({
             <ArrowLeft className="h-3 w-3" />
             Back to Tournaments
           </Link>
-
-          <span
-            className="
-              text-[9px]
-              font-bold
-              uppercase
-              tracking-[0.16em]
-              text-slate-500
-            "
-          >
-            Card Meta · Competitive
-          </span>
         </div>
 
         <header className="space-y-1.5">
@@ -610,6 +608,50 @@ export default function TournamentEditor({
                     `}
                   />
                 </div>
+              </label>
+
+              <label className="space-y-0.5 lg:col-span-2">
+                <span className={labelClass}>
+                  Banner URL (optional)
+                </span>
+
+                <input
+                  type="url"
+                  list="tournament-banner-options"
+                  value={bannerUrl}
+                  onChange={(event) =>
+                    setBannerUrl(event.target.value)
+                  }
+                  placeholder="https://example.com/banner.webp"
+                  className={inputClass}
+                />
+
+                <datalist id="tournament-banner-options">
+                  {bannerOptions.map((option) => (
+                    <option
+                      key={option}
+                      value={option}
+                    />
+                  ))}
+                </datalist>
+
+                <span className="mt-1 block text-[9px] leading-relaxed text-slate-500">
+                  Pick a banner already used by another
+                  tournament or paste a public image URL.
+                </span>
+
+                {bannerUrl.trim() && (
+                  <span className="mt-2 block overflow-hidden rounded-lg border border-slate-700/70 bg-[#070D1F]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={bannerUrl.trim()}
+                      alt="Tournament banner preview"
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      className="h-24 w-full object-cover"
+                    />
+                  </span>
+                )}
               </label>
             </div>
           </section>

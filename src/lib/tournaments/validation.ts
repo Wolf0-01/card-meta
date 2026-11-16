@@ -87,6 +87,22 @@ const tournamentFields = {
       "Use a valid date (YYYY-MM-DD)"
     ),
 
+  bannerUrl: z
+    .union([
+      z.literal(""),
+
+      z
+        .string()
+        .trim()
+        .max(
+          2048,
+          "The banner URL is too long"
+        )
+        .url("Use a valid banner URL"),
+    ])
+    .optional()
+    .nullable(),
+
   standings: z
     .array(tournamentStandingSchema)
     .min(
