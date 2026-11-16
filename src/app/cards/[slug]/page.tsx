@@ -26,6 +26,8 @@ import {
 
 import { prisma } from "@/lib/prisma";
 
+import { getBanlistLabel } from "@/lib/banlist";
+
 import {
   formatSetType,
   slugifySetName,
@@ -803,6 +805,16 @@ export default async function CardDetailPage({
                       Arquetipo: {card.archetype}
                     </span>
                   )}
+
+                  <span className="inline-flex items-center gap-1.5">
+                    <Shield className="h-3.5 w-3.5 text-rose-300" />
+                    Banlist:{" "}
+                    {card.banlistStatus
+                      ? getBanlistLabel(
+                          card.banlistStatus
+                        )
+                      : "Unlimited"}
+                  </span>
 
                   <span className="inline-flex items-center gap-1.5">
                     <CalendarDays className="h-3.5 w-3.5 text-amber-300" />

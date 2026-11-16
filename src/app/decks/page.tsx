@@ -353,219 +353,223 @@ export default async function DecksPage({
           </section>
         )}
 
-        <div
-          className="
-            flex
-            flex-wrap
-            items-center
-            justify-between
-            gap-2
-            border-b
-            border-slate-800
-            pb-2
-          "
-        >
-          <div className="flex min-w-0 items-center gap-2">
-            <LayoutGrid className="h-3.5 w-3.5 shrink-0 text-blue-300" />
-
-            <h2
+        {hasFilters && (
+          <>
+            <div
               className="
-                truncate
-                text-[10px]
-                font-black
-                uppercase
-                tracking-[0.2em]
-                text-slate-300
-              "
-            >
-              {archetype
-                ? `${archetype} Decks`
-                : search
-                  ? `Results for "${search}"`
-                  : "Public decks"}
-            </h2>
-          </div>
-
-          <span
-            className="
-              text-[9px]
-              font-bold
-              uppercase
-              tracking-[0.14em]
-              text-slate-500
-            "
-          >
-            <span className="tabular-nums text-slate-300">
-              {result.total}
-            </span>{" "}
-            {result.total === 1
-              ? "deck"
-              : "decks"}
-          </span>
-        </div>
-
-        {result.items.length === 0 ? (
-          <section
-            className="
-              flex
-              flex-col
-              items-center
-              justify-center
-              gap-2
-              rounded-xl
-              border
-              border-dashed
-              border-slate-700
-              bg-[#0B132B]/60
-              px-6
-              py-14
-              text-center
-            "
-          >
-            <Search className="h-7 w-7 text-slate-600" />
-
-            <p className="text-sm font-bold text-slate-300">
-              {hasFilters
-                ? "No deck matches these filters."
-                : format === "rush"
-                  ? "No public Rush decks yet."
-                  : "No public decks yet."}
-            </p>
-
-            <p className="max-w-sm text-xs text-slate-500">
-              {hasFilters
-                ? "Try another archetype, name or Skill."
-                : format === "rush"
-                  ? "Publish the community's first Rush deck."
-                  : "Publish your first deck so it shows up here."}
-            </p>
-
-            <Link
-              href={
-                hasFilters
-                  ? resetHref
-                  : `/decks/new${formatSuffix}`
-              }
-              className="
-                mt-2
-                inline-flex
+                flex
+                flex-wrap
                 items-center
-                gap-1
-                text-[10px]
-                font-black
-                uppercase
-                tracking-[0.14em]
-                text-blue-300
-                transition-colors
-                hover:text-blue-200
+                justify-between
+                gap-2
+                border-b
+                border-slate-800
+                pb-2
               "
             >
-              {hasFilters
-                ? "Reset filters"
-                : "Create a deck"}
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </section>
-        ) : (
-          <section
-            aria-label="Public decks"
-            className="
-              grid
-              grid-cols-1
-              gap-2.5
-              md:grid-cols-2
-              xl:grid-cols-3
-            "
-          >
-            {result.items.map((deck) => (
-              <PublicDeckCard
-                key={deck.identifier}
-                deck={deck}
-              />
-            ))}
-          </section>
-        )}
-
-        {result.totalPages > 1 && (
-          <nav
-            aria-label="Deck pagination"
-            className="
-              flex
-              items-center
-              justify-between
-              gap-2
-              border-t
-              border-slate-800
-              pt-3
-              text-[10px]
-              font-black
-              uppercase
-              tracking-[0.14em]
-              text-slate-500
-            "
-          >
-            {result.page > 1 ? (
-              <Link
-                href={buildPageHref(
-                  {
-                    search,
-                    skill,
-                    archetype,
-                    format,
-                  },
-                  result.page - 1
-                )}
+              <div className="flex min-w-0 items-center gap-2">
+                <LayoutGrid className="h-3.5 w-3.5 shrink-0 text-blue-300" />
+    
+                <h2
+                  className="
+                    truncate
+                    text-[10px]
+                    font-black
+                    uppercase
+                    tracking-[0.2em]
+                    text-slate-300
+                  "
+                >
+                  {archetype
+                    ? `${archetype} Decks`
+                    : search
+                      ? `Results for "${search}"`
+                      : "Public decks"}
+                </h2>
+              </div>
+    
+              <span
                 className="
-                  inline-flex
-                  items-center
-                  gap-1
-                  text-slate-300
-                  transition-colors
-                  hover:text-blue-200
+                  text-[9px]
+                  font-bold
+                  uppercase
+                  tracking-[0.14em]
+                  text-slate-500
                 "
               >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Previous
-              </Link>
-            ) : (
-              <span className="opacity-40">
-                Previous
+                <span className="tabular-nums text-slate-300">
+                  {result.total}
+                </span>{" "}
+                {result.total === 1
+                  ? "deck"
+                  : "decks"}
               </span>
-            )}
-
-            <span className="tabular-nums">
-              {result.page} / {result.totalPages}
-            </span>
-
-            {result.page < result.totalPages ? (
-              <Link
-                href={buildPageHref(
-                  {
-                    search,
-                    skill,
-                    archetype,
-                    format,
-                  },
-                  result.page + 1
-                )}
+            </div>
+    
+            {result.items.length === 0 ? (
+              <section
                 className="
-                  inline-flex
+                  flex
+                  flex-col
                   items-center
-                  gap-1
-                  text-slate-300
-                  transition-colors
-                  hover:text-blue-200
+                  justify-center
+                  gap-2
+                  rounded-xl
+                  border
+                  border-dashed
+                  border-slate-700
+                  bg-[#0B132B]/60
+                  px-6
+                  py-14
+                  text-center
                 "
               >
-                Next
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
+                <Search className="h-7 w-7 text-slate-600" />
+    
+                <p className="text-sm font-bold text-slate-300">
+                  {hasFilters
+                    ? "No deck matches these filters."
+                    : format === "rush"
+                      ? "No public Rush decks yet."
+                      : "No public decks yet."}
+                </p>
+    
+                <p className="max-w-sm text-xs text-slate-500">
+                  {hasFilters
+                    ? "Try another archetype, name or Skill."
+                    : format === "rush"
+                      ? "Publish the community's first Rush deck."
+                      : "Publish your first deck so it shows up here."}
+                </p>
+    
+                <Link
+                  href={
+                    hasFilters
+                      ? resetHref
+                      : `/decks/new${formatSuffix}`
+                  }
+                  className="
+                    mt-2
+                    inline-flex
+                    items-center
+                    gap-1
+                    text-[10px]
+                    font-black
+                    uppercase
+                    tracking-[0.14em]
+                    text-blue-300
+                    transition-colors
+                    hover:text-blue-200
+                  "
+                >
+                  {hasFilters
+                    ? "Reset filters"
+                    : "Create a deck"}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </section>
             ) : (
-              <span className="opacity-40">
-                Next
-              </span>
+              <section
+                aria-label="Public decks"
+                className="
+                  grid
+                  grid-cols-1
+                  gap-2.5
+                  md:grid-cols-2
+                  xl:grid-cols-3
+                "
+              >
+                {result.items.map((deck) => (
+                  <PublicDeckCard
+                    key={deck.identifier}
+                    deck={deck}
+                  />
+                ))}
+              </section>
             )}
-          </nav>
+    
+            {result.totalPages > 1 && (
+              <nav
+                aria-label="Deck pagination"
+                className="
+                  flex
+                  items-center
+                  justify-between
+                  gap-2
+                  border-t
+                  border-slate-800
+                  pt-3
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-[0.14em]
+                  text-slate-500
+                "
+              >
+                {result.page > 1 ? (
+                  <Link
+                    href={buildPageHref(
+                      {
+                        search,
+                        skill,
+                        archetype,
+                        format,
+                      },
+                      result.page - 1
+                    )}
+                    className="
+                      inline-flex
+                      items-center
+                      gap-1
+                      text-slate-300
+                      transition-colors
+                      hover:text-blue-200
+                    "
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Previous
+                  </Link>
+                ) : (
+                  <span className="opacity-40">
+                    Previous
+                  </span>
+                )}
+    
+                <span className="tabular-nums">
+                  {result.page} / {result.totalPages}
+                </span>
+    
+                {result.page < result.totalPages ? (
+                  <Link
+                    href={buildPageHref(
+                      {
+                        search,
+                        skill,
+                        archetype,
+                        format,
+                      },
+                      result.page + 1
+                    )}
+                    className="
+                      inline-flex
+                      items-center
+                      gap-1
+                      text-slate-300
+                      transition-colors
+                      hover:text-blue-200
+                    "
+                  >
+                    Next
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                ) : (
+                  <span className="opacity-40">
+                    Next
+                  </span>
+                )}
+              </nav>
+            )}
+          </>
         )}
       </div>
     </main>

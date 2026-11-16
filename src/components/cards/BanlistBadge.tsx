@@ -1,5 +1,3 @@
-import { Ban } from "lucide-react";
-
 import {
   getBanlistLabel,
   type BanlistStatus,
@@ -13,23 +11,6 @@ interface BanlistBadgeProps {
   className?: string;
 }
 
-const STATUS_STYLES: Record<
-  BanlistStatus,
-  string
-> = {
-  forbidden:
-    "border-red-300/70 bg-red-600 text-white",
-
-  limited1:
-    "border-orange-300/70 bg-orange-500 text-white",
-
-  limited2:
-    "border-amber-300/70 bg-amber-500 text-amber-950",
-
-  limited3:
-    "border-yellow-300/70 bg-yellow-400 text-yellow-950",
-};
-
 const SIZE_STYLES = {
   sm: "h-5 w-5 text-[9px]",
 
@@ -39,8 +20,12 @@ const SIZE_STYLES = {
 };
 
 /**
- * Icono circular oficial de la banlist de Duel Links.
- * Se coloca en la esquina superior izquierda de la carta.
+ * Insignia oficial de la banlist de Duel Links.
+ *
+ * Reproduce el icono del juego: círculo negro con anillo
+ * rojo grueso y el número en dorado. Forbidden usa el mismo
+ * círculo con una barra diagonal roja. Las cartas sin
+ * restricción no renderizan insignia.
  */
 export default function BanlistBadge({
   status,
@@ -64,23 +49,34 @@ export default function BanlistBadge({
         items-center
         justify-center
         rounded-full
-        border
+        border-[2.5px]
+        border-red-600
+        bg-black
         font-black
         leading-none
-        shadow-[0_2px_8px_rgba(0,0,0,0.6)]
-        ring-1
-        ring-black/30
+        text-amber-400
+        shadow-[0_2px_8px_rgba(0,0,0,0.65)]
         ${SIZE_STYLES[size]}
-        ${STATUS_STYLES[status]}
         ${className}
       `}
     >
       {status === "forbidden" ? (
-        <Ban
+        <svg
           aria-hidden
-          className="h-[62%] w-[62%]"
-          strokeWidth={3}
-        />
+          viewBox="0 0 24 24"
+          className="h-[72%] w-[72%]"
+        >
+          <line
+            x1="4.5"
+            y1="4.5"
+            x2="19.5"
+            y2="19.5"
+            stroke="currentColor"
+            strokeWidth="3.6"
+            strokeLinecap="round"
+            className="text-red-600"
+          />
+        </svg>
       ) : (
         <span aria-hidden>
           {status === "limited1"
