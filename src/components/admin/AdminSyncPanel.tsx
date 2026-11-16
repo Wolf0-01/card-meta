@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import {
+  Ban,
   CheckCircle2,
   Database,
   Loader2,
@@ -10,7 +11,15 @@ import {
   TriangleAlert,
 } from "lucide-react";
 
-type AdminSyncTask = "sets" | "cards";
+type AdminSyncTask = "sets" | "cards" | "banlist";
+
+const TASK_LABELS: Record<AdminSyncTask, string> = {
+  sets: "Sets and banners",
+
+  cards: "Cards and acquisition",
+
+  banlist: "Banlist status",
+};
 
 interface AdminSyncResult {
   task: AdminSyncTask;
@@ -114,7 +123,7 @@ export default function AdminSyncPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-3">
         <section
           className="
             rounded-xl
@@ -315,6 +324,102 @@ export default function AdminSyncPanel() {
               : "Sync cards"}
           </button>
         </section>
+
+        <section
+          className="
+            rounded-xl
+            border
+            border-slate-700/60
+            bg-[#0B132B]
+            p-4
+            ring-1
+            ring-inset
+            ring-white/5
+          "
+        >
+          <div className="flex items-start gap-2">
+            <span
+              aria-hidden
+              className="
+                flex
+                h-8
+                w-8
+                shrink-0
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-rose-500/30
+                bg-rose-500/10
+                text-rose-300
+              "
+            >
+              <Ban className="h-4 w-4" />
+            </span>
+
+            <div className="min-w-0">
+              <h2
+                className="
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-[0.16em]
+                  text-slate-200
+                "
+              >
+                Banlist status
+              </h2>
+
+              <p className="mt-1 text-[10px] leading-relaxed text-slate-400">
+                Sync Forbidden and Limited 1, 2
+                and 3 cards from Duel Links Meta.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              void runTask("banlist");
+            }}
+            disabled={isRunning}
+            className="
+              mt-3
+              inline-flex
+              h-8
+              w-full
+              items-center
+              justify-center
+              gap-1.5
+              rounded-lg
+              border
+              border-rose-500/40
+              bg-rose-500/10
+              px-3
+              text-[9px]
+              font-black
+              uppercase
+              tracking-[0.14em]
+              text-rose-200
+              transition-colors
+              hover:border-rose-400
+              hover:bg-rose-500/20
+              hover:text-white
+              disabled:cursor-wait
+              disabled:opacity-50
+            "
+          >
+            {runningTask === "banlist" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Ban className="h-3.5 w-3.5" />
+            )}
+
+            {runningTask === "banlist"
+              ? "Syncing..."
+              : "Sync banlist"}
+          </button>
+        </section>
       </div>
 
       {isRunning && (
@@ -434,9 +539,7 @@ export default function AdminSyncPanel() {
                 text-slate-400
               "
             >
-              {result.task === "sets"
-                ? "Sets and banners"
-                : "Cards and acquisition"}
+              {TASK_LABELS[result.task]}
             </span>
 
             <span

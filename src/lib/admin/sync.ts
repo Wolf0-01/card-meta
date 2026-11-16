@@ -2,7 +2,10 @@ import { spawn } from "node:child_process";
 
 import path from "node:path";
 
-export type AdminSyncTask = "sets" | "cards";
+export type AdminSyncTask =
+  | "sets"
+  | "cards"
+  | "banlist";
 
 interface SyncStep {
   label: string;
@@ -89,12 +92,26 @@ const TASKS: Record<AdminSyncTask, SyncStep[]> = {
       args: ["--rush", "--apply"],
     },
   ],
+
+  banlist: [
+    {
+      label: "Duel Links banlist",
+
+      script: "scripts/syncBanlist.ts",
+
+      args: [],
+    },
+  ],
 };
 
 export function isAdminSyncTask(
   value: unknown
 ): value is AdminSyncTask {
-  return value === "sets" || value === "cards";
+  return (
+    value === "sets" ||
+    value === "cards" ||
+    value === "banlist"
+  );
 }
 
 function appendOutput(
@@ -194,7 +211,7 @@ function summarize(output: string) {
     .filter(Boolean);
 
   const interesting = lines.filter((line) =>
-    /(✅|⚠|❌|resumen|nuevas:|actualizadas:|insertadas:|sin cambios:|banners manuales|setmeta sincronizado|cartas rush|obtención|importación terminada|error)/i.test(
+    /(✅|⚠|❌|resumen|nuevas:|actualizadas:|insertadas:|sin cambios:|banners manuales|setmeta sincronizado|cartas rush|obtención|importación terminada|banlist|forbidden|limited|coincidencias|pendientes|error)/i.test(
       line
     )
   );

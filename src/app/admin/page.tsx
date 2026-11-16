@@ -85,7 +85,8 @@ export default async function AdminPage() {
             Run catalog maintenance tasks
             from the server. Banners marked with{" "}
             <code className="text-amber-200">#manual</code>{" "}
-            are kept untouched.
+            are kept untouched, and the banlist is
+            synced from Duel Links Meta.
           </p>
 
           <span
