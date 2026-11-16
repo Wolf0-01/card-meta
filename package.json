@@ -13,6 +13,7 @@
     "cards:obtain": "tsx scripts/updateObtain.ts",
     "cards:banlist": "tsx scripts/syncBanlist.ts",
     "cards:rush": "tsx scripts/syncRushCards.ts",
+    "cards:sync": "tsx scripts/syncDlmCatalog.ts",
     "cards:alt-arts": "tsx scripts/syncSpeedAltArts.ts",
     "sets:sync": "tsx scripts/syncSetMeta.ts",
     "guides:seed": "tsx prisma/seedGuides.ts",
