@@ -440,53 +440,55 @@ export default async function CardDetailPage({
                 md:mx-0
               "
             >
-              <div
-                className="
-                  relative
-                  overflow-hidden
-                  rounded-xl
-                  border
-                  border-slate-600/70
-                  bg-slate-900
-                  shadow-[0_18px_45px_-20px_rgba(0,0,0,0.9)]
-                "
-              >
+              <div className="relative">
+                <div
+                  className="
+                    relative
+                    overflow-hidden
+                    rounded-xl
+                    border
+                    border-slate-600/70
+                    bg-slate-900
+                    shadow-[0_18px_45px_-20px_rgba(0,0,0,0.9)]
+                  "
+                >
+                  <span
+                    aria-hidden
+                    className={`
+                      pointer-events-none
+                      absolute
+                      inset-x-0
+                      top-0
+                      z-10
+                      h-[3px]
+                      ${rarityStyle.strip}
+                      ${rarityStyle.glow}
+                    `}
+                  />
+
+                  <CardDetailImage
+                    ygoproId={card.ygoproId}
+                    image={card.image}
+                    name={card.name}
+                  />
+
+                  {card.banlistStatus && (
+                    <span className="absolute left-2 top-2 z-20">
+                      <BanlistBadge
+                        status={card.banlistStatus}
+                        size="lg"
+                      />
+                    </span>
+                  )}
+                </div>
+
                 <span
-                  aria-hidden
-                  className={`
-                    pointer-events-none
-                    absolute
-                    inset-x-0
-                    top-0
-                    z-10
-                    h-[3px]
-                    ${rarityStyle.strip}
-                    ${rarityStyle.glow}
-                  `}
-                />
-
-                <CardDetailImage
-                  ygoproId={card.ygoproId}
-                  image={card.image}
-                  name={card.name}
-                />
-
-                {card.banlistStatus && (
-                  <span className="absolute left-2 top-2 z-20">
-                    <BanlistBadge
-                      status={card.banlistStatus}
-                      size="lg"
-                    />
-                  </span>
-                )}
-
-                <span
                   className={`
                     absolute
-                    right-2
-                    top-2
+                    -top-3
+                    right-0
                     z-20
-                    rounded-md
+                    rounded-t-md
                     px-2
                     py-1
                     text-[11px]

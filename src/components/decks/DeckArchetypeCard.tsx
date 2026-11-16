@@ -123,19 +123,20 @@ export default function DeckArchetypeCard({
         )}
       </span>
 
-      <span className="min-w-0 flex-1">
+      <span className="min-w-0 flex-1 text-center">
         <span
           className="
             block
             truncate
-            text-[11px]
-            font-black
+            text-sm
+            font-extrabold
             uppercase
             leading-tight
-            tracking-[0.04em]
+            tracking-wide
             text-white
             transition-colors
             group-hover:text-blue-100
+            sm:text-base
           "
         >
           {name}
