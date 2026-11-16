@@ -59,7 +59,7 @@ export default async function SetsIndexPage() {
             "
           >
             <ArrowLeft className="h-3 w-3" />
-            Inicio
+            Home
           </Link>
 
           <h1

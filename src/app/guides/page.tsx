@@ -84,20 +84,6 @@ export default async function GuidesPage() {
           </Link>
 
           <div className="flex items-center gap-2">
-            <span
-              className="
-                hidden
-                text-[9px]
-                font-bold
-                uppercase
-                tracking-[0.16em]
-                text-slate-500
-                sm:inline
-              "
-            >
-              Card Meta · Editorial
-            </span>
-
             {canManageGuides(user) && (
               <Link
                 href="/guides/new"

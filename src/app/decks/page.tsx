@@ -201,7 +201,7 @@ export default async function DecksPage({
             "
           >
             <ArrowLeft className="h-3 w-3" />
-            Inicio
+            Home
           </Link>
 
           <div
@@ -213,18 +213,6 @@ export default async function DecksPage({
               text-center
             "
           >
-            <p
-              className="
-                text-[9px]
-                font-black
-                uppercase
-                tracking-[0.24em]
-                text-blue-300
-              "
-            >
-              Card Meta · Duel Links
-            </p>
-
             <h1
               className="
                 text-2xl

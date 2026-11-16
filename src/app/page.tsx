@@ -76,18 +76,6 @@ export default async function Home() {
           "
         >
           <div>
-            <p
-              className="
-                text-[9px]
-                font-black
-                uppercase
-                tracking-[0.24em]
-                text-blue-300
-              "
-            >
-              Card Meta · Duel Links
-            </p>
-
             <h1
               className="
                 mt-1

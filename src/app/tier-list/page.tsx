@@ -189,19 +189,6 @@ export default async function TierListPage({
                 Home
               </Link>
 
-              <p
-                className="
-                  mt-1
-                  text-[9px]
-                  font-black
-                  uppercase
-                  tracking-[0.24em]
-                  text-blue-300
-                "
-              >
-                Card Meta · Competitive
-              </p>
-
               <h1
                 className="
                   mt-1

@@ -476,18 +476,6 @@ export default function NewsEditor({
               ? "Back to article"
               : "Back to News"}
           </Link>
-
-          <span
-            className="
-              text-[9px]
-              font-bold
-              uppercase
-              tracking-[0.16em]
-              text-slate-500
-            "
-          >
-            Card Meta · Editorial
-          </span>
         </div>
 
         <header className="space-y-1.5">
