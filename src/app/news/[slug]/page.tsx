@@ -6,7 +6,6 @@ import { notFound } from "next/navigation";
 
 import {
   ArrowLeft,
-  ArrowRight,
   BookOpen,
   CalendarDays,
   Clock3,
@@ -629,79 +628,6 @@ export default async function NewsArticlePage({
               </p>
             </section>
 
-            <Link
-              href="/cards"
-              className="
-                group
-                flex
-                items-center
-                gap-2
-                rounded-xl
-                border
-                border-slate-700/60
-                bg-[#0B132B]
-                p-3
-                transition-colors
-                hover:border-blue-400/60
-                hover:bg-[#101A36]
-              "
-            >
-              <span
-                aria-hidden
-                className="
-                  flex
-                  h-7
-                  w-7
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-md
-                  border
-                  border-blue-500/30
-                  bg-blue-500/10
-                  text-blue-300
-                "
-              >
-                <BookOpen className="h-4 w-4" />
-              </span>
-
-              <span className="min-w-0 flex-1">
-                <span
-                  className="
-                    block
-                    text-[10px]
-                    font-black
-                    uppercase
-                    tracking-[0.14em]
-                    text-slate-200
-                  "
-                >
-                  Card Catalog
-                </span>
-
-                <span
-                  className="
-                    block
-                    text-[9px]
-                    text-slate-500
-                  "
-                >
-                  Search any card
-                </span>
-              </span>
-
-              <ArrowRight
-                className="
-                  h-3.5
-                  w-3.5
-                  shrink-0
-                  text-slate-500
-                  transition-transform
-                  group-hover:translate-x-0.5
-                  group-hover:text-blue-300
-                "
-              />
-            </Link>
           </aside>
         </div>
 

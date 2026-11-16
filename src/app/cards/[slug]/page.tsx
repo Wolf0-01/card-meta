@@ -479,28 +479,28 @@ export default async function CardDetailPage({
                     />
                   </span>
                 )}
-              </div>
 
-              <span
-                className={`
-                  absolute
-                  bottom-0
-                  left-0
-                  z-20
-                  rounded-tr-xl
-                  px-2.5
-                  py-1
-                  text-[11px]
-                  font-black
-                  leading-none
-                  tracking-[0.14em]
-                  ring-1
-                  ring-white/30
-                  ${rarityStyle.badge}
-                `}
-              >
-                {rarity}
-              </span>
+                <span
+                  className={`
+                    absolute
+                    right-2
+                    top-2
+                    z-20
+                    rounded-md
+                    px-2
+                    py-1
+                    text-[11px]
+                    font-black
+                    leading-none
+                    tracking-[0.14em]
+                    ring-1
+                    ring-white/30
+                    ${rarityStyle.badge}
+                  `}
+                >
+                  {rarity}
+                </span>
+              </div>
             </div>
 
             {/* Right column: card details and effect */}

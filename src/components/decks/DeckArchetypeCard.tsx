@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import Link from "next/link";
 
 interface DeckArchetypeCardProps {
@@ -80,17 +78,29 @@ export default function DeckArchetypeCard({
         "
       >
         {image ? (
-          <Image
-            src={image}
-            alt={name}
-            fill
-            sizes="48px"
+          <span
+            aria-hidden
             className="
-              object-cover
+              absolute
+              inset-0
               transition-transform
               duration-200
               group-hover:scale-[1.05]
             "
+            style={{
+              backgroundImage: `url("${image}")`,
+
+              /*
+               * Recorta el cuadro de ilustración de la carta
+               * (aprox. 11%-89% horizontal y 18%-71% vertical)
+               * para que no se vea el marco ni la caja de texto.
+               */
+              backgroundSize: "132% auto",
+
+              backgroundPosition: "50% 38.7%",
+
+              backgroundRepeat: "no-repeat",
+            }}
           />
         ) : (
           <span
