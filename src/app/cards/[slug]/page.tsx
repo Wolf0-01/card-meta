@@ -485,8 +485,8 @@ export default async function CardDetailPage({
                 <span
                   className={`
                     absolute
-                    -top-3
-                    right-0
+                    -top-2
+                    right-1.5
                     z-20
                     rounded-t-md
                     px-2
