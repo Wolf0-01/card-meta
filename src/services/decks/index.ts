@@ -33,6 +33,7 @@ export {
 
 export {
   findArchetypeBreakdown,
+  findPendingCompetitiveResults,
   findPublicDeckArchetypeGroups,
   findPublicDeckExplorer,
   findRecentPublicDecks,

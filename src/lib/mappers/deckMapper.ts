@@ -8,6 +8,8 @@ import { normalizeDuelFormat } from "@/lib/duelFormat";
 
 import { normalizeBanlistStatus } from "@/lib/banlist";
 
+import { normalizeAchievement } from "@/lib/decks/achievements";
+
 import type { LinkMarker } from "@/types/card";
 import type {
   DeckCard,
@@ -285,6 +287,18 @@ export function mapPrismaDeck(
 image: deck.image,
 
 skill: deck.skill,
+
+achievement: normalizeAchievement(
+  deck.achievement
+),
+
+placement: deck.placement,
+
+notes: deck.notes,
+
+proofUrl: deck.proofUrl,
+
+verified: deck.verified,
 
 description:
 deck.description,

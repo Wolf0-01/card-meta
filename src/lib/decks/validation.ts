@@ -19,6 +19,11 @@ import {
 
 import { DECK_RULES } from "./rules";
 
+import {
+  DECK_ACHIEVEMENTS,
+  TOURNAMENT_PLACEMENTS,
+} from "./achievements";
+
 export { DECK_RULES };
 
 
@@ -45,6 +50,19 @@ export const deckCardInputSchema = z.object({
 
   zone: deckZoneSchema.optional(),
 });
+
+function isHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+
+    return (
+      url.protocol === "http:" ||
+      url.protocol === "https:"
+    );
+  } catch {
+    return false;
+  }
+}
 
 const deckFields = {
   name: z
@@ -92,6 +110,40 @@ const deckFields = {
     .optional(),
 
   isPublic: z.boolean().optional(),
+
+  achievement: z
+    .enum(DECK_ACHIEVEMENTS)
+    .optional(),
+
+  placement: z
+    .enum(TOURNAMENT_PLACEMENTS)
+    .nullable()
+    .optional(),
+
+  notes: z
+    .string()
+    .trim()
+    .max(
+      280,
+      "The notes cannot exceed 280 characters"
+    )
+    .nullable()
+    .optional(),
+
+  proofUrl: z
+    .string()
+    .trim()
+    .max(
+      2048,
+      "The proof URL is too long"
+    )
+    .nullable()
+    .optional()
+    .refine(
+      (value) =>
+        !value || isHttpUrl(value),
+      "The proof URL must start with http:// or https://"
+    ),
 
   cards: z
     .array(deckCardInputSchema)

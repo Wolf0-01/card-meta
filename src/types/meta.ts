@@ -105,6 +105,21 @@ description?: string | null;
 
 skill?: string | null;
 
+/** Logro competitivo declarado: NONE | KOG | KC_MAX | TOURNAMENT. */
+achievement?: string;
+
+/** Puesto del torneo: 1st | 2nd | Top 4 | Top 8. */
+placement?: string | null;
+
+/** Notas breves del jugador sobre el mazo. */
+notes?: string | null;
+
+/** Captura de pantalla que prueba el logro. */
+proofUrl?: string | null;
+
+/** Solo los resultados verificados muestran la insignia oficial. */
+verified?: boolean;
+
 guide?: string | null;
 
 combos?: string | null;

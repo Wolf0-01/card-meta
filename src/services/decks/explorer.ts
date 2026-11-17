@@ -6,6 +6,8 @@ import {
   type PublicDeckExplorerOptions,
 } from "@/lib/decks";
 
+import { listPendingCompetitiveResults } from "@/lib/decks/service";
+
 import type { DuelFormat } from "@/lib/duelFormat";
 
 export async function findPublicDeckExplorer(
@@ -34,4 +36,8 @@ export async function findRecentPublicDecks(
   limit = 6
 ) {
   return getRecentPublicDecks(limit);
+}
+
+export async function findPendingCompetitiveResults() {
+  return listPendingCompetitiveResults();
 }

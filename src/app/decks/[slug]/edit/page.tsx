@@ -10,6 +10,8 @@ import DeckBuilderWorkspace, {
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
 
+import { canManageGuides } from "@/lib/auth/roles";
+
 import { getDeckForViewer } from "@/lib/decks/service";
 
 import type { DraftCard } from "@/types/deck-draft";
@@ -79,12 +81,23 @@ export default async function EditDeckPage({
 
     isPublic: deck.isPublic,
 
+    achievement: deck.achievement,
+
+    placement: deck.placement,
+
+    notes: deck.notes,
+
+    proofUrl: deck.proofUrl,
+
+    verified: deck.verified,
+
     cards,
   };
 
   return (
     <DeckBuilderWorkspace
       initialDeck={initialDeck}
+      isStaff={canManageGuides(user)}
     />
   );
 }

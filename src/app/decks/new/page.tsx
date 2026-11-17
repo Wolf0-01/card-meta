@@ -5,6 +5,8 @@ import DeckBuilderWorkspace from "@/components/deck-builder/compact/DeckBuilderW
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
 
+import { canManageGuides } from "@/lib/auth/roles";
+
 import {
   findDeckByIdentifier,
 } from "@/services/decks";
@@ -84,6 +86,7 @@ export default async function NewDeckPage({
   return (
     <DeckBuilderWorkspace
       templateDeck={templateDeck}
+      isStaff={canManageGuides(user)}
     />
   );
 }

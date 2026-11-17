@@ -24,6 +24,14 @@ import type {
 import { DeckError } from "./errors";
 
 import {
+  isCompetitiveAchievement,
+  normalizeAchievement,
+  resolveResultVerification,
+  sanitizeResultFields,
+  type DeckResultFields,
+} from "./achievements";
+
+import {
   countDeckCards,
   normalizeDeckCards,
   parseDeckCreate,
@@ -111,6 +119,16 @@ export interface UserDeckDTO {
 
   isPublic: boolean;
 
+  achievement: string;
+
+  placement: string | null;
+
+  notes: string | null;
+
+  proofUrl: string | null;
+
+  verified: boolean;
+
   authorId: string | null;
 
   archetype: {
@@ -146,6 +164,16 @@ export interface UserDeckSummary {
   format: string;
 
   isPublic: boolean;
+
+  achievement: string;
+
+  placement: string | null;
+
+  notes: string | null;
+
+  proofUrl: string | null;
+
+  verified: boolean;
 
   archetype: {
     id: string;
@@ -194,6 +222,18 @@ function mapUserDeck(
     format: normalizeDuelFormat(deck.format),
 
     isPublic: deck.isPublic,
+
+    achievement: normalizeAchievement(
+      deck.achievement
+    ),
+
+    placement: deck.placement,
+
+    notes: deck.notes,
+
+    proofUrl: deck.proofUrl,
+
+    verified: deck.verified,
 
     authorId: deck.authorId,
 
@@ -382,13 +422,131 @@ function withBanlistStatus(
   });
 }
 
+function assertResultPlacement(
+  result: DeckResultFields
+) {
+  if (
+    result.achievement === "TOURNAMENT" &&
+    !result.placement
+  ) {
+    throw new DeckError(
+      "VALIDATION",
+      "Select the tournament placement",
+      [
+        {
+          path: "placement",
+
+          message:
+            "Select the tournament placement",
+        },
+      ]
+    );
+  }
+}
+
+interface DeckResultOptions {
+  isStaff?: boolean;
+}
+
+interface PrismaDeckSummary {
+  id: string;
+
+  name: string;
+
+  slug: string;
+
+  identifier: string;
+
+  description: string | null;
+
+  skill: string | null;
+
+  format: string;
+
+  isPublic: boolean;
+
+  achievement: string;
+
+  placement: string | null;
+
+  notes: string | null;
+
+  proofUrl: string | null;
+
+  verified: boolean;
+
+  archetype: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+
+  cards: Array<{
+    quantity: number;
+    zone: string;
+  }>;
+
+  createdAt: Date;
+
+  updatedAt: Date;
+}
+
+function mapUserDeckSummary(
+  deck: PrismaDeckSummary
+): UserDeckSummary {
+  return {
+    id: deck.id,
+
+    name: deck.name,
+
+    slug: deck.slug,
+
+    identifier: deck.identifier,
+
+    description: deck.description,
+
+    skill: deck.skill,
+
+    format: normalizeDuelFormat(deck.format),
+
+    isPublic: deck.isPublic,
+
+    achievement: normalizeAchievement(
+      deck.achievement
+    ),
+
+    placement: deck.placement,
+
+    notes: deck.notes,
+
+    proofUrl: deck.proofUrl,
+
+    verified: deck.verified,
+
+    archetype: deck.archetype,
+
+    counts: countDeckCards(
+      deck.cards.map((card) => ({
+        quantity: card.quantity,
+
+        zone: card.zone as DeckZone,
+      }))
+    ),
+
+    createdAt: deck.createdAt.toISOString(),
+
+    updatedAt: deck.updatedAt.toISOString(),
+  };
+}
+
 // ======================================
 // CREATE
 // ======================================
 
 export async function createUserDeck(
   userId: string,
-  body: unknown
+  body: unknown,
+  options: DeckResultOptions = {}
 ): Promise<UserDeckDTO> {
   const input = parseDeckCreate(body);
 
@@ -397,6 +555,26 @@ export async function createUserDeck(
   );
 
   const isPublic = input.isPublic ?? false;
+
+  const result = sanitizeResultFields({
+    achievement: normalizeAchievement(
+      input.achievement
+    ),
+
+    placement: input.placement ?? null,
+
+    notes: input.notes ?? null,
+
+    proofUrl: input.proofUrl ?? null,
+  });
+
+  assertResultPlacement(result);
+
+  const verified = resolveResultVerification(
+    result,
+    null,
+    Boolean(options.isStaff)
+  );
 
   const format = normalizeDuelFormat(
     input.format
@@ -441,6 +619,16 @@ export async function createUserDeck(
           ? null
           : input.skill?.trim() || null,
 
+      achievement: result.achievement,
+
+      placement: result.placement,
+
+      notes: result.notes,
+
+      proofUrl: result.proofUrl,
+
+      verified,
+
       archetypeId,
 
       cards: {
@@ -461,7 +649,8 @@ export async function createUserDeck(
 export async function updateUserDeck(
   userId: string,
   deckId: string,
-  body: unknown
+  body: unknown,
+  options: DeckResultOptions = {}
 ): Promise<UserDeckDTO> {
   const patch = parseDeckUpdate(body);
 
@@ -487,6 +676,16 @@ export async function updateUserDeck(
         archetypeId: true,
 
         isPublic: true,
+
+        achievement: true,
+
+        placement: true,
+
+        notes: true,
+
+        proofUrl: true,
+
+        verified: true,
 
         cards: {
           select: {
@@ -555,6 +754,52 @@ export async function updateUserDeck(
         ? patch.skill?.trim() || null
         : existing.skill;
 
+  const currentResult = sanitizeResultFields({
+    achievement: normalizeAchievement(
+      existing.achievement
+    ),
+
+    placement: existing.placement,
+
+    notes: existing.notes,
+
+    proofUrl: existing.proofUrl,
+  });
+
+  const nextResult = sanitizeResultFields({
+    achievement:
+      patch.achievement !== undefined
+        ? patch.achievement
+        : currentResult.achievement,
+
+    placement:
+      patch.placement !== undefined
+        ? patch.placement
+        : currentResult.placement,
+
+    notes:
+      patch.notes !== undefined
+        ? patch.notes
+        : currentResult.notes,
+
+    proofUrl:
+      patch.proofUrl !== undefined
+        ? patch.proofUrl
+        : currentResult.proofUrl,
+  });
+
+  assertResultPlacement(nextResult);
+
+  const verified = resolveResultVerification(
+    nextResult,
+    {
+      ...currentResult,
+
+      verified: existing.verified,
+    },
+    Boolean(options.isStaff)
+  );
+
   const deck = await prisma.$transaction(
     async (tx) => {
       await tx.deckCard.deleteMany({
@@ -585,6 +830,16 @@ export async function updateUserDeck(
           format,
 
           isPublic,
+
+          achievement: nextResult.achievement,
+
+          placement: nextResult.placement,
+
+          notes: nextResult.notes,
+
+          proofUrl: nextResult.proofUrl,
+
+          verified,
 
           archetypeId,
 
@@ -698,35 +953,122 @@ export async function listUserDecks(
     },
   });
 
+  return decks.map(mapUserDeckSummary);
+}
+
+export interface PendingCompetitiveResult
+  extends UserDeckSummary {
+  author: UserDeckAuthorDTO | null;
+}
+
+/**
+ * Cola de revisión para ADMIN/EDITOR: resultados
+ * competitivos enviados que todavía no están verificados.
+ */
+export async function listPendingCompetitiveResults(): Promise<
+  PendingCompetitiveResult[]
+> {
+  const decks = await prisma.deck.findMany({
+    where: {
+      achievement: {
+        not: "NONE",
+      },
+
+      verified: false,
+    },
+
+    orderBy: {
+      updatedAt: "desc",
+    },
+
+    include: {
+      archetype: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+
+      author: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true,
+        },
+      },
+
+      cards: {
+        select: {
+          quantity: true,
+          zone: true,
+        },
+      },
+    },
+  });
+
   return decks.map((deck) => ({
-    id: deck.id,
+    ...mapUserDeckSummary(deck),
 
-    name: deck.name,
-
-    slug: deck.slug,
-
-    identifier: deck.identifier,
-
-    description: deck.description,
-
-    skill: deck.skill,
-
-    format: normalizeDuelFormat(deck.format),
-
-    isPublic: deck.isPublic,
-
-    archetype: deck.archetype,
-
-    counts: countDeckCards(
-      deck.cards.map((card) => ({
-        quantity: card.quantity,
-
-        zone: card.zone as DeckZone,
-      }))
-    ),
-
-    createdAt: deck.createdAt.toISOString(),
-
-    updatedAt: deck.updatedAt.toISOString(),
+    author: deck.author,
   }));
+}
+
+/**
+ * Aprueba (o retira) la insignia oficial de un resultado.
+ * Solo debe invocarse desde una ruta protegida para staff.
+ */
+export async function setDeckResultVerification(
+  deckId: string,
+  verified: boolean
+): Promise<UserDeckDTO> {
+  const deck = await prisma.deck.findUnique({
+    where: {
+      id: deckId,
+    },
+
+    select: {
+      id: true,
+
+      achievement: true,
+    },
+  });
+
+  if (!deck) {
+    throw notFound();
+  }
+
+  if (
+    !isCompetitiveAchievement(
+      normalizeAchievement(deck.achievement)
+    )
+  ) {
+    throw new DeckError(
+      "VALIDATION",
+      "This deck has no competitive result to approve",
+      [
+        {
+          path: "achievement",
+
+          message:
+            "This deck has no competitive result to approve",
+        },
+      ]
+    );
+  }
+
+  const updated = await prisma.deck.update({
+    where: {
+      id: deckId,
+    },
+
+    data: {
+      verified,
+    },
+
+    include: userDeckInclude,
+  });
+
+  return mapUserDeck(updated);
 }

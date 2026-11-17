@@ -17,11 +17,24 @@ import {
   Lock,
   Pencil,
   Plus,
+  ShieldCheck,
   Trash2,
+  Trophy,
   X,
 } from "lucide-react";
 
 import Button from "@/components/ui/Button";
+
+import CompetitiveResultForm, {
+  EMPTY_COMPETITIVE_RESULT,
+  toCompetitiveResultValue,
+  type CompetitiveResultValue,
+} from "@/components/decks/CompetitiveResultForm";
+
+import {
+  getAchievementShortLabel,
+  normalizeAchievement,
+} from "@/lib/decks/achievements";
 
 import { DECK_RULES } from "@/lib/decks/rules";
 
@@ -33,6 +46,9 @@ import DeleteDeckDialog from "./DeleteDeckDialog";
 
 interface MyDecksGridProps {
   initialDecks: UserDeckSummary[];
+
+  /** ADMIN/EDITOR pueden aprobar resultados pendientes. */
+  isStaff?: boolean;
 }
 
 interface DeckMutationResponse {
@@ -40,6 +56,16 @@ interface DeckMutationResponse {
     id?: string;
 
     isPublic?: boolean;
+
+    achievement?: string;
+
+    placement?: string | null;
+
+    notes?: string | null;
+
+    proofUrl?: string | null;
+
+    verified?: boolean;
   };
 
   error?: string;
@@ -153,6 +179,7 @@ function Counter({
 
 export default function MyDecksGrid({
   initialDecks,
+  isStaff = false,
 }: MyDecksGridProps) {
   const router = useRouter();
 
@@ -183,6 +210,242 @@ export default function MyDecksGrid({
   const [error, setError] = useState<
     string | null
   >(null);
+
+  const [
+    resultEditorId,
+    setResultEditorId,
+  ] = useState<string | null>(null);
+
+  const [resultDraft, setResultDraft] =
+    useState<CompetitiveResultValue>(
+      EMPTY_COMPETITIVE_RESULT
+    );
+
+  const [resultBusyId, setResultBusyId] =
+    useState<string | null>(null);
+
+  const [approveBusyId, setApproveBusyId] =
+    useState<string | null>(null);
+
+  const [resultNotice, setResultNotice] =
+    useState<string | null>(null);
+
+  function openResultEditor(
+    deck: UserDeckSummary
+  ) {
+    setResultEditorId(deck.id);
+
+    setResultDraft(
+      toCompetitiveResultValue(deck)
+    );
+
+    setResultNotice(null);
+
+    setError(null);
+  }
+
+  async function saveResult(
+    deck: UserDeckSummary
+  ) {
+    if (resultBusyId) {
+      return;
+    }
+
+    if (
+      resultDraft.achievement ===
+        "TOURNAMENT" &&
+      !resultDraft.placement
+    ) {
+      setError(
+        "Select the tournament placement."
+      );
+
+      return;
+    }
+
+    setResultBusyId(deck.id);
+
+    setError(null);
+
+    setResultNotice(null);
+
+    try {
+      const response = await fetch(
+        `/api/decks/${deck.id}`,
+        {
+          method: "PATCH",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            achievement:
+              resultDraft.achievement,
+
+            placement:
+              resultDraft.achievement ===
+              "TOURNAMENT"
+                ? resultDraft.placement ||
+                  null
+                : null,
+
+            notes:
+              resultDraft.notes.trim() ||
+              null,
+
+            proofUrl:
+              resultDraft.proofUrl.trim() ||
+              null,
+          }),
+        }
+      );
+
+      const data = (await response
+        .json()
+        .catch(() => null)) as
+        | DeckMutationResponse
+        | null;
+
+      if (!response.ok) {
+        throw new Error(
+          getMutationError(
+            data,
+            "Could not save the competitive result."
+          )
+        );
+      }
+
+      const updated = data?.deck;
+
+      setDecks((current) =>
+        current.map((item) =>
+          item.id === deck.id
+            ? {
+                ...item,
+
+                achievement:
+                  updated?.achievement ??
+                  resultDraft.achievement,
+
+                placement:
+                  updated?.placement ??
+                  (resultDraft.achievement ===
+                  "TOURNAMENT"
+                    ? resultDraft.placement ||
+                      null
+                    : null),
+
+                notes:
+                  updated?.notes ??
+                  (resultDraft.notes.trim() ||
+                    null),
+
+                proofUrl:
+                  updated?.proofUrl ??
+                  (resultDraft.proofUrl.trim() ||
+                    null),
+
+                verified:
+                  updated?.verified ?? false,
+              }
+            : item
+        )
+      );
+
+      setResultEditorId(null);
+
+      setResultNotice(
+        updated?.verified
+          ? "Competitive result saved and verified."
+          : "Competitive result submitted for review."
+      );
+
+      router.refresh();
+    } catch (saveResultError) {
+      setError(
+        saveResultError instanceof Error
+          ? saveResultError.message
+          : "Could not save the competitive result."
+      );
+    } finally {
+      setResultBusyId(null);
+    }
+  }
+
+  async function approveResult(
+    deck: UserDeckSummary
+  ) {
+    if (approveBusyId) {
+      return;
+    }
+
+    setApproveBusyId(deck.id);
+
+    setError(null);
+
+    setResultNotice(null);
+
+    try {
+      const response = await fetch(
+        `/api/decks/${deck.id}/verify`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            verified: true,
+          }),
+        }
+      );
+
+      const data = (await response
+        .json()
+        .catch(() => null)) as
+        | DeckMutationResponse
+        | null;
+
+      if (!response.ok) {
+        throw new Error(
+          getMutationError(
+            data,
+            "Could not approve the result."
+          )
+        );
+      }
+
+      setDecks((current) =>
+        current.map((item) =>
+          item.id === deck.id
+            ? {
+                ...item,
+                verified:
+                  data?.deck?.verified ?? true,
+              }
+            : item
+        )
+      );
+
+      setResultNotice(
+        `“${deck.name}” result approved.`
+      );
+
+      router.refresh();
+    } catch (approveError) {
+      setError(
+        approveError instanceof Error
+          ? approveError.message
+          : "Could not approve the result."
+      );
+    } finally {
+      setApproveBusyId(null);
+    }
+  }
 
   async function handleVisibilityToggle(
     deck: UserDeckSummary
@@ -511,6 +774,47 @@ export default function MyDecksGrid({
         </div>
       )}
 
+      {resultNotice && (
+        <div
+          role="status"
+          className="
+            flex
+            items-start
+            gap-3
+            rounded-xl
+            border
+            border-emerald-500/40
+            bg-emerald-500/10
+            px-3
+            py-2.5
+            text-xs
+            leading-5
+            text-emerald-200
+          "
+        >
+          <p className="min-w-0 flex-1">
+            {resultNotice}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setResultNotice(null)}
+            aria-label="Dismiss notice"
+            className="
+              shrink-0
+              rounded-md
+              p-0.5
+              text-emerald-300/80
+              transition-colors
+              hover:bg-emerald-500/15
+              hover:text-emerald-100
+            "
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div
           role="group"
@@ -823,10 +1127,168 @@ export default function MyDecksGrid({
                     </span>
                   </div>
 
+                  {deck.achievement !== "NONE" && (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span
+                        className={`
+                          inline-flex
+                          items-center
+                          gap-1
+                          rounded-md
+                          border
+                          px-1.5
+                          py-0.5
+                          text-[9px]
+                          font-bold
+                          uppercase
+                          tracking-wide
+                          ${
+                            deck.verified
+                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                              : "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                          }
+                        `}
+                      >
+                        <Trophy className="h-2.5 w-2.5" />
+
+                        {getAchievementShortLabel(
+                          normalizeAchievement(
+                            deck.achievement
+                          )
+                        )}
+
+                        {deck.placement
+                          ? ` · ${deck.placement}`
+                          : ""}
+
+                        {deck.verified
+                          ? " · Verified"
+                          : " · Pending"}
+                      </span>
+                    </div>
+                  )}
+
                   {deck.description && (
                     <p className="line-clamp-2 text-[11px] leading-4 text-foreground-muted">
                       {deck.description}
                     </p>
+                  )}
+
+                  <div className="flex flex-wrap gap-1.5 border-t border-border/60 pt-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        resultEditorId ===
+                        deck.id
+                          ? setResultEditorId(null)
+                          : openResultEditor(deck)
+                      }
+                      className={`
+                        ${ACTION_BASE}
+                        border-amber-500/30
+                        bg-amber-500/5
+                        text-amber-200
+                        hover:bg-amber-500/15
+                        focus:ring-amber-500/30
+                      `}
+                    >
+                      <Trophy className="h-3.5 w-3.5" />
+
+                      {resultEditorId === deck.id
+                        ? "Hide result"
+                        : "Competitive result"}
+                    </button>
+
+                    {isStaff &&
+                      deck.achievement !==
+                        "NONE" &&
+                      !deck.verified && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            approveResult(deck)
+                          }
+                          disabled={
+                            approveBusyId ===
+                            deck.id
+                          }
+                          className={`
+                            ${ACTION_BASE}
+                            border-emerald-500/40
+                            bg-emerald-500/10
+                            text-emerald-300
+                            hover:bg-emerald-500/20
+                            focus:ring-emerald-500/30
+                            disabled:cursor-wait
+                            disabled:opacity-60
+                          `}
+                        >
+                          <ShieldCheck className="h-3.5 w-3.5" />
+
+                          {approveBusyId ===
+                          deck.id
+                            ? "Approving..."
+                            : "Approve Result"}
+                        </button>
+                      )}
+                  </div>
+
+                  {resultEditorId === deck.id && (
+                    <div className="space-y-2">
+                      <CompetitiveResultForm
+                        value={resultDraft}
+                        onChange={setResultDraft}
+                        isStaff={isStaff}
+                        disabled={
+                          resultBusyId === deck.id
+                        }
+                      />
+
+                      <div className="flex justify-end gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setResultEditorId(null)
+                          }
+                          className={`
+                            ${ACTION_BASE}
+                            border-border
+                            bg-surface
+                            text-foreground-muted
+                            hover:text-foreground
+                            focus:ring-primary/30
+                          `}
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            saveResult(deck)
+                          }
+                          disabled={
+                            resultBusyId ===
+                            deck.id
+                          }
+                          className={`
+                            ${ACTION_BASE}
+                            border-primary/40
+                            bg-primary/10
+                            text-primary
+                            hover:bg-primary/20
+                            focus:ring-primary/30
+                            disabled:cursor-wait
+                            disabled:opacity-60
+                          `}
+                        >
+                          {resultBusyId ===
+                          deck.id
+                            ? "Saving..."
+                            : "Save result"}
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
 

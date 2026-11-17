@@ -9,6 +9,8 @@ import MyDecksGrid from "@/components/decks/MyDecksGrid";
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
 
+import { canManageGuides } from "@/lib/auth/roles";
+
 import { listUserDecks } from "@/lib/decks/service";
 
 export const metadata: Metadata = {
@@ -154,7 +156,10 @@ export default async function MyDecksPage({
           </div>
         )}
 
-        <MyDecksGrid initialDecks={decks} />
+        <MyDecksGrid
+          initialDecks={decks}
+          isStaff={canManageGuides(user)}
+        />
       </Container>
     </main>
   );

@@ -5,6 +5,8 @@ import {
   unauthorized,
 } from "@/lib/auth/requireUser";
 
+import { canManageGuides } from "@/lib/auth/roles";
+
 import {
   createUserDeck,
   listUserDecks,
@@ -55,7 +57,10 @@ export async function POST(request: Request) {
   try {
     const deck = await createUserDeck(
       user.id,
-      body
+      body,
+      {
+        isStaff: canManageGuides(user),
+      }
     );
 
     return NextResponse.json(

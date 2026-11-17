@@ -5,6 +5,8 @@ import {
   unauthorized,
 } from "@/lib/auth/requireUser";
 
+import { canManageGuides } from "@/lib/auth/roles";
+
 import {
   deleteUserDeck,
   getDeckForViewer,
@@ -72,7 +74,10 @@ export async function PATCH(
     const deck = await updateUserDeck(
       user.id,
       id,
-      body
+      body,
+      {
+        isStaff: canManageGuides(user),
+      }
     );
 
     return NextResponse.json({

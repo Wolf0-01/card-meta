@@ -12,14 +12,32 @@ import {
 
 import ArchetypeBreakdown from "@/components/decks/ArchetypeBreakdown";
 
+import ArchetypeDeckTable, {
+  type ArchetypeDeckRow,
+} from "@/components/decks/ArchetypeDeckTable";
+
+import CompetitiveReviewQueue from "@/components/decks/CompetitiveReviewQueue";
+
 import DeckArchetypeCard from "@/components/decks/DeckArchetypeCard";
 
 import DeckExplorerControls from "@/components/decks/DeckExplorerControls";
 
 import PublicDeckCard from "@/components/decks/PublicDeckCard";
 
+import { getCurrentUser } from "@/lib/auth/currentUser";
+
+import { canManageGuides } from "@/lib/auth/roles";
+
+import {
+  normalizeAchievement,
+  normalizePlacement,
+} from "@/lib/decks/achievements";
+
+import { estimateDeckGemCost } from "@/lib/decks/gemCost";
+
 import {
   findArchetypeBreakdown,
+  findPendingCompetitiveResults,
   findPublicDeckArchetypeGroups,
   findPublicDeckExplorer,
 } from "@/services/decks";
@@ -107,7 +125,11 @@ export default async function DecksPage({
       ? Math.floor(parsedPage)
       : 1;
 
-  const [result, archetypes, breakdown] =
+  const user = await getCurrentUser();
+
+  const isStaff = canManageGuides(user);
+
+  const [result, archetypes, breakdown, pendingResults] =
     await Promise.all([
       findPublicDeckExplorer({
         search,
@@ -126,6 +148,10 @@ export default async function DecksPage({
             archetype
           )
         : Promise.resolve(null),
+
+      isStaff
+        ? findPendingCompetitiveResults()
+        : Promise.resolve([]),
     ]);
 
   const hasFilters =
@@ -142,6 +168,39 @@ export default async function DecksPage({
     (total, group) => total + group.count,
     0
   );
+
+  const deckRows: ArchetypeDeckRow[] =
+    result.items.map((deck) => ({
+      id: deck.id,
+
+      href: `/decks/${deck.slug}/${deck.identifier}`,
+
+      skill: deck.skill ?? null,
+
+      notes: deck.notes ?? null,
+
+      achievement: normalizeAchievement(
+        deck.achievement
+      ),
+
+      placement: normalizePlacement(
+        deck.placement
+      ),
+
+      verified: deck.verified === true,
+
+      playerUsername:
+        deck.author?.username ?? null,
+
+      playerName:
+        deck.author?.displayName ??
+        deck.author?.username ??
+        null,
+
+      price: estimateDeckGemCost(deck),
+
+      createdAt: deck.createdAt,
+    }));
 
   function buildArchetypeHref(
     name: string
@@ -254,6 +313,12 @@ export default async function DecksPage({
 
         {breakdown && (
           <ArchetypeBreakdown breakdown={breakdown} />
+        )}
+
+        {isStaff && pendingResults.length > 0 && (
+          <CompetitiveReviewQueue
+            results={pendingResults}
+          />
         )}
 
         {archetypes.length > 0 && (
@@ -456,6 +521,8 @@ export default async function DecksPage({
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </section>
+            ) : archetype ? (
+              <ArchetypeDeckTable rows={deckRows} />
             ) : (
               <section
                 aria-label="Public decks"

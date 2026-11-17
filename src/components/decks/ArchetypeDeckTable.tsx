@@ -1,0 +1,416 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
+import Link from "next/link";
+
+import {
+  BadgeCheck,
+  ClipboardList,
+  Clock,
+  Gem,
+  Trophy,
+} from "lucide-react";
+
+import {
+  getAchievementEmblem,
+  type DeckAchievement,
+  type TournamentPlacement,
+} from "@/lib/decks/achievements";
+
+import {
+  formatDate,
+  formatNumber,
+} from "@/lib/format";
+
+export interface ArchetypeDeckRow {
+  id: string;
+
+  href: string;
+
+  skill: string | null;
+
+  notes: string | null;
+
+  achievement: DeckAchievement;
+
+  placement: TournamentPlacement | null;
+
+  verified: boolean;
+
+  playerUsername: string | null;
+
+  playerName: string | null;
+
+  price: number;
+
+  createdAt: string;
+}
+
+interface ArchetypeDeckTableProps {
+  rows: ArchetypeDeckRow[];
+}
+
+const TONE_CLASSES = {
+  gold: "border-amber-400/40 bg-amber-400/10 text-amber-300",
+  blue: "border-sky-400/40 bg-sky-400/10 text-sky-300",
+  violet:
+    "border-violet-400/40 bg-violet-400/10 text-violet-300",
+} as const;
+
+function TopEmblem({
+  achievement,
+  verified,
+}: {
+  achievement: DeckAchievement;
+  verified: boolean;
+}) {
+  const emblem = getAchievementEmblem(achievement);
+
+  if (!emblem) {
+    return (
+      <span className="text-slate-600">—</span>
+    );
+  }
+
+  if (!verified) {
+    return (
+      <span
+        title="Pending staff review"
+        className="
+          inline-flex
+          items-center
+          gap-1
+          rounded-full
+          border
+          border-slate-600/60
+          bg-slate-800/60
+          px-1.5
+          py-0.5
+          text-[9px]
+          font-bold
+          uppercase
+          tracking-wide
+          text-slate-400
+        "
+      >
+        <Clock className="h-2.5 w-2.5" />
+        Pending
+      </span>
+    );
+  }
+
+  const Icon =
+    achievement === "KC_MAX" ? (
+      <BadgeCheck className="h-3.5 w-3.5" />
+    ) : achievement === "TOURNAMENT" ? (
+      <Trophy className="h-3.5 w-3.5" />
+    ) : (
+      <span
+        aria-hidden
+        className="text-[13px] leading-none"
+      >
+        🦁
+      </span>
+    );
+
+  return (
+    <span
+      title={emblem.label}
+      aria-label={emblem.label}
+      className={`
+        inline-flex
+        h-7
+        w-7
+        items-center
+        justify-center
+        rounded-full
+        border
+        ${TONE_CLASSES[emblem.tone]}
+      `}
+    >
+      {Icon}
+    </span>
+  );
+}
+
+function NotesCell({
+  notes,
+}: {
+  notes: string | null;
+}) {
+  if (!notes) {
+    return (
+      <span className="text-slate-600">—</span>
+    );
+  }
+
+  return (
+    <span
+      tabIndex={0}
+      title={notes}
+      aria-label={`Notes: ${notes}`}
+      className="
+        group
+        relative
+        inline-flex
+        cursor-help
+        items-center
+        justify-center
+        rounded-md
+        border
+        border-slate-700
+        bg-slate-800/60
+        p-1
+        text-slate-300
+        outline-none
+        transition-colors
+        hover:border-blue-400/50
+        hover:text-blue-200
+        focus-visible:border-blue-400/60
+        focus-visible:ring-2
+        focus-visible:ring-blue-500/30
+      "
+    >
+      <ClipboardList className="h-3.5 w-3.5" />
+
+      <span
+        role="tooltip"
+        className="
+          pointer-events-none
+          absolute
+          left-1/2
+          top-full
+          z-40
+          mt-2
+          hidden
+          w-56
+          -translate-x-1/2
+          rounded-lg
+          border
+          border-slate-700
+          bg-[#0B132B]
+          px-2.5
+          py-2
+          text-left
+          text-[10px]
+          font-medium
+          leading-4
+          text-slate-200
+          shadow-xl
+          group-hover:block
+          group-focus-visible:block
+        "
+      >
+        {notes}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * Tabla compacta estilo Duel Links Meta para los mazos de
+ * un arquetipo. Cada fila abre la ficha completa del mazo.
+ */
+export default function ArchetypeDeckTable({
+  rows,
+}: ArchetypeDeckTableProps) {
+  const router = useRouter();
+
+  return (
+    <div
+      className="
+        overflow-x-auto
+        rounded-xl
+        border
+        border-slate-800
+        bg-[#0B132B]/60
+        lg:overflow-visible
+      "
+    >
+      <table className="w-full min-w-[720px] border-collapse text-left">
+        <thead>
+          <tr
+            className="
+              border-b
+              border-slate-800
+              text-[9px]
+              font-black
+              uppercase
+              tracking-[0.16em]
+              text-slate-500
+            "
+          >
+            <th scope="col" className="px-3 py-2.5">
+              Skill
+            </th>
+
+            <th scope="col" className="px-2 py-2.5">
+              Notes
+            </th>
+
+            <th scope="col" className="px-2 py-2.5">
+              Top
+            </th>
+
+            <th scope="col" className="px-2 py-2.5">
+              Place
+            </th>
+
+            <th scope="col" className="px-3 py-2.5">
+              Player
+            </th>
+
+            <th scope="col" className="px-2 py-2.5 text-right">
+              Price
+            </th>
+
+            <th scope="col" className="px-3 py-2.5 text-right">
+              Date
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {rows.map((row) => {
+            const playerLabel =
+              row.playerName ??
+              row.playerUsername ??
+              "Anonymous";
+
+            return (
+              <tr
+                key={row.id}
+                tabIndex={0}
+                aria-label={`Open ${playerLabel}'s deck`}
+                onClick={() => router.push(row.href)}
+                onKeyDown={(event) => {
+                  if (
+                    event.key === "Enter" ||
+                    event.key === " "
+                  ) {
+                    event.preventDefault();
+
+                    router.push(row.href);
+                  }
+                }}
+                className="
+                  group
+                  cursor-pointer
+                  border-b
+                  border-slate-800/60
+                  outline-none
+                  transition-colors
+                  last:border-b-0
+                  hover:bg-blue-500/[0.06]
+                  focus-visible:bg-blue-500/[0.08]
+                "
+              >
+                <td className="max-w-[220px] px-3 py-2.5">
+                  <span className="flex items-center gap-2">
+                    <span
+                      aria-hidden
+                      className="
+                        h-2
+                        w-2
+                        shrink-0
+                        rotate-45
+                        rounded-[1px]
+                        bg-amber-400
+                        shadow-[0_0_8px_rgba(251,191,36,0.6)]
+                      "
+                    />
+
+                    <span className="truncate text-[11px] font-semibold text-slate-200">
+                      {row.skill?.trim() ||
+                        "No skill"}
+                    </span>
+                  </span>
+                </td>
+
+                <td className="px-2 py-2.5">
+                  <NotesCell notes={row.notes} />
+                </td>
+
+                <td className="px-2 py-2.5">
+                  <TopEmblem
+                    achievement={row.achievement}
+                    verified={row.verified}
+                  />
+                </td>
+
+                <td className="px-2 py-2.5">
+                  {row.verified &&
+                  row.achievement === "TOURNAMENT" &&
+                  row.placement ? (
+                    <span
+                      className="
+                        inline-flex
+                        items-center
+                        rounded-md
+                        border
+                        border-violet-400/30
+                        bg-violet-400/10
+                        px-1.5
+                        py-0.5
+                        text-[9px]
+                        font-black
+                        uppercase
+                        tracking-wide
+                        text-violet-200
+                      "
+                    >
+                      {row.placement}
+                    </span>
+                  ) : (
+                    <span className="text-slate-600">
+                      —
+                    </span>
+                  )}
+                </td>
+
+                <td className="max-w-[160px] px-3 py-2.5">
+                  {row.playerUsername ? (
+                    <Link
+                      href={`/user/${row.playerUsername}`}
+                      onClick={(event) =>
+                        event.stopPropagation()
+                      }
+                      className="
+                        block
+                        truncate
+                        text-[11px]
+                        font-semibold
+                        text-blue-300
+                        transition-colors
+                        hover:text-blue-200
+                        hover:underline
+                      "
+                    >
+                      {playerLabel}
+                    </Link>
+                  ) : (
+                    <span className="text-[11px] font-semibold text-slate-500">
+                      {playerLabel}
+                    </span>
+                  )}
+                </td>
+
+                <td className="whitespace-nowrap px-2 py-2.5 text-right">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold tabular-nums text-emerald-300">
+                    <Gem className="h-3 w-3 text-emerald-400" />
+                    {formatNumber(row.price)}
+                  </span>
+                </td>
+
+                <td className="whitespace-nowrap px-3 py-2.5 text-right text-[10px] font-semibold text-slate-400">
+                  {formatDate(row.createdAt)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}

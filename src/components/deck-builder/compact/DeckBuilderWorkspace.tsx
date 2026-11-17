@@ -13,6 +13,12 @@ import Button from "@/components/ui/Button";
 
 import SkillHoverCard from "@/components/decks/SkillHoverCard";
 
+import CompetitiveResultForm, {
+  EMPTY_COMPETITIVE_RESULT,
+  toCompetitiveResultValue,
+  type CompetitiveResultValue,
+} from "@/components/decks/CompetitiveResultForm";
+
 import useDeckDraft, {
   type DeckDraftSeed,
 } from "@/hooks/useDeckDraft";
@@ -34,6 +40,16 @@ import DraftZone from "./DraftZone";
 export interface EditableDeckData
   extends DeckDraftSeed {
   id: string;
+
+  achievement?: string | null;
+
+  placement?: string | null;
+
+  notes?: string | null;
+
+  proofUrl?: string | null;
+
+  verified?: boolean;
 }
 
 interface DeckBuilderWorkspaceProps {
@@ -45,6 +61,12 @@ interface DeckBuilderWorkspaceProps {
    * las cartas pero guarda como mazo nuevo.
    */
   templateDeck?: DeckDraftSeed;
+
+  /*
+   * ADMIN/EDITOR: sus resultados competitivos se
+   * verifican automáticamente en el servidor.
+   */
+  isStaff?: boolean;
 }
 
 interface SaveDeckResponse {
@@ -68,6 +90,7 @@ type SavingMode = "draft" | "publish" | null;
 export default function DeckBuilderWorkspace({
   initialDeck,
   templateDeck,
+  isStaff = false,
 }: DeckBuilderWorkspaceProps = {}) {
   const router = useRouter();
 
@@ -95,6 +118,13 @@ export default function DeckBuilderWorkspace({
   const [notice, setNotice] = useState<
     string | null
   >(null);
+
+  const [
+    competitiveResult,
+    setCompetitiveResult,
+  ] = useState<CompetitiveResultValue>(() =>
+    toCompetitiveResultValue(initialDeck)
+  );
 
   const cardsByZone = useMemo(
     () => ({
@@ -285,6 +315,24 @@ export default function DeckBuilderWorkspace({
             format: draft.format,
 
             isPublic: makePublic,
+
+            achievement:
+              competitiveResult.achievement,
+
+            placement:
+              competitiveResult.achievement ===
+              "TOURNAMENT"
+                ? competitiveResult.placement ||
+                  null
+                : null,
+
+            notes:
+              competitiveResult.notes.trim() ||
+              null,
+
+            proofUrl:
+              competitiveResult.proofUrl.trim() ||
+              null,
 
             cards: draft.cards.map(
               (card) => ({
@@ -814,6 +862,13 @@ export default function DeckBuilderWorkspace({
               </p>
             )}
 
+            <CompetitiveResultForm
+              value={competitiveResult}
+              onChange={setCompetitiveResult}
+              isStaff={isStaff}
+              disabled={isSaving}
+            />
+
             <DraftZone
               zone="main"
               cards={cardsByZone.main}
@@ -879,6 +934,10 @@ export default function DeckBuilderWorkspace({
                       )
                     ) {
                       draft.clearDeck();
+
+                      setCompetitiveResult(
+                        EMPTY_COMPETITIVE_RESULT
+                      );
 
                       setError(null);
                     }
