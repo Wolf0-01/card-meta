@@ -17,6 +17,8 @@ import CardHoverTooltip, {
   type TooltipAnchor,
 } from "./CardHoverTooltip";
 
+import BanlistBadge from "./BanlistBadge";
+
 import {
   normalizeRarity,
   RARITY_STYLES,
@@ -232,6 +234,15 @@ export default function CatalogCardTile({
               ${rarityStyle.glow}
             `}
           />
+
+          {card.banlistStatus && (
+            <span className="absolute left-0.5 top-0.5 z-20 flex">
+              <BanlistBadge
+                status={card.banlistStatus}
+                size="sm"
+              />
+            </span>
+          )}
 
           {levelLabel && (
             <span

@@ -12,6 +12,8 @@ import {
 
 import ArchetypeBreakdown from "@/components/decks/ArchetypeBreakdown";
 
+import ArchetypeCardFilterProvider from "@/components/decks/ArchetypeCardFilterContext";
+
 import ArchetypeDeckTable, {
   type ArchetypeDeckRow,
 } from "@/components/decks/ArchetypeDeckTable";
@@ -32,8 +34,6 @@ import {
   normalizeAchievement,
   normalizePlacement,
 } from "@/lib/decks/achievements";
-
-import { estimateDeckGemCost } from "@/lib/decks/gemCost";
 
 import {
   findArchetypeBreakdown,
@@ -197,7 +197,9 @@ export default async function DecksPage({
         deck.author?.username ??
         null,
 
-      price: estimateDeckGemCost(deck),
+      cardIds: deck.cards.map(
+        (deckCard) => deckCard.card.id
+      ),
 
       createdAt: deck.createdAt,
     }));
@@ -311,9 +313,79 @@ export default async function DecksPage({
           total={result.total}
         />
 
-        {breakdown && (
-          <ArchetypeBreakdown breakdown={breakdown} />
-        )}
+        <ArchetypeCardFilterProvider>
+          {archetype && (
+            <section
+              aria-label={`${archetype} archetype`}
+              className="
+                flex
+                flex-wrap
+                items-end
+                justify-between
+                gap-2
+                border-b
+                border-slate-800
+                pb-2
+              "
+            >
+              <div className="min-w-0">
+                <Link
+                  href={resetHref}
+                  className="
+                    inline-flex
+                    items-center
+                    gap-1
+                    text-[9px]
+                    font-black
+                    uppercase
+                    tracking-[0.18em]
+                    text-slate-500
+                    transition-colors
+                    hover:text-blue-300
+                  "
+                >
+                  <ArrowLeft className="h-3 w-3" />
+                  All Archetypes
+                </Link>
+
+                <h2
+                  className="
+                    mt-1
+                    truncate
+                    text-lg
+                    font-black
+                    uppercase
+                    tracking-tight
+                    text-white
+                    sm:text-xl
+                  "
+                >
+                  {archetype}
+                </h2>
+              </div>
+
+              <span
+                className="
+                  text-[9px]
+                  font-bold
+                  uppercase
+                  tracking-[0.14em]
+                  text-slate-500
+                "
+              >
+                <span className="tabular-nums text-slate-300">
+                  {breakdown?.deckCount ?? result.total}
+                </span>{" "}
+                {(breakdown?.deckCount ?? result.total) === 1
+                  ? "deck"
+                  : "decks"}
+              </span>
+            </section>
+          )}
+
+          {breakdown && (
+            <ArchetypeBreakdown breakdown={breakdown} />
+          )}
 
         {isStaff && pendingResults.length > 0 && (
           <CompetitiveReviewQueue
@@ -321,7 +393,7 @@ export default async function DecksPage({
           />
         )}
 
-        {archetypes.length > 0 && (
+        {!archetype && archetypes.length > 0 && (
           <section
             aria-label="Archetypes with public decks"
             className="space-y-2"
@@ -408,56 +480,56 @@ export default async function DecksPage({
 
         {hasFilters && (
           <>
-            <div
-              className="
-                flex
-                flex-wrap
-                items-center
-                justify-between
-                gap-2
-                border-b
-                border-slate-800
-                pb-2
-              "
-            >
-              <div className="flex min-w-0 items-center gap-2">
-                <LayoutGrid className="h-3.5 w-3.5 shrink-0 text-blue-300" />
-    
-                <h2
-                  className="
-                    truncate
-                    text-[10px]
-                    font-black
-                    uppercase
-                    tracking-[0.2em]
-                    text-slate-300
-                  "
-                >
-                  {archetype
-                    ? `${archetype} Decks`
-                    : search
-                      ? `Results for "${search}"`
-                      : "Public decks"}
-                </h2>
-              </div>
-    
-              <span
+            {!archetype && (
+              <div
                 className="
-                  text-[9px]
-                  font-bold
-                  uppercase
-                  tracking-[0.14em]
-                  text-slate-500
+                  flex
+                  flex-wrap
+                  items-center
+                  justify-between
+                  gap-2
+                  border-b
+                  border-slate-800
+                  pb-2
                 "
               >
-                <span className="tabular-nums text-slate-300">
-                  {result.total}
-                </span>{" "}
-                {result.total === 1
-                  ? "deck"
-                  : "decks"}
-              </span>
-            </div>
+                <div className="flex min-w-0 items-center gap-2">
+                  <LayoutGrid className="h-3.5 w-3.5 shrink-0 text-blue-300" />
+      
+                  <h2
+                    className="
+                      truncate
+                      text-[10px]
+                      font-black
+                      uppercase
+                      tracking-[0.2em]
+                      text-slate-300
+                    "
+                  >
+                    {search
+                      ? `Results for "${search}"`
+                      : "Public decks"}
+                  </h2>
+                </div>
+      
+                <span
+                  className="
+                    text-[9px]
+                    font-bold
+                    uppercase
+                    tracking-[0.14em]
+                    text-slate-500
+                  "
+                >
+                  <span className="tabular-nums text-slate-300">
+                    {result.total}
+                  </span>{" "}
+                  {result.total === 1
+                    ? "deck"
+                    : "decks"}
+                </span>
+              </div>
+            )}
     
             {result.items.length === 0 ? (
               <section
@@ -626,6 +698,7 @@ export default async function DecksPage({
             )}
           </>
         )}
+        </ArchetypeCardFilterProvider>
       </div>
     </main>
   );

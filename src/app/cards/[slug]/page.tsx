@@ -10,16 +10,10 @@ import {
   BookOpen,
   CalendarDays,
   CircleDot,
-  Droplets,
-  Flame,
-  Mountain,
-  Moon,
   Package,
   Shield,
   Sparkles,
-  Sun,
   Swords,
-  Wind,
   Zap,
   type LucideIcon,
 } from "lucide-react";
@@ -41,6 +35,9 @@ import {
 import CardDetailImage from "@/components/cards/CardDetailImage";
 import CardRelated from "@/components/cards/CardRelated";
 import BanlistBadge from "@/components/cards/BanlistBadge";
+import AttributeOrb, {
+  getAttributeIcon,
+} from "@/components/cards/AttributeOrb";
 import { CardArtworkProvider } from "@/components/cards/CardArtworkContext";
 import CardArtworkGallery from "@/components/cards/CardArtworkGallery";
 
@@ -59,64 +56,27 @@ interface CardPageProps {
   }>;
 }
 
-interface AttributeMeta {
-  Icon: LucideIcon;
+const ATTRIBUTE_CLASSES: Record<string, string> = {
+  DARK:
+    "border-violet-500/40 bg-violet-500/10 text-violet-300",
 
-  classes: string;
-}
+  LIGHT:
+    "border-amber-400/40 bg-amber-400/10 text-amber-300",
 
-const ATTRIBUTE_META: Record<
-  string,
-  AttributeMeta
-> = {
-  DARK: {
-    Icon: Moon,
+  EARTH:
+    "border-amber-700/50 bg-amber-700/15 text-amber-400",
 
-    classes:
-      "border-violet-500/40 bg-violet-500/10 text-violet-300",
-  },
+  WATER:
+    "border-sky-500/40 bg-sky-500/10 text-sky-300",
 
-  LIGHT: {
-    Icon: Sun,
+  FIRE:
+    "border-red-500/40 bg-red-500/10 text-red-300",
 
-    classes:
-      "border-amber-400/40 bg-amber-400/10 text-amber-300",
-  },
+  WIND:
+    "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
 
-  EARTH: {
-    Icon: Mountain,
-
-    classes:
-      "border-amber-700/50 bg-amber-700/15 text-amber-400",
-  },
-
-  WATER: {
-    Icon: Droplets,
-
-    classes:
-      "border-sky-500/40 bg-sky-500/10 text-sky-300",
-  },
-
-  FIRE: {
-    Icon: Flame,
-
-    classes:
-      "border-red-500/40 bg-red-500/10 text-red-300",
-  },
-
-  WIND: {
-    Icon: Wind,
-
-    classes:
-      "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
-  },
-
-  DIVINE: {
-    Icon: Sparkles,
-
-    classes:
-      "border-orange-500/40 bg-orange-500/10 text-orange-300",
-  },
+  DIVINE:
+    "border-orange-500/40 bg-orange-500/10 text-orange-300",
 };
 
 const DATE_FORMATTER =
@@ -297,23 +257,14 @@ export default async function CardDetailPage({
     card.attribute?.toUpperCase() ??
     null;
 
-  const attributeMeta =
-    attributeKey
-      ? ATTRIBUTE_META[attributeKey]
-      : null;
-
-  const TypeIcon: LucideIcon =
-    attributeMeta?.Icon ??
-    (isSpell
-      ? Sparkles
-      : isTrap
-        ? Shield
-        : isSkill
-          ? Zap
-          : CircleDot);
+  const TypeIcon: LucideIcon = isSkill
+    ? Zap
+    : CircleDot;
 
   const propertyClasses =
-    attributeMeta?.classes ??
+    (attributeKey
+      ? ATTRIBUTE_CLASSES[attributeKey]
+      : null) ??
     (isSpell
       ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
       : isTrap
@@ -331,6 +282,9 @@ export default async function CardDetailPage({
         : isSkill
           ? "SKILL"
           : "CARD");
+
+  const propertyIcon =
+    getAttributeIcon(propertyLabel);
 
   const kindParts = [
     card.race,
@@ -473,7 +427,7 @@ export default async function CardDetailPage({
                   />
 
                   {card.banlistStatus && (
-                    <span className="absolute left-2 top-2 z-20">
+                    <span className="absolute left-1.5 top-1.5 z-20 flex">
                       <BanlistBadge
                         status={card.banlistStatus}
                         size="lg"
@@ -536,7 +490,14 @@ export default async function CardDetailPage({
                     ${propertyClasses}
                   `}
                 >
-                  <TypeIcon className="h-4 w-4" />
+                  {propertyIcon ? (
+                    <AttributeOrb
+                      attribute={propertyLabel}
+                      size={30}
+                    />
+                  ) : (
+                    <TypeIcon className="h-4 w-4" />
+                  )}
                 </span>
 
                 <span

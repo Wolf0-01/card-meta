@@ -22,6 +22,8 @@ import {
   X,
 } from "lucide-react";
 
+import AttributeOrb from "./AttributeOrb";
+
 const TYPE_OPTIONS = [
   { value: "", label: "All" },
   { value: "Monster", label: "Monsters" },
@@ -569,33 +571,87 @@ export default function CardCatalogControls() {
                     </select>
                   </label>
 
-                  <label className="block">
-                    <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
+                  <div className="block">
+                    <span className="mb-0.5 flex items-center justify-between gap-1 text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">
                       Attribute
+
+                      {attribute && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateFilter(
+                              "attribute",
+                              ""
+                            )
+                          }
+                          className="
+                            text-[8px]
+                            font-black
+                            uppercase
+                            tracking-[0.1em]
+                            text-blue-300
+                            transition-colors
+                            hover:text-blue-200
+                          "
+                        >
+                          Clear
+                        </button>
+                      )}
                     </span>
 
-                    <select
-                      value={attribute}
-                      onChange={(event) =>
-                        updateFilter(
-                          "attribute",
-                          event.target.value
-                        )
-                      }
-                      className={`${controlClasses} w-full`}
+                    <div
+                      role="group"
+                      aria-label="Attribute"
+                      className="grid grid-cols-4 gap-1"
                     >
-                      {ATTRIBUTE_OPTIONS.map(
-                        (option) => (
-                          <option
+                      {ATTRIBUTE_OPTIONS.filter(
+                        (option) =>
+                          option.value !== ""
+                      ).map((option) => {
+                        const active =
+                          attribute ===
+                          option.value;
+
+                        return (
+                          <button
                             key={option.value}
-                            value={option.value}
+                            type="button"
+                            aria-pressed={active}
+                            aria-label={option.label}
+                            title={option.label}
+                            onClick={() =>
+                              updateFilter(
+                                "attribute",
+                                active
+                                  ? ""
+                                  : option.value
+                              )
+                            }
+                            className={`
+                              flex
+                              h-7
+                              items-center
+                              justify-center
+                              rounded-md
+                              border
+                              bg-[#070D1F]
+                              transition-colors
+                              ${
+                                active
+                                  ? "border-blue-400 ring-2 ring-blue-500/30"
+                                  : "border-slate-700/80 hover:border-slate-500"
+                              }
+                            `}
                           >
-                            {option.label}
-                          </option>
-                        )
-                      )}
-                    </select>
-                  </label>
+                            <AttributeOrb
+                              attribute={option.value}
+                              size={22}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
 
                   <label className="block">
                     <span className="mb-0.5 block text-[8px] font-black uppercase tracking-[0.14em] text-slate-500">

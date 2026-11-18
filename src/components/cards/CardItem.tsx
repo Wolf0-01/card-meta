@@ -88,8 +88,8 @@ export default function CardItem({
         <div
           className="
             absolute
-            left-1
-            top-1
+            left-0.5
+            top-0.5
             z-10
             flex
             flex-wrap

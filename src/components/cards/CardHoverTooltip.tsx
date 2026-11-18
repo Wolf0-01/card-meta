@@ -165,7 +165,7 @@ export default function CardHoverTooltip({
             className="object-contain"
           />
 
-          <span className="absolute left-1.5 top-1.5 z-10">
+          <span className="absolute left-0.5 top-0.5 z-10 flex">
             <BanlistBadge
               status={card.banlistStatus}
               size="md"

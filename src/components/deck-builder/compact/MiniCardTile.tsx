@@ -223,7 +223,7 @@ export default function MiniCardTile({
         )}
 
         {card.banlistStatus && (
-          <span className="absolute left-1 top-1 z-10">
+          <span className="absolute left-0.5 top-0.5 z-10 flex">
             <BanlistBadge
               status={card.banlistStatus}
               size="sm"
