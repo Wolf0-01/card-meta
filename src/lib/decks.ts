@@ -3,6 +3,8 @@ import { Prisma } from "@prisma/client";
 
 import { getCardImageSrc } from "@/lib/cards/image";
 
+import { normalizeAchievement } from "@/lib/decks/achievements";
+
 import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
 
 import { pickDeckEmblem } from "@/lib/decks/emblem";
@@ -582,19 +584,17 @@ export interface ArchetypeBreakdownSkill {
 }
 
 export interface ArchetypeBreakdownCard {
-  id: number;
+  /** Información completa para la miniatura y el tooltip. */
+  card: MetaDeck["cards"][number]["card"];
 
-  name: string;
-
-  slug: string;
-
-  image: string | null;
-
-  rarity: string | null;
-
+  /** Número de mazos que incluyen al menos una copia. */
   deckCount: number;
 
+  /** Porcentaje real de inclusión entre los mazos públicos. */
   percentage: number;
+
+  /** Cantidad modal: 1x, 2x o 3x. */
+  copies: number;
 }
 
 export interface ArchetypeBreakdown {
@@ -602,20 +602,189 @@ export interface ArchetypeBreakdown {
 
   deckCount: number;
 
-  topSkill: ArchetypeBreakdownSkill | null;
+  /** Media de cartas del Main Deck entre los mazos públicos. */
+  averageSize: number;
 
-  coreCards: ArchetypeBreakdownCard[];
+  mainDeck: ArchetypeBreakdownCard[];
+
+  extraDeck: ArchetypeBreakdownCard[];
+
+  /** Ranking completo de Skills por uso. */
+  skills: ArchetypeBreakdownSkill[];
+
+  /** Mazo destacado para el bloque Sample Deck. */
+  sampleDeck: MetaDeck | null;
 }
 
-const CORE_CARD_LIMIT = 8;
+const MAIN_DECK_BREAKDOWN_LIMIT = 18;
+
+const EXTRA_DECK_BREAKDOWN_LIMIT = 8;
+
+/**
+ * Agrupa las cartas de una zona y calcula su cantidad modal
+ * y su porcentaje real de inclusión.
+ */
+function buildCardBreakdown(
+  decks: MetaDeck[],
+  zone: "main" | "extra",
+  limit: number
+): ArchetypeBreakdownCard[] {
+  const usage = new Map<
+    number,
+    {
+      card: MetaDeck["cards"][number]["card"];
+
+      deckCount: number;
+
+      quantityCounts: Map<number, number>;
+    }
+  >();
+
+  for (const deck of decks) {
+    const quantities = new Map<
+      number,
+      {
+        card: MetaDeck["cards"][number]["card"];
+
+        quantity: number;
+      }
+    >();
+
+    for (const deckCard of deck.cards) {
+      if (deckCard.zone !== zone) {
+        continue;
+      }
+
+      const current = quantities.get(
+        deckCard.card.id
+      );
+
+      if (current) {
+        current.quantity += deckCard.quantity;
+      } else {
+        quantities.set(deckCard.card.id, {
+          card: deckCard.card,
+
+          quantity: deckCard.quantity,
+        });
+      }
+    }
+
+    for (const [cardId, { card, quantity }] of quantities) {
+      const current = usage.get(cardId);
+
+      if (current) {
+        current.deckCount += 1;
+
+        current.quantityCounts.set(
+          quantity,
+          (current.quantityCounts.get(quantity) ??
+            0) + 1
+        );
+
+        continue;
+      }
+
+      usage.set(cardId, {
+        card,
+
+        deckCount: 1,
+
+        quantityCounts: new Map([[quantity, 1]]),
+      });
+    }
+  }
+
+  return [...usage.values()]
+    .sort(
+      (a, b) =>
+        b.deckCount - a.deckCount ||
+        a.card.name.localeCompare(b.card.name)
+    )
+    .slice(0, limit)
+    .map(({ card, deckCount, quantityCounts }) => {
+      /*
+       * Cantidad modal. En caso de empate se prefiere la
+       * cantidad mayor para reflejar la lista más completa.
+       */
+      const copies =
+        [...quantityCounts.entries()].sort(
+          (a, b) =>
+            b[1] - a[1] ||
+            b[0] - a[0]
+        )[0]?.[0] ?? 1;
+
+      return {
+        card,
+
+        deckCount,
+
+        percentage: Math.round(
+          (deckCount / decks.length) * 100
+        ),
+
+        copies,
+      };
+    });
+}
+
+/**
+ * Elige el mazo del bloque Sample Deck: primero los
+ * verificados de Torneo, después KoG y KC Cup, y como
+ * último recurso el mazo público más reciente.
+ */
+function pickSampleDeck(
+  decks: MetaDeck[]
+): MetaDeck | null {
+  if (decks.length === 0) {
+    return null;
+  }
+
+  function score(deck: MetaDeck): number {
+    if (!deck.verified) {
+      return 0;
+    }
+
+    switch (normalizeAchievement(deck.achievement)) {
+      case "TOURNAMENT":
+        return 4;
+
+      case "KOG":
+        return 3;
+
+      case "KC_MAX":
+        return 2;
+
+      default:
+        return 1;
+    }
+  }
+
+  let best = decks[0];
+
+  let bestScore = score(best);
+
+  for (const deck of decks.slice(1)) {
+    const nextScore = score(deck);
+
+    if (nextScore > bestScore) {
+      best = deck;
+
+      bestScore = nextScore;
+    }
+  }
+
+  return best;
+}
 
 /**
  * Desglose estadístico de un arquetipo calculado con los
- * mazos públicos reales de PostgreSQL: la Skill más usada y
- * las cartas del Main Deck que aparecen en más listas.
+ * mazos públicos reales de PostgreSQL.
  *
- * Los porcentajes se recalculan en cada petición, así que el
- * bloque se actualiza automáticamente al subir más mazos.
+ * Separa Main Deck y Extra Deck, calcula la cantidad modal
+ * de cada carta, su porcentaje real de inclusión, la media
+ * de tamaño del Main Deck y el ranking completo de Skills.
+ * Los porcentajes se recalculan en cada petición.
  */
 export async function getArchetypeBreakdown(
   format: DuelFormat = "speed",
@@ -654,111 +823,71 @@ export async function getArchetypeBreakdown(
 
   const skillCounts = new Map<string, number>();
 
+  let mainDeckTotal = 0;
+
   for (const deck of decks) {
     const skill = deck.skill?.trim();
 
-    if (!skill) {
-      continue;
-    }
-
-    skillCounts.set(
-      skill,
-      (skillCounts.get(skill) ?? 0) + 1
-    );
-  }
-
-  const topSkillEntry = [
-    ...skillCounts.entries(),
-  ].sort(
-    (a, b) =>
-      b[1] - a[1] || a[0].localeCompare(b[0])
-  )[0];
-
-  const topSkill = topSkillEntry
-    ? {
-        name: topSkillEntry[0],
-
-        deckCount: topSkillEntry[1],
-
-        percentage: Math.round(
-          (topSkillEntry[1] / deckCount) * 100
-        ),
-      }
-    : null;
-
-  const cardUsage = new Map<
-    number,
-    {
-      card: MetaDeck["cards"][number]["card"];
-
-      deckCount: number;
-    }
-  >();
-
-  for (const deck of decks) {
-    const seen = new Set<number>();
-
-    for (const deckCard of deck.cards) {
-      if (
-        deckCard.zone !== "main" ||
-        seen.has(deckCard.card.id)
-      ) {
-        continue;
-      }
-
-      seen.add(deckCard.card.id);
-
-      const current = cardUsage.get(
-        deckCard.card.id
+    if (skill) {
+      skillCounts.set(
+        skill,
+        (skillCounts.get(skill) ?? 0) + 1
       );
-
-      if (current) {
-        current.deckCount += 1;
-      } else {
-        cardUsage.set(deckCard.card.id, {
-          card: deckCard.card,
-
-          deckCount: 1,
-        });
-      }
     }
+
+    mainDeckTotal += deck.cards
+      .filter(
+        (deckCard) => deckCard.zone === "main"
+      )
+      .reduce(
+        (total, deckCard) =>
+          total + deckCard.quantity,
+        0
+      );
   }
 
-  const coreCards: ArchetypeBreakdownCard[] = [
-    ...cardUsage.values(),
+  const skills: ArchetypeBreakdownSkill[] = [
+    ...skillCounts.entries(),
   ]
+    .map(([name, count]) => ({
+      name,
+
+      deckCount: count,
+
+      percentage: Math.round(
+        (count / deckCount) * 100
+      ),
+    }))
     .sort(
       (a, b) =>
         b.deckCount - a.deckCount ||
-        a.card.name.localeCompare(b.card.name)
-    )
-    .slice(0, CORE_CARD_LIMIT)
-    .map(({ card, deckCount: usage }) => ({
-      id: card.id,
-
-      name: card.name,
-
-      slug: card.slug,
-
-      image: card.image,
-
-      rarity: card.rarity,
-
-      deckCount: usage,
-
-      percentage: Math.round(
-        (usage / deckCount) * 100
-      ),
-    }));
+        a.name.localeCompare(b.name)
+    );
 
   return {
     archetype: term,
 
     deckCount,
 
-    topSkill,
+    averageSize: Math.round(
+      mainDeckTotal / deckCount
+    ),
 
-    coreCards,
+    mainDeck: buildCardBreakdown(
+      decks,
+      "main",
+      MAIN_DECK_BREAKDOWN_LIMIT
+    ),
+
+    extraDeck: buildCardBreakdown(
+      decks,
+      "extra",
+      EXTRA_DECK_BREAKDOWN_LIMIT
+    ),
+
+    skills,
+
+    sampleDeck: pickSampleDeck(decks),
   };
 }
 

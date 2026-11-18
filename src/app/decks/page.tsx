@@ -18,6 +18,8 @@ import ArchetypeDeckTable, {
   type ArchetypeDeckRow,
 } from "@/components/decks/ArchetypeDeckTable";
 
+import ArchetypeSampleDeck from "@/components/decks/ArchetypeSampleDeck";
+
 import CompetitiveReviewQueue from "@/components/decks/CompetitiveReviewQueue";
 
 import DeckArchetypeCard from "@/components/decks/DeckArchetypeCard";
@@ -247,7 +249,7 @@ export default async function DecksPage({
       >
         <header className="space-y-2">
           <Link
-            href="/"
+            href={archetype ? resetHref : "/"}
             className="
               inline-flex
               items-center
@@ -262,7 +264,7 @@ export default async function DecksPage({
             "
           >
             <ArrowLeft className="h-3 w-3" />
-            Home
+            {archetype ? "All Archetypes" : "Home"}
           </Link>
 
           <div
@@ -284,8 +286,13 @@ export default async function DecksPage({
                 sm:text-3xl
               "
             >
-              Top Decks:{" "}
-              {format === "rush" ? "Rush" : "Speed"}
+              {archetype
+                ? `${archetype} Deck Breakdown`
+                : `Top Decks: ${
+                    format === "rush"
+                      ? "Rush"
+                      : "Speed"
+                  }`}
             </h1>
 
             <p
@@ -296,11 +303,21 @@ export default async function DecksPage({
                 text-slate-400
               "
             >
-              Public community decks for{" "}
-              {format === "rush"
-                ? "Rush Duel"
-                : "Speed Duel"}
-              , grouped by archetype.
+              {archetype
+                ? breakdown
+                  ? `Deck Statistics · Average size: ${
+                      breakdown.averageSize
+                    } ${
+                      breakdown.averageSize === 1
+                        ? "card"
+                        : "cards"
+                    }`
+                  : "Deck Statistics"
+                : `Public community decks for ${
+                    format === "rush"
+                      ? "Rush Duel"
+                      : "Speed Duel"
+                  }, grouped by archetype.`}
             </p>
           </div>
         </header>
@@ -314,73 +331,10 @@ export default async function DecksPage({
         />
 
         <ArchetypeCardFilterProvider>
-          {archetype && (
-            <section
-              aria-label={`${archetype} archetype`}
-              className="
-                flex
-                flex-wrap
-                items-end
-                justify-between
-                gap-2
-                border-b
-                border-slate-800
-                pb-2
-              "
-            >
-              <div className="min-w-0">
-                <Link
-                  href={resetHref}
-                  className="
-                    inline-flex
-                    items-center
-                    gap-1
-                    text-[9px]
-                    font-black
-                    uppercase
-                    tracking-[0.18em]
-                    text-slate-500
-                    transition-colors
-                    hover:text-blue-300
-                  "
-                >
-                  <ArrowLeft className="h-3 w-3" />
-                  All Archetypes
-                </Link>
-
-                <h2
-                  className="
-                    mt-1
-                    truncate
-                    text-lg
-                    font-black
-                    uppercase
-                    tracking-tight
-                    text-white
-                    sm:text-xl
-                  "
-                >
-                  {archetype}
-                </h2>
-              </div>
-
-              <span
-                className="
-                  text-[9px]
-                  font-bold
-                  uppercase
-                  tracking-[0.14em]
-                  text-slate-500
-                "
-              >
-                <span className="tabular-nums text-slate-300">
-                  {breakdown?.deckCount ?? result.total}
-                </span>{" "}
-                {(breakdown?.deckCount ?? result.total) === 1
-                  ? "deck"
-                  : "decks"}
-              </span>
-            </section>
+          {isStaff && pendingResults.length > 0 && (
+            <CompetitiveReviewQueue
+              results={pendingResults}
+            />
           )}
 
           {breakdown && (
@@ -390,11 +344,11 @@ export default async function DecksPage({
             />
           )}
 
-        {isStaff && pendingResults.length > 0 && (
-          <CompetitiveReviewQueue
-            results={pendingResults}
-          />
-        )}
+          {breakdown?.sampleDeck && (
+            <ArchetypeSampleDeck
+              deck={breakdown.sampleDeck}
+            />
+          )}
 
         {!archetype && archetypes.length > 0 && (
           <section
