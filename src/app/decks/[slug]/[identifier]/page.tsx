@@ -6,7 +6,13 @@ import DeckViewer from "@/components/decks/DeckViewer";
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
 
+import { canManageGuides } from "@/lib/auth/roles";
+
+import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
+
 import { calculateDeckGemEstimate } from "@/lib/decks/gemCalculator";
+
+import { findGuideByArchetype } from "@/lib/guides";
 
 import {
   findDeckByIdentifier,
@@ -72,6 +78,24 @@ export default async function DeckPage({
   const gemEstimate =
     await calculateDeckGemEstimate(deck);
 
+  const archetypeLabel =
+    getDeckArchetypeLabel(deck);
+
+  const archetypeGuide =
+    await findGuideByArchetype(archetypeLabel);
+
+  const archetypeParams = new URLSearchParams({
+    archetype: archetypeLabel,
+  });
+
+  if (deck.format === "rush") {
+    archetypeParams.set("format", "rush");
+  }
+
+  const breakdownHref = archetypeGuide
+    ? `/guides/${archetypeGuide.slug}`
+    : `/decks?${archetypeParams.toString()}`;
+
   return (
     <main
       className="
@@ -83,6 +107,8 @@ export default async function DeckPage({
         <DeckViewer
           deck={deck}
           gemEstimate={gemEstimate}
+          breakdownHref={breakdownHref}
+          canViewPlayerProfile={canManageGuides(user)}
           isOwner={
             Boolean(user) &&
             user?.id === deck.authorId

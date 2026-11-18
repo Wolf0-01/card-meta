@@ -1,15 +1,26 @@
 "use client";
 
+import Link from "next/link";
+
+import { ArrowRight } from "lucide-react";
+
 import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
 
 import type { MetaDeck } from "@/types/meta";
 
 interface Props {
   deck: MetaDeck;
+
+  /**
+   * Destino de la tarjeta: la guía publicada del arquetipo
+   * o el explorador de mazos filtrado por arquetipo.
+   */
+  href: string;
 }
 
 export default function DeckArchetypeBanner({
   deck,
+  href,
 }: Props) {
   const banner =
     deck.banner ??
@@ -21,14 +32,23 @@ export default function DeckArchetypeBanner({
     getDeckArchetypeLabel(deck);
 
   return (
-    <div
+    <Link
+      href={href}
       className="
+        group
         relative
+        block
         overflow-hidden
         rounded-2xl
         border
         border-border
         bg-background-secondary
+        outline-none
+        transition-colors
+        hover:border-blue-400/60
+        focus-visible:border-blue-400/60
+        focus-visible:ring-2
+        focus-visible:ring-blue-500/40
       "
     >
       <div className="relative aspect-[16/10]">
@@ -37,8 +57,15 @@ export default function DeckArchetypeBanner({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={banner}
-            alt={`Banner de ${archetype}`}
-            className="h-full w-full object-cover"
+            alt={`Banner for ${archetype}`}
+            className="
+              h-full
+              w-full
+              object-cover
+              transition-transform
+              duration-300
+              group-hover:scale-[1.03]
+            "
           />
         ) : (
           <div
@@ -71,7 +98,7 @@ export default function DeckArchetypeBanner({
               text-amber-300
             "
           >
-            Arquetipo
+            Archetype
           </p>
 
           <h2
@@ -96,8 +123,35 @@ export default function DeckArchetypeBanner({
           >
             Decklist and competitive guide
           </p>
+
+          <span
+            className="
+              mt-2
+              inline-flex
+              items-center
+              gap-1
+              text-[9px]
+              font-black
+              uppercase
+              tracking-[0.14em]
+              text-blue-300/80
+              transition-colors
+              group-hover:text-blue-200
+            "
+          >
+            View archetype
+            <ArrowRight
+              className="
+                h-3
+                w-3
+                transition-transform
+                duration-200
+                group-hover:translate-x-0.5
+              "
+            />
+          </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

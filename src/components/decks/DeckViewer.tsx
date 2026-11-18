@@ -32,6 +32,19 @@ interface Props {
   relatedDecks?: MetaDeck[];
 
   /**
+   * Destino de la tarjeta lateral del arquetipo: la guía
+   * publicada o el explorador filtrado por arquetipo.
+   * Si no se indica, se usa el explorador por arquetipo.
+   */
+  breakdownHref?: string;
+
+  /**
+   * Solo ADMIN y EDITOR pueden abrir el perfil público
+   * del creador desde la cabecera del mazo.
+   */
+  canViewPlayerProfile?: boolean;
+
+  /**
    * Muestra el bloque lateral "Deck details" solo al
    * propietario del mazo. Los visitantes no lo ven.
    */
@@ -52,6 +65,8 @@ export default function DeckViewer({
   deck,
   gemEstimate,
   relatedDecks = [],
+  breakdownHref,
+  canViewPlayerProfile = false,
   isOwner = false,
 }: Props) {
   const cards = deck.cards ?? [];
@@ -81,6 +96,12 @@ export default function DeckViewer({
     author?.displayName?.trim() ||
     author?.username ||
     "Anonymous creator";
+
+  const resolvedBreakdownHref =
+    breakdownHref ??
+    `/decks?archetype=${encodeURIComponent(
+      getDeckArchetypeLabel(deck)
+    )}`;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -126,7 +147,8 @@ export default function DeckViewer({
           "
         >
           from{" "}
-          {author?.username ? (
+          {canViewPlayerProfile &&
+          author?.username ? (
             <Link
               href={`/user/${author.username}`}
               className="
@@ -268,7 +290,10 @@ export default function DeckViewer({
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-6">
-          <DeckArchetypeBanner deck={deck} />
+          <DeckArchetypeBanner
+            deck={deck}
+            href={resolvedBreakdownHref}
+          />
 
           {isOwner && (
             <DeckCreatorCard deck={deck} />

@@ -50,6 +50,17 @@ export interface ArchetypeDeckRow {
 
 interface ArchetypeDeckTableProps {
   rows: ArchetypeDeckRow[];
+
+  /**
+   * Solo ADMIN y EDITOR pueden filtrar por Core Card.
+   */
+  canFilter?: boolean;
+
+  /**
+   * Solo ADMIN y EDITOR pueden abrir el perfil público
+   * del jugador desde la tabla.
+   */
+  canViewPlayerProfile?: boolean;
 }
 
 const TONE_CLASSES = {
@@ -262,13 +273,16 @@ function NotesCell({
  */
 export default function ArchetypeDeckTable({
   rows,
+  canFilter = false,
+  canViewPlayerProfile = false,
 }: ArchetypeDeckTableProps) {
   const router = useRouter();
 
   const filter = useArchetypeCardFilter();
 
-  const selectedCardId =
-    filter?.selected?.id ?? null;
+  const selectedCardId = canFilter
+    ? filter?.selected?.id ?? null
+    : null;
 
   const visibleRows =
     selectedCardId === null
@@ -279,7 +293,7 @@ export default function ArchetypeDeckTable({
 
   return (
     <div className="space-y-2">
-      {filter?.selected && (
+      {canFilter && filter?.selected && (
         <div
           className="
             flex
@@ -502,7 +516,8 @@ export default function ArchetypeDeckTable({
                     </td>
 
                     <td className="max-w-[160px] px-3 py-2.5">
-                      {row.playerUsername ? (
+                      {canViewPlayerProfile &&
+                      row.playerUsername ? (
                         <Link
                           href={`/user/${row.playerUsername}`}
                           onClick={(event) =>
@@ -522,7 +537,22 @@ export default function ArchetypeDeckTable({
                           {playerLabel}
                         </Link>
                       ) : (
-                        <span className="text-[11px] font-semibold text-slate-500">
+                        <span
+                          onClick={(event) =>
+                            event.stopPropagation()
+                          }
+                          className={`
+                            block
+                            truncate
+                            text-[11px]
+                            font-semibold
+                            ${
+                              row.playerUsername
+                                ? "text-slate-300"
+                                : "text-slate-500"
+                            }
+                          `}
+                        >
                           {playerLabel}
                         </span>
                       )}

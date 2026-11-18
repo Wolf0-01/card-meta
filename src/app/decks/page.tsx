@@ -384,7 +384,10 @@ export default async function DecksPage({
           )}
 
           {breakdown && (
-            <ArchetypeBreakdown breakdown={breakdown} />
+            <ArchetypeBreakdown
+              breakdown={breakdown}
+              canFilterBreakdown={isStaff}
+            />
           )}
 
         {isStaff && pendingResults.length > 0 && (
@@ -594,7 +597,11 @@ export default async function DecksPage({
                 </Link>
               </section>
             ) : archetype ? (
-              <ArchetypeDeckTable rows={deckRows} />
+              <ArchetypeDeckTable
+                rows={deckRows}
+                canFilter={isStaff}
+                canViewPlayerProfile={isStaff}
+              />
             ) : (
               <section
                 aria-label="Public decks"

@@ -24,6 +24,14 @@ import { useArchetypeCardFilter } from "./ArchetypeCardFilterContext";
 
 interface ArchetypeBreakdownProps {
   breakdown: ArchetypeBreakdownData;
+
+  /**
+   * Solo ADMIN y EDITOR pueden usar las Core Cards como
+   * filtro de la tabla. El resto de visitantes ve los
+   * porcentajes de inclusión como información de solo
+   * lectura.
+   */
+  canFilterBreakdown?: boolean;
 }
 
 function deckFraction(
@@ -33,6 +41,195 @@ function deckFraction(
   return `${count}/${total} ${
     total === 1 ? "deck" : "decks"
   }`;
+}
+
+interface CoreCardTileProps {
+  card: ArchetypeBreakdownData["coreCards"][number];
+
+  totalDecks: number;
+
+  interactive: boolean;
+
+  selected: boolean;
+
+  onToggle: () => void;
+}
+
+function CoreCardTile({
+  card,
+  totalDecks,
+  interactive,
+  selected,
+  onToggle,
+}: CoreCardTileProps) {
+  const rarity = normalizeRarity(card.rarity);
+
+  const rarityStyle = RARITY_STYLES[rarity];
+
+  const fraction = deckFraction(
+    card.deckCount,
+    totalDecks
+  );
+
+  const title = `${card.name} · ${fraction}`;
+
+  const content = (
+    <>
+      <span
+        className={`
+          relative
+          block
+          aspect-[59/86]
+          overflow-hidden
+          rounded-lg
+          border
+          bg-slate-800
+          transition-colors
+          ${
+            selected
+              ? "border-blue-400 ring-2 ring-blue-400/60"
+              : interactive
+                ? "border-slate-700 group-hover:border-blue-400/80 group-focus-visible:border-blue-400/80"
+                : "border-slate-700"
+          }
+        `}
+      >
+        {card.image ? (
+          <Image
+            src={card.image}
+            alt={card.name}
+            fill
+            sizes="86px"
+            className={`
+              object-cover
+              ${
+                interactive
+                  ? "transition-transform duration-200 group-hover:scale-[1.04]"
+                  : ""
+              }
+            `}
+          />
+        ) : (
+          <span
+            aria-hidden
+            className="
+              flex
+              h-full
+              w-full
+              items-center
+              justify-center
+              text-[9px]
+              font-black
+              text-slate-500
+            "
+          >
+            {rarity}
+          </span>
+        )}
+
+        <span
+          aria-hidden
+          className={`absolute inset-x-0 top-0 h-[2px] ${rarityStyle.strip}`}
+        />
+
+        <span
+          className={`
+            absolute
+            bottom-0
+            right-0
+            rounded-tl-md
+            px-1.5
+            py-0.5
+            text-[9px]
+            font-black
+            leading-none
+            tabular-nums
+            ring-1
+            ring-white/20
+            ${rarityStyle.badge}
+          `}
+        >
+          {card.percentage}%
+        </span>
+
+        {selected && (
+          <span
+            aria-hidden
+            className="
+              absolute
+              inset-0
+              flex
+              items-center
+              justify-center
+              bg-blue-950/45
+            "
+          >
+            <span
+              className="
+                flex
+                h-6
+                w-6
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-blue-300/70
+                bg-blue-500
+                text-white
+                shadow-lg
+              "
+            >
+              <Check className="h-3.5 w-3.5" />
+            </span>
+          </span>
+        )}
+      </span>
+
+      <span
+        className="
+          mt-0.5
+          block
+          text-center
+          text-[8px]
+          font-bold
+          tabular-nums
+          text-slate-500
+        "
+      >
+        {fraction}
+      </span>
+    </>
+  );
+
+  if (!interactive) {
+    return (
+      <div
+        title={title}
+        className="relative block min-w-0"
+      >
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={selected}
+      title={title}
+      className="
+        group
+        relative
+        block
+        min-w-0
+        text-left
+        outline-none
+      "
+    >
+      {content}
+    </button>
+  );
 }
 
 /**
@@ -45,6 +242,7 @@ function deckFraction(
  */
 export default function ArchetypeBreakdown({
   breakdown,
+  canFilterBreakdown = false,
 }: ArchetypeBreakdownProps) {
   const { topSkill, coreCards } = breakdown;
 
@@ -289,7 +487,9 @@ export default function ArchetypeBreakdown({
                   text-slate-600
                 "
               >
-                Click to filter · Inclusion rate
+                {canFilterBreakdown
+                  ? "Click to filter · Inclusion rate"
+                  : "Inclusion rate"}
               </p>
             </div>
 
@@ -301,173 +501,31 @@ export default function ArchetypeBreakdown({
                 gap-1.5
               "
             >
-              {coreCards.map((card) => {
-                const rarity = normalizeRarity(
-                  card.rarity
-                );
+              {coreCards.map((card) => (
+                <CoreCardTile
+                  key={card.id}
+                  card={card}
+                  totalDecks={breakdown.deckCount}
+                  interactive={canFilterBreakdown}
+                  selected={
+                    canFilterBreakdown &&
+                    selectedCardId === card.id
+                  }
+                  onToggle={() =>
+                    filter?.toggle({
+                      id: card.id,
 
-                const rarityStyle =
-                  RARITY_STYLES[rarity];
-
-                const isSelected =
-                  selectedCardId === card.id;
-
-                return (
-                  <button
-                    key={card.id}
-                    type="button"
-                    onClick={() =>
-                      filter?.toggle({
-                        id: card.id,
-
-                        name: card.name,
-                      })
-                    }
-                    aria-pressed={isSelected}
-                    title={`${card.name} · ${deckFraction(
-                      card.deckCount,
-                      breakdown.deckCount
-                    )}`}
-                    className="
-                      group
-                      relative
-                      block
-                      min-w-0
-                      text-left
-                      outline-none
-                    "
-                  >
-                    <span
-                      className={`
-                        relative
-                        block
-                        aspect-[59/86]
-                        overflow-hidden
-                        rounded-lg
-                        border
-                        bg-slate-800
-                        transition-colors
-                        ${
-                          isSelected
-                            ? "border-blue-400 ring-2 ring-blue-400/60"
-                            : "border-slate-700 group-hover:border-blue-400/80 group-focus-visible:border-blue-400/80"
-                        }
-                      `}
-                    >
-                      {card.image ? (
-                        <Image
-                          src={card.image}
-                          alt={card.name}
-                          fill
-                          sizes="86px"
-                          className="
-                            object-cover
-                            transition-transform
-                            duration-200
-                            group-hover:scale-[1.04]
-                          "
-                        />
-                      ) : (
-                        <span
-                          aria-hidden
-                          className="
-                            flex
-                            h-full
-                            w-full
-                            items-center
-                            justify-center
-                            text-[9px]
-                            font-black
-                            text-slate-500
-                          "
-                        >
-                          {rarity}
-                        </span>
-                      )}
-
-                      <span
-                        aria-hidden
-                        className={`absolute inset-x-0 top-0 h-[2px] ${rarityStyle.strip}`}
-                      />
-
-                      <span
-                        className={`
-                          absolute
-                          bottom-0
-                          right-0
-                          rounded-tl-md
-                          px-1.5
-                          py-0.5
-                          text-[9px]
-                          font-black
-                          leading-none
-                          tabular-nums
-                          ring-1
-                          ring-white/20
-                          ${rarityStyle.badge}
-                        `}
-                      >
-                        {card.percentage}%
-                      </span>
-
-                      {isSelected && (
-                        <span
-                          aria-hidden
-                          className="
-                            absolute
-                            inset-0
-                            flex
-                            items-center
-                            justify-center
-                            bg-blue-950/45
-                          "
-                        >
-                          <span
-                            className="
-                              flex
-                              h-6
-                              w-6
-                              items-center
-                              justify-center
-                              rounded-full
-                              border
-                              border-blue-300/70
-                              bg-blue-500
-                              text-white
-                              shadow-lg
-                            "
-                          >
-                            <Check className="h-3.5 w-3.5" />
-                          </span>
-                        </span>
-                      )}
-                    </span>
-
-                    <span
-                      className="
-                        mt-0.5
-                        block
-                        text-center
-                        text-[8px]
-                        font-bold
-                        tabular-nums
-                        text-slate-500
-                      "
-                    >
-                      {deckFraction(
-                        card.deckCount,
-                        breakdown.deckCount
-                      )}
-                    </span>
-                  </button>
-                );
-              })}
+                      name: card.name,
+                    })
+                  }
+                />
+              ))}
             </div>
           </div>
         )}
       </div>
 
-      {filter?.selected && (
+      {canFilterBreakdown && filter?.selected && (
         <div
           className="
             mt-2.5

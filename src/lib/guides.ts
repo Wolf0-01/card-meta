@@ -286,6 +286,57 @@ export const getFeaturedGuides = cache(
   }
 );
 
+function normalizeGuideKey(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Busca la guía publicada que corresponde a un arquetipo.
+ *
+ * Las guías no guardan una relación explícita con el
+ * arquetipo, así que se compara el nombre contra sus
+ * etiquetas y contra el inicio del título
+ * ("Snake-Eye Guide: ...", "Blue-Eyes: ...").
+ */
+export const findGuideByArchetype = cache(
+  async (
+    archetype: string
+  ): Promise<GuideListItem | null> => {
+    const target = normalizeGuideKey(archetype);
+
+    if (!target) {
+      return null;
+    }
+
+    const guides = await getGuides();
+
+    return (
+      guides.find((guide) => {
+        const tags = guide.tags.map(
+          normalizeGuideKey
+        );
+
+        if (tags.includes(target)) {
+          return true;
+        }
+
+        const title = normalizeGuideKey(
+          guide.title
+        );
+
+        return (
+          title === target ||
+          title.startsWith(`${target}-`)
+        );
+      }) ?? null
+    );
+  }
+);
+
 export const getGuide = cache(
   async (
     slug: string
