@@ -26,7 +26,8 @@ export default function DeckCardGrid({
         grid
         grid-cols-[repeat(5,minmax(0,72px))]
         justify-center
-        gap-1.5
+        gap-x-1.5
+        gap-y-2.5
       "
     >
       {cards.map((deckCard) =>
@@ -41,6 +42,7 @@ export default function DeckCardGrid({
             <DeckCardItem
               key={`${deckCard.id}-${copyIndex}`}
               card={deckCard.card}
+              compact
             />
           )
         )

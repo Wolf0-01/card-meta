@@ -454,49 +454,80 @@ export default async function CardDetailPage({
                 gap-4
               "
             >
-              <div
-                className="
-                  flex
-                  flex-wrap
-                  items-center
-                  gap-x-3
-                  gap-y-2
-                "
-              >
-                <span
-                  className={`
-                    inline-flex
-                    h-9
-                    w-9
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-lg
-                    border
-                    ${propertyClasses}
-                  `}
-                >
-                  {propertyIcon ? (
-                    <AttributeOrb
-                      attribute={propertyLabel}
-                      size={30}
-                    />
-                  ) : (
-                    <TypeIcon className="h-4 w-4" />
-                  )}
-                </span>
-
-                <span
+              <div className="flex flex-col gap-1.5">
+                <div
                   className="
-                    text-[11px]
-                    font-black
-                    uppercase
-                    tracking-[0.18em]
-                    text-slate-300
+                    flex
+                    flex-wrap
+                    items-center
+                    gap-x-3
+                    gap-y-2
                   "
                 >
-                  {propertyLabel}
-                </span>
+                  <span
+                    className={`
+                      inline-flex
+                      h-9
+                      w-9
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-lg
+                      border
+                      ${propertyClasses}
+                    `}
+                  >
+                    {propertyIcon ? (
+                      <AttributeOrb
+                        attribute={propertyLabel}
+                        size={30}
+                      />
+                    ) : (
+                      <TypeIcon className="h-4 w-4" />
+                    )}
+                  </span>
+
+                  <span
+                    className="
+                      text-[11px]
+                      font-black
+                      uppercase
+                      tracking-[0.18em]
+                      text-slate-300
+                    "
+                  >
+                    {propertyLabel}
+                  </span>
+                </div>
+
+                {isMonster &&
+                  levelValue !== null && (
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="
+                        text-[10px]
+                        font-black
+                        uppercase
+                        tracking-[0.16em]
+                        text-slate-500
+                      "
+                    >
+                      {levelLabel}
+                    </span>
+
+                    <span
+                      className="
+                        text-lg
+                        font-black
+                        leading-none
+                        tabular-nums
+                        text-white
+                      "
+                    >
+                      {levelValue}
+                    </span>
+                  </div>
+                )}
 
                 <span
                   className="
@@ -588,34 +619,6 @@ export default async function CardDetailPage({
                         "
                       >
                         / {formatStat(card.defense)}
-                      </span>
-                    </span>
-                  )}
-
-                  {levelValue !== null && (
-                    <span className="inline-flex items-baseline gap-1.5">
-                      <span
-                        className="
-                          text-[10px]
-                          font-black
-                          uppercase
-                          tracking-[0.16em]
-                          text-slate-500
-                        "
-                      >
-                        {levelLabel}
-                      </span>
-
-                      <span
-                        className="
-                          text-lg
-                          font-black
-                          leading-none
-                          tabular-nums
-                          text-white
-                        "
-                      >
-                        / {levelValue}
                       </span>
                     </span>
                   )}

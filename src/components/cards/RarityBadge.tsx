@@ -30,7 +30,7 @@ const SIZE_CLASSES: Record<
   RarityBadgeSize,
   string
 > = {
-  xs: "h-2",
+  xs: "h-[7px]",
   sm: "h-2.5",
   md: "h-3",
   lg: "h-5",

@@ -17,6 +17,7 @@ import {
   validateDraft,
 } from "./draft";
 import { DeckError } from "./errors";
+import { sortDeckCards } from "./rarityOrder";
 import { DECK_RULES } from "./rules";
 import {
   deckZoneSchema,
@@ -570,5 +571,215 @@ describe("banlist compartida por grupo", () => {
         ),
       "only 1 card total from the Limited 1 list"
     );
+  });
+});
+
+interface TestSortableCard {
+  quantity: number;
+
+  zone: DeckZone;
+
+  card: {
+    name: string;
+
+    type: string;
+
+    rarity: string | null;
+
+    race: string | null;
+
+    frameType: string | null;
+  };
+}
+
+function sortableCard(
+  name: string,
+  type: string,
+  rarity: string | null,
+  quantity = 1,
+  options: {
+    zone?: DeckZone;
+
+    race?: string | null;
+
+    frameType?: string | null;
+  } = {}
+): TestSortableCard {
+  return {
+    quantity,
+    zone: options.zone ?? "main",
+    card: {
+      name,
+      type,
+      rarity,
+      race: options.race ?? null,
+      frameType: options.frameType ?? null,
+    },
+  };
+}
+
+function sortedNames(
+  cards: TestSortableCard[]
+): string[] {
+  return sortDeckCards(cards).map(
+    (entry) => entry.card.name
+  );
+}
+
+describe("sortDeckCards (Duel Links Meta)", () => {
+  it("ordena por bloque y subtipo oficial", () => {
+    const cards = [
+      sortableCard(
+        "Trap Counter",
+        "Trap Card",
+        "UR",
+        3,
+        { race: "Counter" }
+      ),
+      sortableCard(
+        "Trap Normal",
+        "Trap Card",
+        "UR",
+        1,
+        { race: "Normal" }
+      ),
+      sortableCard(
+        "Spell Field",
+        "Spell Card",
+        "UR",
+        1,
+        { race: "Field" }
+      ),
+      sortableCard(
+        "Spell Quick",
+        "Spell Card",
+        "UR",
+        1,
+        { race: "Quick-Play" }
+      ),
+      sortableCard(
+        "Spell Normal",
+        "Spell Card",
+        "UR",
+        1,
+        { race: "Normal" }
+      ),
+      sortableCard(
+        "Monster Normal",
+        "Normal Monster",
+        "UR"
+      ),
+      sortableCard(
+        "Monster Effect",
+        "Effect Monster",
+        "UR"
+      ),
+      sortableCard(
+        "Monster Ritual",
+        "Ritual Monster",
+        "UR"
+      ),
+    ];
+
+    assert.deepEqual(sortedNames(cards), [
+      "Monster Ritual",
+      "Monster Effect",
+      "Monster Normal",
+      "Spell Normal",
+      "Spell Quick",
+      "Spell Field",
+      "Trap Normal",
+      "Trap Counter",
+    ]);
+  });
+
+  it("aplica rareza, copias y nombre dentro del subtipo", () => {
+    const cards = [
+      sortableCard(
+        "Alpha",
+        "Effect Monster",
+        "N",
+        3
+      ),
+      sortableCard(
+        "Bravo",
+        "Effect Monster",
+        "UR",
+        1
+      ),
+      sortableCard(
+        "Charlie",
+        "Effect Monster",
+        "UR",
+        3
+      ),
+      sortableCard(
+        "Delta",
+        "Effect Monster",
+        "UR",
+        2
+      ),
+      sortableCard(
+        "Echo",
+        "Effect Monster",
+        "UR",
+        2
+      ),
+      sortableCard(
+        "Foxtrot",
+        "Effect Monster",
+        "SR",
+        1
+      ),
+    ];
+
+    assert.deepEqual(sortedNames(cards), [
+      "Charlie",
+      "Delta",
+      "Echo",
+      "Bravo",
+      "Foxtrot",
+      "Alpha",
+    ]);
+  });
+
+  it("ordena el Extra Deck Fusion → Synchro → Xyz → Link", () => {
+    const cards = [
+      sortableCard(
+        "Link",
+        "Link Monster",
+        "UR",
+        1,
+        { zone: "extra", frameType: "Link" }
+      ),
+      sortableCard(
+        "Xyz",
+        "Xyz Monster",
+        "UR",
+        1,
+        { zone: "extra", frameType: "Xyz" }
+      ),
+      sortableCard(
+        "Synchro",
+        "Synchro Monster",
+        "UR",
+        1,
+        { zone: "extra", frameType: "Synchro" }
+      ),
+      sortableCard(
+        "Fusion",
+        "Fusion Monster",
+        "UR",
+        1,
+        { zone: "extra", frameType: "Fusion" }
+      ),
+    ];
+
+    assert.deepEqual(sortedNames(cards), [
+      "Fusion",
+      "Synchro",
+      "Xyz",
+      "Link",
+    ]);
   });
 });
