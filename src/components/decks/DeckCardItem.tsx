@@ -16,10 +16,11 @@ import CardHoverTooltip, {
 
 import {
   normalizeRarity,
-  RARITY_STYLES,
 } from "@/components/cards/cardRarity";
 
 import BanlistBadge from "@/components/cards/BanlistBadge";
+
+import RarityBadge from "@/components/cards/RarityBadge";
 
 import { DeckCardInfo } from "@/types/deck";
 
@@ -46,8 +47,6 @@ export default function DeckCardItem({
     useRef<HTMLAnchorElement>(null);
 
   const rarity = normalizeRarity(card.rarity);
-
-  const rarityStyle = RARITY_STYLES[rarity];
 
   function showTooltip() {
     const rect =
@@ -176,27 +175,12 @@ export default function DeckCardItem({
           )}
         </div>
 
-        {!compact && card.rarity && (
-          <span
-            className={`
-              absolute
-              -top-2.5
-              right-0
-              z-10
-              rounded-t-md
-              px-1.5
-              py-0.5
-              text-[8px]
-              font-black
-              leading-none
-              tracking-wide
-              ring-1
-              ring-white/25
-              ${rarityStyle.badge}
-            `}
-          >
-            {rarity}
-          </span>
+        {card.rarity && (
+          <RarityBadge
+            rarity={rarity}
+            size={compact ? "xs" : "sm"}
+            className="absolute -top-2 right-0 z-10"
+          />
         )}
       </Link>
 

@@ -3,6 +3,7 @@
 import CardPreview from "./CardPreview";
 import CardBadge from "./CardBadge";
 import BanlistBadge from "./BanlistBadge";
+import RarityBadge from "./RarityBadge";
 
 import type {
   CardPreviewData,
@@ -101,14 +102,6 @@ export default function CardItem({
             size="sm"
           />
 
-          {card.rarity && (
-            <CardBadge
-              variant="rarity"
-            >
-              {card.rarity}
-            </CardBadge>
-          )}
-
           {isMonster && (
             <CardBadge
               variant="monster"
@@ -133,6 +126,14 @@ export default function CardItem({
             </CardBadge>
           )}
         </div>
+
+        {card.rarity && (
+          <RarityBadge
+            rarity={card.rarity}
+            size="xs"
+            className="absolute right-0.5 top-0.5 z-10"
+          />
+        )}
 
         {quantity !== undefined &&
           quantity > 1 && (

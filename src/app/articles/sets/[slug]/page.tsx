@@ -11,6 +11,8 @@ import {
 
 import CatalogGrid from "@/components/cards/CatalogGrid";
 
+import RarityBadge from "@/components/cards/RarityBadge";
+
 import {
   RARITY_STYLES,
 } from "@/components/cards/cardRarity";
@@ -337,22 +339,26 @@ export default async function CardSetPage({
               {groups.map((group) => (
                 <span
                   key={group.rarity}
-                  className={`
+                  className="
                     inline-flex
                     items-center
                     gap-1.5
-                    rounded-md
-                    px-2
-                    py-1
-                    text-[10px]
-                    font-black
-                    tracking-wide
-                    ${RARITY_STYLES[group.rarity].badge}
-                  `}
+                  "
                 >
-                  {group.rarity}
+                  <RarityBadge
+                    rarity={group.rarity}
+                    size="sm"
+                  />
 
-                  <span className="opacity-70">
+                  <span
+                    className="
+                      text-[10px]
+                      font-black
+                      tabular-nums
+                      tracking-wide
+                      text-slate-400
+                    "
+                  >
                     {group.cards.length}
                   </span>
                 </span>
@@ -445,14 +451,18 @@ export default async function CardSetPage({
                 <h2
                   id={`rarity-${group.rarity}`}
                   className="
-                    text-sm
-                    font-black
-                    uppercase
-                    tracking-[0.18em]
-                    text-white
+                    flex
+                    items-center
                   "
                 >
-                  {group.rarity}
+                  <RarityBadge
+                    rarity={group.rarity}
+                    size="md"
+                  />
+
+                  <span className="sr-only">
+                    {group.rarity}
+                  </span>
                 </h2>
 
                 <span

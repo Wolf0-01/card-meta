@@ -17,6 +17,8 @@ import CardHoverTooltip, {
 
 import BanlistBadge from "@/components/cards/BanlistBadge";
 
+import RarityBadge from "@/components/cards/RarityBadge";
+
 import {
   normalizeRarity,
   RARITY_STYLES,
@@ -247,27 +249,11 @@ export default function ArchetypeBreakdownCardTile({
         </span>
       </span>
 
-      <span
-        aria-hidden
-        className={`
-          absolute
-          -top-2
-          right-0
-          z-10
-          rounded-t-md
-          px-1.5
-          py-0.5
-          text-[8px]
-          font-black
-          leading-none
-          tracking-wide
-          ring-1
-          ring-white/25
-          ${rarityStyle.badge}
-        `}
-      >
-        {rarity}
-      </span>
+      <RarityBadge
+        rarity={rarity}
+        size="sm"
+        className="absolute -top-2 right-0 z-10"
+      />
     </>
   );
 

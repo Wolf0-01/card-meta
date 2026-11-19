@@ -16,6 +16,8 @@ import {
 
 import BanlistBadge from "./BanlistBadge";
 
+import RarityBadge from "./RarityBadge";
+
 import type {
   CardPreviewData,
 } from "@/types/CardPreviewData";
@@ -290,21 +292,11 @@ export default function CardHoverTooltip({
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span
-              className={`
-                rounded
-                px-1.5
-                py-0.5
-                text-[9px]
-                font-black
-                tracking-wide
-                ring-1
-                ring-white/25
-                ${rarityStyle.badge}
-              `}
-            >
-              {rarity}
-            </span>
+            <RarityBadge
+              rarity={rarity}
+              size="sm"
+              className="shrink-0"
+            />
 
             {card.archetype && (
               <span

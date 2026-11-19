@@ -19,6 +19,8 @@ import CardHoverTooltip, {
 
 import BanlistBadge from "./BanlistBadge";
 
+import RarityBadge from "./RarityBadge";
+
 import {
   normalizeRarity,
   RARITY_STYLES,
@@ -266,26 +268,11 @@ export default function CatalogCardTile({
           )}
         </div>
 
-        <span
-          className={`
-            absolute
-            -top-2.5
-            right-0
-            z-20
-            rounded-t-md
-            px-1.5
-            py-0.5
-            text-[8px]
-            font-black
-            leading-none
-            tracking-[0.08em]
-            ring-1
-            ring-white/25
-            ${rarityStyle.badge}
-          `}
-        >
-          {rarity}
-        </span>
+        <RarityBadge
+          rarity={rarity}
+          size="sm"
+          className="absolute -top-2 right-0 z-20"
+        />
       </Link>
 
       {anchor && (

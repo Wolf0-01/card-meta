@@ -35,6 +35,7 @@ import {
 import CardDetailImage from "@/components/cards/CardDetailImage";
 import CardRelated from "@/components/cards/CardRelated";
 import BanlistBadge from "@/components/cards/BanlistBadge";
+import RarityBadge from "@/components/cards/RarityBadge";
 import AttributeOrb, {
   getAttributeIcon,
 } from "@/components/cards/AttributeOrb";
@@ -436,26 +437,11 @@ export default async function CardDetailPage({
                   )}
                 </div>
 
-                <span
-                  className={`
-                    absolute
-                    -top-3
-                    right-0
-                    z-20
-                    rounded-t-md
-                    px-2
-                    py-1
-                    text-[11px]
-                    font-black
-                    leading-none
-                    tracking-[0.14em]
-                    ring-1
-                    ring-white/30
-                    ${rarityStyle.badge}
-                  `}
-                >
-                  {rarity}
-                </span>
+                <RarityBadge
+                  rarity={rarity}
+                  size="lg"
+                  className="absolute -top-3 right-0 z-20"
+                />
               </div>
             </div>
 

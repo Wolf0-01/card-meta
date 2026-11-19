@@ -86,14 +86,25 @@ function ColumnHeading({
   );
 }
 
+const PANEL_CLASSES = `
+  rounded-xl
+  border
+  border-slate-700/60
+  bg-[#0B132B]
+  p-3
+  ring-1
+  ring-inset
+  ring-white/5
+`;
+
 /**
  * Desglose del arquetipo en dos columnas, al estilo de la
  * página DECK BREAKDOWN de Duel Links Meta.
  *
  * La columna izquierda muestra el Top Main Deck y la derecha
  * el Top Extra Deck con el ranking completo de Popular
- * Skills. Los datos se recalculan con los mazos públicos
- * reales en cada petición.
+ * Skills. Cada sección vive en su propia tarjeta, sin un
+ * recuadro exterior común.
  */
 export default function ArchetypeBreakdown({
   breakdown,
@@ -109,19 +120,18 @@ export default function ArchetypeBreakdown({
   return (
     <section
       aria-label={`${breakdown.archetype} deck breakdown`}
-      className="
-        rounded-xl
-        border
-        border-slate-700/60
-        bg-[#0B132B]
-        p-3
-        ring-1
-        ring-inset
-        ring-white/5
-      "
+      className="space-y-4"
     >
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        <div className="lg:col-span-7">
+      <div
+        className="
+          grid
+          grid-cols-1
+          gap-4
+          lg:grid-cols-12
+          lg:gap-6
+        "
+      >
+        <div className={`${PANEL_CLASSES} lg:col-span-6`}>
           <ColumnHeading
             title="Top Main Deck"
             hint={
@@ -169,8 +179,8 @@ export default function ArchetypeBreakdown({
           )}
         </div>
 
-        <div className="space-y-5 lg:col-span-5">
-          <div>
+        <div className="flex flex-col gap-4 lg:col-span-6">
+          <div className={PANEL_CLASSES}>
             <ColumnHeading
               title="Top Extra Deck"
               hint="Inclusion rate"
@@ -183,6 +193,7 @@ export default function ArchetypeBreakdown({
                   grid-cols-4
                   gap-2
                   pt-2
+                  sm:grid-cols-6
                 "
               >
                 {extraDeck.map((entry) => (
@@ -213,7 +224,7 @@ export default function ArchetypeBreakdown({
             )}
           </div>
 
-          <div>
+          <div className={PANEL_CLASSES}>
             <ColumnHeading title="Popular Skills" />
 
             {skills.length > 0 ? (
@@ -279,7 +290,6 @@ export default function ArchetypeBreakdown({
       {canFilterBreakdown && filter?.selected && (
         <div
           className="
-            mt-3
             flex
             flex-wrap
             items-center

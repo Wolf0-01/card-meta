@@ -14,6 +14,8 @@ import type {
 
 import BanlistBadge from "@/components/cards/BanlistBadge";
 
+import RarityBadge from "@/components/cards/RarityBadge";
+
 import type { CardPreviewData } from "@/types/CardPreviewData";
 
 import type { DeckZone } from "@/types/deck";
@@ -206,7 +208,7 @@ export default function MiniCardTile({
             className="
               absolute
               right-1
-              top-1
+              bottom-1
               rounded
               bg-black/80
               px-1
@@ -269,6 +271,14 @@ export default function MiniCardTile({
           </span>
         )}
       </div>
+
+      {card.rarity && (
+        <RarityBadge
+          rarity={card.rarity}
+          size="xs"
+          className="absolute -top-2 right-0 z-10"
+        />
+      )}
 
       {isDeck && (
         <div className="mt-1 flex items-center gap-1">
