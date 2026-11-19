@@ -50,6 +50,9 @@ const SCRIPT_TIMEOUT_MS = 20 * 60 * 1000;
 /*
  * Los scripts son los mismos que se ejecutan por CLI.
  * `syncSetMeta` respeta los banners marcados con #manual.
+ * `syncDlmCatalog` sincroniza Speed y Rush juntos sin perder
+ * las cartas compartidas, y `syncSpeedAltArts` restaura los
+ * artes alternativos de Speed.
  */
 const TASKS: Record<AdminSyncTask, SyncStep[]> = {
   sets: [
@@ -64,32 +67,18 @@ const TASKS: Record<AdminSyncTask, SyncStep[]> = {
 
   cards: [
     {
-      label: "New Speed cards",
+      label: "Duel Links catalog (Speed + Rush)",
 
-      script: "scripts/importCards.ts",
+      script: "scripts/syncDlmCatalog.ts",
 
       args: [],
     },
     {
-      label: "New Rush cards",
+      label: "Speed alternate arts",
 
-      script: "scripts/syncRushCards.ts",
+      script: "scripts/syncSpeedAltArts.ts",
 
-      args: ["--apply"],
-    },
-    {
-      label: "Speed obtain sources",
-
-      script: "scripts/updateObtain.ts",
-
-      args: ["--apply"],
-    },
-    {
-      label: "Rush obtain sources",
-
-      script: "scripts/updateObtain.ts",
-
-      args: ["--rush", "--apply"],
+      args: [],
     },
   ],
 

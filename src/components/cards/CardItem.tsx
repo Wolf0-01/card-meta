@@ -130,7 +130,7 @@ export default function CardItem({
         {card.rarity && (
           <RarityBadge
             rarity={card.rarity}
-            size="xs"
+            size="sm"
             className="absolute right-0.5 top-0.5 z-10"
           />
         )}

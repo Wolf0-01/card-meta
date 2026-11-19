@@ -251,7 +251,7 @@ export default function ArchetypeBreakdownCardTile({
 
       <RarityBadge
         rarity={rarity}
-        size="sm"
+        size="xs"
         className="absolute -top-2 right-0 z-10"
       />
     </>

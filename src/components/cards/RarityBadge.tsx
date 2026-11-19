@@ -7,7 +7,7 @@ import {
 
 /**
  * Etiquetas inclinadas oficiales de rareza. Los PNG viven en
- * `public/icons` y mantienen su proporción 160×64 al
+ * `public/icons` y mantienen su proporción 160×40 al
  * renderizarse con una altura fija y `w-auto`.
  */
 export const RARITY_ICON_SRC: Record<
@@ -30,10 +30,10 @@ const SIZE_CLASSES: Record<
   RarityBadgeSize,
   string
 > = {
-  xs: "h-3.5",
-  sm: "h-4",
-  md: "h-5",
-  lg: "h-7",
+  xs: "h-2",
+  sm: "h-2.5",
+  md: "h-3",
+  lg: "h-5",
 };
 
 interface RarityBadgeProps {
@@ -62,7 +62,7 @@ export default function RarityBadge({
       src={RARITY_ICON_SRC[normalized]}
       alt={`${normalized} rarity`}
       width={160}
-      height={64}
+      height={40}
       unoptimized
       draggable={false}
       className={`
