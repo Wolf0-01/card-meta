@@ -10,15 +10,9 @@ import {
   Search,
 } from "lucide-react";
 
-import ArchetypeBreakdown from "@/components/decks/ArchetypeBreakdown";
-
-import ArchetypeCardFilterProvider from "@/components/decks/ArchetypeCardFilterContext";
-
 import ArchetypeDeckTable, {
   type ArchetypeDeckRow,
 } from "@/components/decks/ArchetypeDeckTable";
-
-import ArchetypeSampleDeck from "@/components/decks/ArchetypeSampleDeck";
 
 import CompetitiveReviewQueue from "@/components/decks/CompetitiveReviewQueue";
 
@@ -38,7 +32,6 @@ import {
 } from "@/lib/decks/achievements";
 
 import {
-  findArchetypeBreakdown,
   findPendingCompetitiveResults,
   findPublicDeckArchetypeGroups,
   findPublicDeckExplorer,
@@ -131,7 +124,7 @@ export default async function DecksPage({
 
   const isStaff = canManageGuides(user);
 
-  const [result, archetypes, breakdown, pendingResults] =
+  const [result, archetypes, pendingResults] =
     await Promise.all([
       findPublicDeckExplorer({
         search,
@@ -143,13 +136,6 @@ export default async function DecksPage({
       }),
 
       findPublicDeckArchetypeGroups(format),
-
-      archetype
-        ? findArchetypeBreakdown(
-            format,
-            archetype
-          )
-        : Promise.resolve(null),
 
       isStaff
         ? findPendingCompetitiveResults()
@@ -287,7 +273,7 @@ export default async function DecksPage({
               "
             >
               {archetype
-                ? `${archetype} Deck Breakdown`
+                ? archetype
                 : `Top Decks: ${
                     format === "rush"
                       ? "Rush"
@@ -295,30 +281,22 @@ export default async function DecksPage({
                   }`}
             </h1>
 
-            <p
-              className="
-                max-w-xl
-                text-[11px]
-                leading-relaxed
-                text-slate-400
-              "
-            >
-              {archetype
-                ? breakdown
-                  ? `Deck Statistics · Average size: ${
-                      breakdown.averageSize
-                    } ${
-                      breakdown.averageSize === 1
-                        ? "card"
-                        : "cards"
-                    }`
-                  : "Deck Statistics"
-                : `Public community decks for ${
-                    format === "rush"
-                      ? "Rush Duel"
-                      : "Speed Duel"
-                  }, grouped by archetype.`}
-            </p>
+            {!archetype && (
+              <p
+                className="
+                  max-w-xl
+                  text-[11px]
+                  leading-relaxed
+                  text-slate-400
+                "
+              >
+                {`Public community decks for ${
+                  format === "rush"
+                    ? "Rush Duel"
+                    : "Speed Duel"
+                }, grouped by archetype.`}
+              </p>
+            )}
           </div>
         </header>
 
@@ -330,25 +308,11 @@ export default async function DecksPage({
           total={result.total}
         />
 
-        <ArchetypeCardFilterProvider>
-          {isStaff && pendingResults.length > 0 && (
-            <CompetitiveReviewQueue
-              results={pendingResults}
-            />
-          )}
-
-          {breakdown && (
-            <ArchetypeBreakdown
-              breakdown={breakdown}
-              canFilterBreakdown={isStaff}
-            />
-          )}
-
-          {breakdown?.sampleDeck && (
-            <ArchetypeSampleDeck
-              deck={breakdown.sampleDeck}
-            />
-          )}
+        {isStaff && pendingResults.length > 0 && (
+          <CompetitiveReviewQueue
+            results={pendingResults}
+          />
+        )}
 
         {!archetype && archetypes.length > 0 && (
           <section
@@ -553,7 +517,6 @@ export default async function DecksPage({
             ) : archetype ? (
               <ArchetypeDeckTable
                 rows={deckRows}
-                canFilter={isStaff}
                 canViewPlayerProfile={isStaff}
               />
             ) : (
@@ -659,7 +622,6 @@ export default async function DecksPage({
             )}
           </>
         )}
-        </ArchetypeCardFilterProvider>
       </div>
     </main>
   );

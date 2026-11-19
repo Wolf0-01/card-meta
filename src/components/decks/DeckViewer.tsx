@@ -99,9 +99,9 @@ export default function DeckViewer({
 
   const resolvedBreakdownHref =
     breakdownHref ??
-    `/decks?archetype=${encodeURIComponent(
+    `/decks/breakdown/${encodeURIComponent(
       getDeckArchetypeLabel(deck)
-    )}`;
+    )}${deck.format === "rush" ? "?format=rush" : ""}`;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">

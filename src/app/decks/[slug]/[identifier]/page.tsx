@@ -12,8 +12,6 @@ import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
 
 import { calculateDeckGemEstimate } from "@/lib/decks/gemCalculator";
 
-import { findGuideByArchetype } from "@/lib/guides";
-
 import {
   findDeckByIdentifier,
 } from "@/services/decks";
@@ -81,20 +79,18 @@ export default async function DeckPage({
   const archetypeLabel =
     getDeckArchetypeLabel(deck);
 
-  const archetypeGuide =
-    await findGuideByArchetype(archetypeLabel);
-
-  const archetypeParams = new URLSearchParams({
-    archetype: archetypeLabel,
-  });
+  const breakdownParams = new URLSearchParams();
 
   if (deck.format === "rush") {
-    archetypeParams.set("format", "rush");
+    breakdownParams.set("format", "rush");
   }
 
-  const breakdownHref = archetypeGuide
-    ? `/guides/${archetypeGuide.slug}`
-    : `/decks?${archetypeParams.toString()}`;
+  const breakdownQuery =
+    breakdownParams.toString();
+
+  const breakdownHref = `/decks/breakdown/${encodeURIComponent(
+    archetypeLabel
+  )}${breakdownQuery ? `?${breakdownQuery}` : ""}`;
 
   return (
     <main
