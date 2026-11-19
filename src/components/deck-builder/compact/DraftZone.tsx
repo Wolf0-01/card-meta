@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useMemo,
   useState,
 } from "react";
 
@@ -123,7 +124,10 @@ export default function DraftZone({
     100
   );
 
-  const sortedCards = sortDeckCards(cards);
+  const sortedCards = useMemo(
+    () => sortDeckCards(cards),
+    [cards]
+  );
 
   /*
    * Cada copia se pinta como una miniatura independiente:
@@ -167,12 +171,14 @@ export default function DraftZone({
           grid
           grid-cols-[repeat(5,minmax(0,72px))]
           justify-center
-          gap-1.5
+          gap-x-1.5
+          gap-y-2.5
         `
         : `
           grid
           grid-cols-[repeat(auto-fill,minmax(72px,1fr))]
-          gap-1.5
+          gap-x-1.5
+          gap-y-2.5
         `;
 
     return (

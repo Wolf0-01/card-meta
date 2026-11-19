@@ -889,7 +889,8 @@ export default function CardSearchSidebar({
                 className="
                   grid
                   grid-cols-[repeat(auto-fill,minmax(88px,1fr))]
-                  gap-2
+                  gap-x-1.5
+                  gap-y-2.5
                 "
               >
                 {cards.map((card) => (

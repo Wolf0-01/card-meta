@@ -343,20 +343,6 @@ export default function MiniCardTile({
           </button>
         </div>
       )}
-
-      {!isDeck && (
-        <p
-          className="
-            mt-1
-            truncate
-            text-[10px]
-            leading-tight
-            text-foreground-muted
-          "
-        >
-          {card.name}
-        </p>
-      )}
     </div>
   );
 }
