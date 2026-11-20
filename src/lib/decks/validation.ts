@@ -109,6 +109,16 @@ const deckFields = {
     .nullable()
     .optional(),
 
+  archetypeName: z
+    .string()
+    .trim()
+    .max(
+      80,
+      "The archetype cannot exceed 80 characters"
+    )
+    .nullable()
+    .optional(),
+
   isPublic: z.boolean().optional(),
 
   achievement: z

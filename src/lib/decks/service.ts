@@ -13,6 +13,11 @@ import {
 import { prisma } from "@/lib/prisma";
 
 import {
+  detectArchetype,
+  type DeckCardInput,
+} from "@/lib/archetypeEngine";
+
+import {
   mapPrismaCardToDeckCardInfo,
 } from "@/lib/mappers/deckMapper";
 
@@ -376,6 +381,137 @@ async function resolveArchetypeId(
   return archetype.id;
 }
 
+function slugifyArchetypeName(name: string) {
+  return (
+    name
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "archetype"
+  );
+}
+
+/*
+ * Resuelve un arquetipo por su nombre visible. Si todavía
+ * no existe, lo crea para que el creador pueda confirmar o
+ * corregir el nombre exacto desde el Deck Builder.
+ */
+async function resolveArchetypeName(
+  name: string | null | undefined
+) {
+  const trimmed = name?.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  const slug = slugifyArchetypeName(trimmed);
+
+  const existing =
+    await prisma.archetype.findFirst({
+      where: {
+        OR: [
+          {
+            name: {
+              equals: trimmed,
+              mode: "insensitive",
+            },
+          },
+          {
+            slug: {
+              equals: slug,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+
+      select: {
+        id: true,
+      },
+    });
+
+  if (existing) {
+    return existing.id;
+  }
+
+  let candidate = slug;
+
+  let suffix = 2;
+
+  while (
+    await prisma.archetype.findUnique({
+      where: {
+        slug: candidate,
+      },
+
+      select: {
+        id: true,
+      },
+    })
+  ) {
+    candidate = `${slug}-${suffix}`;
+
+    suffix += 1;
+  }
+
+  const created =
+    await prisma.archetype.create({
+      data: {
+        name: trimmed,
+
+        slug: candidate,
+      },
+
+      select: {
+        id: true,
+      },
+    });
+
+  return created.id;
+}
+
+interface ResolveDeckArchetypeInput {
+  archetypeId?: string | null;
+
+  archetypeName?: string | null;
+
+  name?: string | null;
+
+  skill?: string | null;
+
+  cards: DeckCardInput[];
+}
+
+async function resolveDeckArchetype(
+  input: ResolveDeckArchetypeInput
+) {
+  if (input.archetypeName !== undefined) {
+    const manual = input.archetypeName?.trim();
+
+    if (manual) {
+      return resolveArchetypeName(manual);
+    }
+  } else if (input.archetypeId !== undefined) {
+    return resolveArchetypeId(input.archetypeId);
+  }
+
+  const detected = await detectArchetype({
+    name: input.name,
+
+    skill: input.skill,
+
+    cards: input.cards,
+  });
+
+  if (!detected) {
+    return null;
+  }
+
+  return resolveArchetypeName(detected);
+}
+
 function deckCardCreateData(
   cards: NormalizedDeckCard[]
 ) {
@@ -591,9 +727,29 @@ export async function createUserDeck(
     format
   );
 
-  const archetypeId = await resolveArchetypeId(
-    input.archetypeId
-  );
+  const skill =
+    format === "rush"
+      ? null
+      : input.skill?.trim() || null;
+
+  const archetypeId =
+    await resolveDeckArchetype({
+      archetypeId: input.archetypeId,
+
+      archetypeName: input.archetypeName,
+
+      name: input.name,
+
+      skill,
+
+      cards: cards.map((card) => ({
+        id: card.cardId,
+
+        quantity: card.quantity,
+
+        zone: card.zone,
+      })),
+    });
 
   const deck = await prisma.deck.create({
     data: {
@@ -614,10 +770,7 @@ export async function createUserDeck(
 
       description: input.description ?? null,
 
-      skill:
-        format === "rush"
-          ? null
-          : input.skill?.trim() || null,
+      skill,
 
       achievement: result.achievement,
 
@@ -733,13 +886,6 @@ export async function updateUserDeck(
     format
   );
 
-  const archetypeId =
-    patch.archetypeId !== undefined
-      ? await resolveArchetypeId(
-          patch.archetypeId
-        )
-      : existing.archetypeId;
-
   const name = patch.name ?? existing.name;
 
   const description =
@@ -753,6 +899,50 @@ export async function updateUserDeck(
       : patch.skill !== undefined
         ? patch.skill?.trim() || null
         : existing.skill;
+
+  const archetypeCards = cards.map((card) => ({
+    id: card.cardId,
+
+    quantity: card.quantity,
+
+    zone: card.zone,
+  }));
+
+  let archetypeId = existing.archetypeId;
+
+  if (patch.archetypeName !== undefined) {
+    /*
+     * El formulario siempre envía el campo. Si viene vacío
+     * se vuelve a detectar automáticamente con el título,
+     * la Skill y las copias del Main Deck.
+     */
+    archetypeId = await resolveDeckArchetype({
+      archetypeName: patch.archetypeName,
+
+      name,
+
+      skill,
+
+      cards: archetypeCards,
+    });
+  } else if (patch.archetypeId !== undefined) {
+    archetypeId = await resolveArchetypeId(
+      patch.archetypeId
+    );
+  } else if (!archetypeId) {
+    const detected = await detectArchetype({
+      name,
+
+      skill,
+
+      cards: archetypeCards,
+    });
+
+    if (detected) {
+      archetypeId =
+        await resolveArchetypeName(detected);
+    }
+  }
 
   const currentResult = sanitizeResultFields({
     achievement: normalizeAchievement(

@@ -74,6 +74,9 @@ export default async function EditDeckPage({
 
     skill: deck.skill ?? "",
 
+    archetype:
+      deck.archetype?.name ?? "",
+
     format:
       deck.format === "rush"
         ? "rush"

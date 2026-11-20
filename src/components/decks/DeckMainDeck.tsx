@@ -2,8 +2,6 @@
 
 import DeckCardGrid from "./DeckCardGrid";
 
-import { sortDeckCards } from "@/lib/decks/rarityOrder";
-
 import type { MetaDeck } from "@/types/meta";
 
 interface Props {
@@ -30,7 +28,7 @@ export default function DeckMainDeck({
 
   return (
     <DeckCardGrid
-      cards={sortDeckCards(mainDeck)}
+      cards={mainDeck}
     />
   );
 }

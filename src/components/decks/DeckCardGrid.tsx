@@ -2,6 +2,8 @@
 
 import DeckCardItem from "./DeckCardItem";
 
+import { sortDeckCards } from "@/lib/decks/rarityOrder";
+
 import type { DeckCard } from "@/types/deck";
 
 interface DeckCardGridProps {
@@ -20,6 +22,14 @@ export default function DeckCardGrid({
     return null;
   }
 
+  /*
+   * El orden jerárquico de Duel Links Meta se aplica
+   * sobre las cartas agrupadas (para conocer si tienen
+   * 3x, 2x o 1x copia) y solo después se expanden las
+   * copias individuales.
+   */
+  const sortedCards = sortDeckCards(cards);
+
   return (
     <div
       className="
@@ -30,7 +40,7 @@ export default function DeckCardGrid({
         gap-y-2.5
       "
     >
-      {cards.map((deckCard) =>
+      {sortedCards.map((deckCard) =>
         Array.from(
           {
             length: Math.max(

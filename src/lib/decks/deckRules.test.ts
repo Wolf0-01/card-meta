@@ -18,6 +18,7 @@ import {
 } from "./draft";
 import { DeckError } from "./errors";
 import { sortDeckCards } from "./rarityOrder";
+import { suggestArchetypeName } from "./archetypeSuggestion";
 import { DECK_RULES } from "./rules";
 import {
   deckZoneSchema,
@@ -781,5 +782,69 @@ describe("sortDeckCards (Duel Links Meta)", () => {
       "Xyz",
       "Link",
     ]);
+  });
+});
+
+describe("suggestArchetypeName", () => {
+  function archetypeCard(
+    archetype: string,
+    quantity: number,
+    zone: DeckZone = "main"
+  ) {
+    return {
+      quantity,
+      zone,
+      card: { archetype },
+    };
+  }
+
+  it("prioriza el arquetipo mencionado en el título", () => {
+    const cards = [
+      archetypeCard("Centur-Ion", 4),
+      archetypeCard("Stardust", 4),
+      archetypeCard("Centur-Ion", 1, "extra"),
+    ];
+
+    assert.equal(
+      suggestArchetypeName({
+        name: "Stardust / Synchron",
+        skill: "",
+        cards,
+      }),
+      "Stardust"
+    );
+  });
+
+  it("usa la Skill cuando el título no menciona el arquetipo", () => {
+    const cards = [
+      archetypeCard("Stardust", 2),
+      archetypeCard("Centur-Ion", 3),
+    ];
+
+    assert.equal(
+      suggestArchetypeName({
+        name: "Synchro combo",
+        skill: "Bonds of the Stardust",
+        cards,
+      }),
+      "Stardust"
+    );
+  });
+
+  it("pondera las copias del Main Deck antes que el Extra Deck", () => {
+    const cards = [
+      archetypeCard("Stardust", 2),
+      archetypeCard("Centur-Ion", 1),
+      archetypeCard("Centur-Ion", 3, "extra"),
+    ];
+
+    assert.equal(
+      suggestArchetypeName({
+        name: "Deck",
+        skill: "",
+        cards,
+      }),
+      "Stardust"
+    );
   });
 });

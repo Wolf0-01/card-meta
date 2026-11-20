@@ -60,6 +60,9 @@ export default async function NewDeckPage({
 
         skill: deck.skill ?? "",
 
+        archetype:
+          deck.archetype?.name ?? "",
+
         format:
           deck.format === "rush"
             ? "rush"

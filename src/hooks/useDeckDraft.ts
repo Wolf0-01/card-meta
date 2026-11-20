@@ -65,6 +65,8 @@ export interface DeckDraftSeed {
 
   skill: string;
 
+  archetype?: string;
+
   format?: DuelFormat;
 }
 
@@ -149,6 +151,11 @@ function readStoredDraft(
           ? parsed.skill
           : "",
 
+      archetype:
+        typeof parsed.archetype === "string"
+          ? parsed.archetype
+          : "",
+
       format: normalizeDuelFormat(
         typeof parsed.format === "string"
           ? parsed.format
@@ -200,6 +207,11 @@ export default function useDeckDraft({
     () => initialDraft?.skill ?? ""
   );
 
+  const [archetype, setArchetype] =
+    useState(
+      () => initialDraft?.archetype ?? ""
+    );
+
   const [format, setFormatState] =
     useState<DuelFormat>(() =>
       normalizeDuelFormat(
@@ -236,6 +248,7 @@ export default function useDeckDraft({
           description,
           isPublic,
           skill,
+          archetype,
           format,
         })
       );
@@ -251,6 +264,7 @@ export default function useDeckDraft({
     description,
     isPublic,
     skill,
+    archetype,
     format,
     isReady,
     storageKey,
@@ -422,6 +436,8 @@ export default function useDeckDraft({
 
     setSkill("");
 
+    setArchetype("");
+
     setFormatState("speed");
 
     /*
@@ -469,6 +485,10 @@ export default function useDeckDraft({
     skill: isReady ? skill : "",
 
     setSkill,
+
+    archetype: isReady ? archetype : "",
+
+    setArchetype,
 
     format: isReady ? format : "speed",
 

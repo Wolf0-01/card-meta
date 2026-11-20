@@ -25,6 +25,12 @@ import useDeckDraft, {
 
 import { DECK_RULES } from "@/lib/decks/rules";
 
+import { sortDeckCards } from "@/lib/decks/rarityOrder";
+
+import {
+  suggestArchetypeName,
+} from "@/lib/decks/archetypeSuggestion";
+
 import type { DuelFormat } from "@/lib/duelFormat";
 
 import type {
@@ -137,6 +143,18 @@ export default function DeckBuilderWorkspace({
       ),
     }),
     [draft.cards]
+  );
+
+  const suggestedArchetype = useMemo(
+    () =>
+      suggestArchetypeName({
+        name: draft.name,
+
+        skill: draft.skill,
+
+        cards: draft.cards,
+      }),
+    [draft.name, draft.skill, draft.cards]
   );
 
   const missingForPublish = Math.max(
@@ -312,6 +330,9 @@ export default function DeckBuilderWorkspace({
                 ? null
                 : draft.skill.trim() || null,
 
+            archetypeName:
+              draft.archetype.trim() || null,
+
             format: draft.format,
 
             isPublic: makePublic,
@@ -334,15 +355,15 @@ export default function DeckBuilderWorkspace({
               competitiveResult.proofUrl.trim() ||
               null,
 
-            cards: draft.cards.map(
-              (card) => ({
-                id: card.id,
+            cards: sortDeckCards(
+              draft.cards
+            ).map((card) => ({
+              id: card.id,
 
-                quantity: card.quantity,
+              quantity: card.quantity,
 
-                zone: card.zone,
-              })
-            ),
+              zone: card.zone,
+            })),
           }),
         }
       );
@@ -758,6 +779,104 @@ export default function DeckBuilderWorkspace({
                   "
                 />
               </label>
+            </div>
+
+            <div
+              className="
+                flex
+                items-center
+                justify-between
+                gap-3
+                rounded-xl
+                border
+                border-border
+                bg-background-secondary
+                px-3.5
+                py-2.5
+              "
+            >
+              <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                <span
+                  aria-hidden
+                  className="
+                    h-2.5
+                    w-2.5
+                    shrink-0
+                    rounded-full
+                    bg-primary
+                    shadow-[0_0_10px_rgba(59,130,246,0.6)]
+                  "
+                />
+
+                <span
+                  className="
+                    shrink-0
+                    text-[9px]
+                    font-black
+                    uppercase
+                    tracking-[0.16em]
+                    text-foreground-muted
+                  "
+                >
+                  Archetype
+                </span>
+
+                <input
+                  value={draft.archetype}
+                  onChange={(event) =>
+                    draft.setArchetype(
+                      event.target.value
+                    )
+                  }
+                  placeholder={
+                    suggestedArchetype
+                      ? `Auto: ${suggestedArchetype}`
+                      : "Optional · auto-detected"
+                  }
+                  maxLength={80}
+                  aria-label="Deck archetype"
+                  className="
+                    min-w-0
+                    flex-1
+                    bg-transparent
+                    text-xs
+                    font-semibold
+                    text-foreground
+                    outline-none
+                    placeholder:font-normal
+                    placeholder:text-foreground-muted
+                  "
+                />
+              </div>
+
+              {suggestedArchetype &&
+                suggestedArchetype !==
+                  draft.archetype.trim() && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      draft.setArchetype(
+                        suggestedArchetype
+                      )
+                    }
+                    className="
+                      shrink-0
+                      rounded-md
+                      border
+                      border-primary/40
+                      bg-primary/10
+                      px-2
+                      py-1
+                      text-[10px]
+                      font-black
+                      text-primary
+                      transition-colors
+                      hover:bg-primary/20
+                    "
+                  >
+                    Use {suggestedArchetype}
+                  </button>
+                )}
             </div>
 
             {draft.format !== "rush" && (
