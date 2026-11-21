@@ -21,7 +21,7 @@ import { DECK_RULES } from "./rules";
 
 import {
   DECK_ACHIEVEMENTS,
-  TOURNAMENT_PLACEMENTS,
+  DECK_PLACEMENTS,
 } from "./achievements";
 
 export { DECK_RULES };
@@ -126,7 +126,7 @@ const deckFields = {
     .optional(),
 
   placement: z
-    .enum(TOURNAMENT_PLACEMENTS)
+    .enum(DECK_PLACEMENTS)
     .nullable()
     .optional(),
 

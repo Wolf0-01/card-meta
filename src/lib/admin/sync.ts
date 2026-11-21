@@ -5,7 +5,8 @@ import path from "node:path";
 export type AdminSyncTask =
   | "sets"
   | "cards"
-  | "banlist";
+  | "banlist"
+  | "skills";
 
 interface SyncStep {
   label: string;
@@ -91,6 +92,16 @@ const TASKS: Record<AdminSyncTask, SyncStep[]> = {
       args: [],
     },
   ],
+
+  skills: [
+    {
+      label: "Skills and effects",
+
+      script: "scripts/syncSkills.ts",
+
+      args: [],
+    },
+  ],
 };
 
 export function isAdminSyncTask(
@@ -99,7 +110,8 @@ export function isAdminSyncTask(
   return (
     value === "sets" ||
     value === "cards" ||
-    value === "banlist"
+    value === "banlist" ||
+    value === "skills"
   );
 }
 
@@ -200,7 +212,7 @@ function summarize(output: string) {
     .filter(Boolean);
 
   const interesting = lines.filter((line) =>
-    /(✅|⚠|❌|resumen|nuevas:|actualizadas:|insertadas:|sin cambios:|banners manuales|setmeta sincronizado|cartas rush|obtención|importación terminada|banlist|forbidden|limited|coincidencias|pendientes|error)/i.test(
+    /(✅|⚠|❌|resumen|nuevas:|actualizadas:|insertadas:|sin cambios:|banners manuales|setmeta sincronizado|cartas rush|obtención|importación terminada|banlist|forbidden|limited|coincidencias|pendientes|skills|habilidades|efectos|error)/i.test(
       line
     )
   );

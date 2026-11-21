@@ -16,6 +16,8 @@ import {
 
 import CatalogCardTile from "@/components/cards/CatalogCardTile";
 
+import SectionCardStrip from "@/components/cards/SectionCardStrip";
+
 import NewsActions from "@/components/news/NewsActions";
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
@@ -375,6 +377,7 @@ export default async function NewsArticlePage({
                         <p
                           key={paragraph}
                           className="
+                            whitespace-pre-line
                             text-[12.5px]
                             leading-7
                             text-slate-300
@@ -396,6 +399,7 @@ export default async function NewsArticlePage({
                                   flex
                                   items-start
                                   gap-2
+                                  whitespace-pre-line
                                   text-[12px]
                                   leading-6
                                   text-slate-400
@@ -421,6 +425,10 @@ export default async function NewsArticlePage({
                           )}
                         </ul>
                       )}
+
+                    <SectionCardStrip
+                      cards={section.featuredCards}
+                    />
                   </div>
                 </section>
               )

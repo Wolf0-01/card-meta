@@ -33,6 +33,11 @@ export interface NewsSection {
   featuredCardNames?: string[];
 }
 
+export interface NewsSectionDetail
+  extends NewsSection {
+  featuredCards: CardPreviewData[];
+}
+
 export interface NewsArticle {
   id: string;
 
@@ -60,7 +65,7 @@ export interface NewsArticle {
 
   featuredCards: CardPreviewData[];
 
-  sections: NewsSection[];
+  sections: NewsSectionDetail[];
 }
 
 interface NewsContent {
@@ -241,11 +246,31 @@ function estimateReadingMinutes(
 
 function toNewsArticle(
   article: PrismaNewsArticle,
-  featuredCards: CardPreviewData[]
+  featuredCards: CardPreviewData[],
+  cardsByName: Map<
+    string,
+    CardPreviewData
+  >
 ): NewsArticle {
   const content = parseNewsContent(
     article.content
   );
+
+  const sections: NewsSectionDetail[] =
+    content.sections.map((section) => ({
+      ...section,
+
+      featuredCards: (
+        section.featuredCardNames ?? []
+      )
+        .map((name) => cardsByName.get(name))
+        .filter(
+          (
+            card
+          ): card is CardPreviewData =>
+            card !== undefined
+        ),
+    }));
 
   return {
     id: article.id,
@@ -278,7 +303,7 @@ function toNewsArticle(
 
     featuredCards,
 
-    sections: content.sections,
+    sections,
   };
 }
 
@@ -295,21 +320,48 @@ export const getNewsArticles = cache(
         },
       });
 
+    const contents = new Map(
+      articles.map((article) => [
+        article.slug,
+        parseNewsContent(article.content),
+      ])
+    );
+
     const featuredNames = Array.from(
       new Set(
-        articles.flatMap((article) =>
-          parseNewsContent(article.content)
-            .featuredCardNames
+        articles.flatMap(
+          (article) =>
+            contents.get(article.slug)
+              ?.featuredCardNames ?? []
         )
       )
     );
 
-    const featuredCards =
-      featuredNames.length > 0
+    const sectionCardNames = Array.from(
+      new Set(
+        [...contents.values()].flatMap(
+          (content) =>
+            content.sections.flatMap(
+              (section) =>
+                section.featuredCardNames ?? []
+            )
+        )
+      )
+    );
+
+    const allCardNames = Array.from(
+      new Set([
+        ...featuredNames,
+        ...sectionCardNames,
+      ])
+    );
+
+    const cardRows =
+      allCardNames.length > 0
         ? await prisma.card.findMany({
             where: {
               name: {
-                in: featuredNames,
+                in: allCardNames,
               },
             },
 
@@ -318,28 +370,31 @@ export const getNewsArticles = cache(
         : [];
 
     const cardsByName = new Map(
-      featuredCards.map((card) => [
+      cardRows.map((card) => [
         card.name,
-        card,
+        mapPrismaCardPreview(card),
       ])
     );
 
     return articles.map((article) => {
-      const content = parseNewsContent(
-        article.content
-      );
+      const content =
+        contents.get(article.slug) ??
+        parseNewsContent(article.content);
 
       const cards = content.featuredCardNames
         .map((name) => cardsByName.get(name))
         .filter(
           (
             card
-          ): card is (typeof featuredCards)[number] =>
-            Boolean(card)
-        )
-        .map(mapPrismaCardPreview);
+          ): card is CardPreviewData =>
+            card !== undefined
+        );
 
-      return toNewsArticle(article, cards);
+      return toNewsArticle(
+        article,
+        cards,
+        cardsByName
+      );
     });
   }
 );

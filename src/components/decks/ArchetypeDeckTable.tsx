@@ -16,7 +16,7 @@ import {
 import {
   getAchievementEmblem,
   type DeckAchievement,
-  type TournamentPlacement,
+  type DeckPlacement,
 } from "@/lib/decks/achievements";
 
 import { formatDate } from "@/lib/format";
@@ -34,7 +34,7 @@ export interface ArchetypeDeckRow {
 
   achievement: DeckAchievement;
 
-  placement: TournamentPlacement | null;
+  placement: DeckPlacement | null;
 
   verified: boolean;
 
@@ -486,8 +486,10 @@ export default function ArchetypeDeckTable({
 
                     <td className="px-2 py-2.5">
                       {row.verified &&
-                      row.achievement ===
-                        "TOURNAMENT" &&
+                      (row.achievement ===
+                        "TOURNAMENT" ||
+                        row.achievement ===
+                          "KC_MAX") &&
                       row.placement ? (
                         <span
                           className="

@@ -125,16 +125,19 @@ export default function TournamentResultCard({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
-            <h2
+            <Link
+              href={`/tournaments/${event.slug}`}
               className="
                 truncate
                 text-sm
                 font-black
                 text-white
+                transition-colors
+                hover:text-blue-200
               "
             >
               {event.name}
-            </h2>
+            </Link>
 
             <span
               className={`

@@ -87,6 +87,38 @@ describe("normalizePlacement", () => {
     assert.equal(normalizePlacement("Top 8"), "Top 8");
   });
 
+  it("normalizes KC Cup placements", () => {
+    assert.equal(
+      normalizePlacement("DLv. MAX"),
+      "DLv. MAX"
+    );
+
+    assert.equal(
+      normalizePlacement("dlv max"),
+      "DLv. MAX"
+    );
+
+    assert.equal(
+      normalizePlacement("Top 100 Global"),
+      "Top 100 Global"
+    );
+
+    assert.equal(
+      normalizePlacement("global rank 1"),
+      "Global Rank 1"
+    );
+
+    assert.equal(
+      normalizePlacement("GLOBAL RANK 2"),
+      "Global Rank 2"
+    );
+
+    assert.equal(
+      normalizePlacement("Global Rank 3"),
+      "Global Rank 3"
+    );
+  });
+
   it("returns null for unknown placements", () => {
     assert.equal(normalizePlacement("3rd"), null);
 
@@ -153,6 +185,57 @@ describe("sanitizeResultFields", () => {
     });
 
     assert.equal(sanitized.placement, "Top 4");
+  });
+
+  it("keeps and normalizes a KC Cup placement", () => {
+    const sanitized = sanitizeResultFields({
+      achievement: "KC_MAX",
+
+      placement: "top 100 global",
+
+      notes: null,
+
+      proofUrl: null,
+    });
+
+    assert.equal(
+      sanitized.placement,
+      "Top 100 Global"
+    );
+  });
+
+  it("drops a placement that does not belong to the achievement", () => {
+    const kcWithTournamentPlacement =
+      sanitizeResultFields({
+        achievement: "KC_MAX",
+
+        placement: "1st",
+
+        notes: null,
+
+        proofUrl: null,
+      });
+
+    const tournamentWithKcPlacement =
+      sanitizeResultFields({
+        achievement: "TOURNAMENT",
+
+        placement: "Global Rank 1",
+
+        notes: null,
+
+        proofUrl: null,
+      });
+
+    assert.equal(
+      kcWithTournamentPlacement.placement,
+      null
+    );
+
+    assert.equal(
+      tournamentWithKcPlacement.placement,
+      null
+    );
   });
 
   it("trims empty notes and proof URLs to null", () => {

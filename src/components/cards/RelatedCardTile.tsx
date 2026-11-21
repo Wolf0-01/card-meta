@@ -13,6 +13,8 @@ import type {
   CardPreviewData,
 } from "@/types/CardPreviewData";
 
+import BanlistBadge from "./BanlistBadge";
+
 import CardHoverTooltip, {
   type TooltipAnchor,
 } from "./CardHoverTooltip";
@@ -26,6 +28,12 @@ import {
 
 interface RelatedCardTileProps {
   card: CardPreviewData;
+
+  /**
+   * Muestra el círculo de la banlist sobre la miniatura.
+   * Se activa en las tiras de cartas de artículos y guías.
+   */
+  showBanlist?: boolean;
 }
 
 /**
@@ -36,6 +44,7 @@ interface RelatedCardTileProps {
  */
 export default function RelatedCardTile({
   card,
+  showBanlist = false,
 }: RelatedCardTileProps) {
   const [failed, setFailed] = useState(false);
 
@@ -191,6 +200,15 @@ export default function RelatedCardTile({
               ${rarityStyle.glow}
             `}
           />
+
+          {showBanlist && card.banlistStatus && (
+            <span className="pointer-events-none absolute left-1 top-1 z-20 flex">
+              <BanlistBadge
+                status={card.banlistStatus}
+                size="sm"
+              />
+            </span>
+          )}
         </div>
 
         <RarityBadge

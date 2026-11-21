@@ -286,7 +286,9 @@ export default function MyDecksGrid({
 
             placement:
               resultDraft.achievement ===
-              "TOURNAMENT"
+                "TOURNAMENT" ||
+              resultDraft.achievement ===
+                "KC_MAX"
                 ? resultDraft.placement ||
                   null
                 : null,
@@ -332,7 +334,9 @@ export default function MyDecksGrid({
                 placement:
                   updated?.placement ??
                   (resultDraft.achievement ===
-                  "TOURNAMENT"
+                    "TOURNAMENT" ||
+                  resultDraft.achievement ===
+                    "KC_MAX"
                     ? resultDraft.placement ||
                       null
                     : null),

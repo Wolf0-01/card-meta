@@ -25,6 +25,48 @@ export const TOURNAMENT_PLACEMENTS = [
 export type TournamentPlacement =
   (typeof TOURNAMENT_PLACEMENTS)[number];
 
+/**
+ * Puestos oficiales de la KC Cup. Duel Links Meta los
+ * muestra junto al logro "KC Cup DLv. Max".
+ */
+export const KC_CUP_PLACEMENTS = [
+  "DLv. MAX",
+  "Top 100 Global",
+  "Global Rank 1",
+  "Global Rank 2",
+  "Global Rank 3",
+] as const;
+
+export type KcCupPlacement =
+  (typeof KC_CUP_PLACEMENTS)[number];
+
+export const DECK_PLACEMENTS = [
+  ...TOURNAMENT_PLACEMENTS,
+  ...KC_CUP_PLACEMENTS,
+] as const;
+
+export type DeckPlacement =
+  (typeof DECK_PLACEMENTS)[number];
+
+/**
+ * Puestos permitidos para cada logro competitivo.
+ * Devuelve `null` cuando el logro no admite puesto.
+ */
+export function getPlacementsForAchievement(
+  achievement: DeckAchievement
+): readonly DeckPlacement[] | null {
+  switch (achievement) {
+    case "TOURNAMENT":
+      return TOURNAMENT_PLACEMENTS;
+
+    case "KC_MAX":
+      return KC_CUP_PLACEMENTS;
+
+    default:
+      return null;
+  }
+}
+
 const ACHIEVEMENT_ALIASES: Record<
   string,
   DeckAchievement
@@ -82,36 +124,59 @@ export function normalizeAchievement(
     : "NONE";
 }
 
-/** Normaliza el puesto de un torneo. */
+/**
+ * Normaliza el puesto de un torneo o de la KC Cup.
+ * Devuelve `null` si el valor no es un puesto oficial.
+ */
 export function normalizePlacement(
   value: unknown
-): TournamentPlacement | null {
+): DeckPlacement | null {
   if (typeof value !== "string") {
     return null;
   }
 
-  const compact = value
+  const key = value
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, "");
+    .replace(/[^a-z0-9]/g, "");
 
-  if (compact === "1st" || compact === "1") {
-    return "1st";
+  switch (key) {
+    case "1st":
+    case "1":
+      return "1st";
+
+    case "2nd":
+    case "2":
+      return "2nd";
+
+    case "top4":
+    case "4":
+      return "Top 4";
+
+    case "top8":
+    case "8":
+      return "Top 8";
+
+    case "dlvmax":
+    case "dlv":
+      return "DLv. MAX";
+
+    case "top100global":
+    case "top100":
+      return "Top 100 Global";
+
+    case "globalrank1":
+      return "Global Rank 1";
+
+    case "globalrank2":
+      return "Global Rank 2";
+
+    case "globalrank3":
+      return "Global Rank 3";
+
+    default:
+      return null;
   }
-
-  if (compact === "2nd" || compact === "2") {
-    return "2nd";
-  }
-
-  if (compact === "top4" || compact === "4") {
-    return "Top 4";
-  }
-
-  if (compact === "top8" || compact === "8") {
-    return "Top 8";
-  }
-
-  return null;
 }
 
 export function isCompetitiveAchievement(
@@ -212,7 +277,7 @@ export interface DeckResultInput {
 export interface DeckResultFields {
   achievement: DeckAchievement;
 
-  placement: TournamentPlacement | null;
+  placement: DeckPlacement | null;
 
   notes: string | null;
 
@@ -221,7 +286,8 @@ export interface DeckResultFields {
 
 /**
  * Limpia y coherencia los campos de resultado antes de
- * guardarlos: un mazo estándar no puede tener puesto y un
+ * guardarlos: solo los logros que admiten puesto lo
+ * conservan, y siempre dentro de su lista oficial. Un
  * torneo sin puesto se rechaza más arriba (servicio).
  */
 export function sanitizeResultFields(
@@ -230,12 +296,19 @@ export function sanitizeResultFields(
   const achievement =
     normalizeAchievement(fields.achievement);
 
+  const allowed =
+    getPlacementsForAchievement(achievement);
+
+  const placement =
+    normalizePlacement(fields.placement);
+
   return {
     achievement,
 
     placement:
-      achievement === "TOURNAMENT"
-        ? normalizePlacement(fields.placement)
+      placement &&
+      allowed?.includes(placement)
+        ? placement
         : null,
 
     notes: fields.notes?.trim() || null,

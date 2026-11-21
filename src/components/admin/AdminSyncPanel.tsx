@@ -8,10 +8,15 @@ import {
   Database,
   Loader2,
   RefreshCw,
+  Sparkles,
   TriangleAlert,
 } from "lucide-react";
 
-type AdminSyncTask = "sets" | "cards" | "banlist";
+type AdminSyncTask =
+  | "sets"
+  | "cards"
+  | "banlist"
+  | "skills";
 
 const TASK_LABELS: Record<AdminSyncTask, string> = {
   sets: "Sets and banners",
@@ -19,6 +24,8 @@ const TASK_LABELS: Record<AdminSyncTask, string> = {
   cards: "Cards and acquisition",
 
   banlist: "Banlist status",
+
+  skills: "Skills and effects",
 };
 
 interface AdminSyncResult {
@@ -123,7 +130,7 @@ export default function AdminSyncPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <section
           className="
             rounded-xl
@@ -418,6 +425,102 @@ export default function AdminSyncPanel() {
             {runningTask === "banlist"
               ? "Syncing..."
               : "Sync banlist"}
+          </button>
+        </section>
+
+        <section
+          className="
+            rounded-xl
+            border
+            border-slate-700/60
+            bg-[#0B132B]
+            p-4
+            ring-1
+            ring-inset
+            ring-white/5
+          "
+        >
+          <div className="flex items-start gap-2">
+            <span
+              aria-hidden
+              className="
+                flex
+                h-8
+                w-8
+                shrink-0
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-violet-500/30
+                bg-violet-500/10
+                text-violet-300
+              "
+            >
+              <Sparkles className="h-4 w-4" />
+            </span>
+
+            <div className="min-w-0">
+              <h2
+                className="
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-[0.16em]
+                  text-slate-200
+                "
+              >
+                Skills &amp; effects
+              </h2>
+
+              <p className="mt-1 text-[10px] leading-relaxed text-slate-400">
+                Sync Skill names, descriptions and formats
+                from Duel Links Meta.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              void runTask("skills");
+            }}
+            disabled={isRunning}
+            className="
+              mt-3
+              inline-flex
+              h-8
+              w-full
+              items-center
+              justify-center
+              gap-1.5
+              rounded-lg
+              border
+              border-violet-500/40
+              bg-violet-500/10
+              px-3
+              text-[9px]
+              font-black
+              uppercase
+              tracking-[0.14em]
+              text-violet-200
+              transition-colors
+              hover:border-violet-400
+              hover:bg-violet-500/20
+              hover:text-white
+              disabled:cursor-wait
+              disabled:opacity-50
+            "
+          >
+            {runningTask === "skills" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="h-3.5 w-3.5" />
+            )}
+
+            {runningTask === "skills"
+              ? "Syncing..."
+              : "Sync skills"}
           </button>
         </section>
       </div>

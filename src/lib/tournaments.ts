@@ -2,7 +2,11 @@ import { cache } from "react";
 
 import type { Prisma } from "@prisma/client";
 
+import { mapPrismaDeck } from "@/lib/mappers/deckMapper";
+
 import { prisma } from "@/lib/prisma";
+
+import type { MetaDeck } from "@/types/meta";
 
 export type TournamentOrganizer = string;
 
@@ -54,6 +58,9 @@ export interface TournamentPlacement {
 
   signatureCard: TournamentSignatureCard | null;
 
+  /** Deck.id público vinculado al puesto, si existe. */
+  deckId: string | null;
+
   deck: TournamentDeckLink | null;
 
   archetypeHref: string;
@@ -94,6 +101,37 @@ export interface TournamentData {
 
   updatedAt: string;
 }
+
+export interface TournamentDeckEntry {
+  placement: TournamentPlacement;
+
+  deck: MetaDeck;
+}
+
+export interface TournamentDetail
+  extends TournamentEvent {
+  /** Listas completas del podio con un deckId público. */
+  podiumDecks: TournamentDeckEntry[];
+}
+
+const tournamentDeckInclude = {
+  archetype: true,
+
+  author: {
+    select: {
+      id: true,
+      username: true,
+      displayName: true,
+      avatarUrl: true,
+    },
+  },
+
+  cards: {
+    include: {
+      card: true,
+    },
+  },
+} satisfies Prisma.DeckInclude;
 
 function asRecord(
   value: unknown
@@ -210,6 +248,88 @@ function toDeckLink(
   };
 }
 
+interface TournamentRow {
+  id: string;
+
+  slug: string;
+
+  name: string;
+
+  organizer: string;
+
+  date: Date;
+
+  playerCount: number;
+
+  format: string;
+
+  bannerUrl: string | null;
+}
+
+function buildTournamentEvent(
+  tournament: TournamentRow,
+  standings: TournamentStandingSeed[],
+  decksById: Map<string, PublicDeckRow>
+): TournamentEvent | null {
+  const placements: TournamentPlacement[] =
+    standings.map((standing) => {
+      const deck = standing.deckId
+        ? decksById.get(standing.deckId) ??
+          null
+        : null;
+
+      return {
+        place: standing.rank,
+
+        player: standing.player,
+
+        archetype: standing.archetype,
+
+        signatureCard: null,
+
+        deckId: deck?.id ?? null,
+
+        deck: deck ? toDeckLink(deck) : null,
+
+        archetypeHref: `/decks?q=${encodeURIComponent(
+          standing.archetype
+        )}`,
+      };
+    });
+
+  if (placements.length === 0) {
+    return null;
+  }
+
+  return {
+    id: tournament.id,
+
+    slug: tournament.slug,
+
+    name: tournament.name,
+
+    organizer: tournament.organizer,
+
+    date: tournament.date.toISOString(),
+
+    players: tournament.playerCount,
+
+    format: tournament.format,
+
+    bannerUrl: tournament.bannerUrl,
+
+    placements,
+
+    champion: placements[0],
+
+    topCount: placements.length,
+
+    publicListCount: placements.filter(
+      (placement) => placement.deck
+    ).length,
+  };
+}
+
 /**
  * Construye la página de torneos a partir de los resultados
  * reales guardados en PostgreSQL. Cada puesto puede enlazar
@@ -283,67 +403,17 @@ export const getTournamentData = cache(
     );
 
     const events: TournamentEvent[] = tournaments
-      .map((tournament) => {
-        const standings =
-          standingsBySlug.get(tournament.slug) ??
-          [];
+      .map((tournament) =>
+        buildTournamentEvent(
+          tournament,
 
-        const placements: TournamentPlacement[] =
-          standings.map((standing) => {
-            const deck = standing.deckId
-              ? decksById.get(standing.deckId) ??
-                null
-              : null;
+          standingsBySlug.get(
+            tournament.slug
+          ) ?? [],
 
-            return {
-              place: standing.rank,
-
-              player: standing.player,
-
-              archetype: standing.archetype,
-
-              signatureCard: null,
-
-              deck: deck ? toDeckLink(deck) : null,
-
-              archetypeHref: `/decks?q=${encodeURIComponent(
-                standing.archetype
-              )}`,
-            };
-          });
-
-        if (placements.length === 0) {
-          return null;
-        }
-
-        return {
-          id: tournament.id,
-
-          slug: tournament.slug,
-
-          name: tournament.name,
-
-          organizer: tournament.organizer,
-
-          date: tournament.date.toISOString(),
-
-          players: tournament.playerCount,
-
-          format: tournament.format,
-
-          bannerUrl: tournament.bannerUrl,
-
-          placements,
-
-          champion: placements[0],
-
-          topCount: placements.length,
-
-          publicListCount: placements.filter(
-            (placement) => placement.deck
-          ).length,
-        };
-      })
+          decksById
+        )
+      )
       .filter(
         (
           event
@@ -374,6 +444,117 @@ export const getTournamentData = cache(
       updatedAt:
         events[0]?.date ??
         new Date().toISOString(),
+    };
+  }
+);
+
+/**
+ * Detalle de un torneo por slug, incluyendo las listas
+ * completas del podio que tienen un Deck.id público.
+ */
+export const getTournamentBySlug = cache(
+  async (
+    slug: string
+  ): Promise<TournamentDetail | null> => {
+    const tournament =
+      await prisma.tournament.findUnique({
+        where: {
+          slug,
+        },
+      });
+
+    if (!tournament) {
+      return null;
+    }
+
+    const standings = parseTournamentStandings(
+      tournament.standings
+    );
+
+    const deckIds = Array.from(
+      new Set(
+        standings.flatMap((standing) =>
+          standing.deckId
+            ? [standing.deckId]
+            : []
+        )
+      )
+    );
+
+    const deckRows =
+      deckIds.length > 0
+        ? await prisma.deck.findMany({
+            where: {
+              id: {
+                in: deckIds,
+              },
+
+              isPublic: true,
+            },
+
+            include: tournamentDeckInclude,
+          })
+        : [];
+
+    const decksById = new Map<
+      string,
+      PublicDeckRow
+    >(
+      deckRows.map((deck) => [
+        deck.id,
+        {
+          id: deck.id,
+          name: deck.name,
+          slug: deck.slug,
+          identifier: deck.identifier,
+          author: deck.author,
+        },
+      ])
+    );
+
+    const fullDecksById = new Map(
+      deckRows.map((deck) => [deck.id, deck])
+    );
+
+    const event = buildTournamentEvent(
+      tournament,
+      standings,
+      decksById
+    );
+
+    if (!event) {
+      return null;
+    }
+
+    const podiumDecks: TournamentDeckEntry[] =
+      event.placements
+        .filter(
+          (placement) =>
+            placement.place <= 3 &&
+            placement.deckId !== null
+        )
+        .flatMap((placement) => {
+          const deck = placement.deckId
+            ? fullDecksById.get(
+                placement.deckId
+              )
+            : undefined;
+
+          return deck
+            ? [
+                {
+                  placement,
+
+                  deck: mapPrismaDeck(deck),
+                },
+              ]
+            : [];
+        });
+
+    return {
+      ...event,
+
+      podiumDecks,
     };
   }
 );

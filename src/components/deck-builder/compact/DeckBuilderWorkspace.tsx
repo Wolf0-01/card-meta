@@ -342,7 +342,9 @@ export default function DeckBuilderWorkspace({
 
             placement:
               competitiveResult.achievement ===
-              "TOURNAMENT"
+                "TOURNAMENT" ||
+              competitiveResult.achievement ===
+                "KC_MAX"
                 ? competitiveResult.placement ||
                   null
                 : null,

@@ -799,19 +799,46 @@ export async function getArchetypeBreakdown(
   const normalizedFormat =
     normalizeDuelFormat(format);
 
-  const rows = await findDecks({
+  const baseWhere: Prisma.DeckWhereInput = {
+    isPublic: true,
+
+    format: normalizedFormat,
+
+    AND: [buildArchetypeMatch(term)],
+  };
+
+  /*
+   * El Breakdown prioriza las listas recientes para reflejar
+   * el meta actual. Si el arquetipo no tiene mazos en los
+   * últimos 30 días, se usa su historial completo.
+   */
+  const recentSince = new Date(
+    Date.now() - 30 * 24 * 60 * 60 * 1000
+  );
+
+  let rows = await findDecks({
     where: {
-      isPublic: true,
+      ...baseWhere,
 
-      format: normalizedFormat,
-
-      AND: [buildArchetypeMatch(term)],
+      createdAt: {
+        gte: recentSince,
+      },
     },
 
     orderBy: {
       createdAt: "desc",
     },
   });
+
+  if (rows.length === 0) {
+    rows = await findDecks({
+      where: baseWhere,
+
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
 
   const decks = rows.map(mapPrismaDeck);
 

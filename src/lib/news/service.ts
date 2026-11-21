@@ -132,6 +132,13 @@ function buildNewsContent(
       ...(section.bullets.length > 0
         ? { bullets: section.bullets }
         : {}),
+
+      ...(section.featuredCardNames.length > 0
+        ? {
+            featuredCardNames:
+              section.featuredCardNames,
+          }
+        : {}),
     })),
   } as Prisma.InputJsonValue;
 }

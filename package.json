@@ -16,6 +16,7 @@
     "cards:sync": "tsx scripts/syncDlmCatalog.ts",
     "cards:alt-arts": "tsx scripts/syncSpeedAltArts.ts",
     "sets:sync": "tsx scripts/syncSetMeta.ts",
+    "skills:sync": "tsx scripts/syncSkills.ts",
     "guides:seed": "tsx prisma/seedGuides.ts",
     "news:seed": "tsx prisma/seedNews.ts"
   },

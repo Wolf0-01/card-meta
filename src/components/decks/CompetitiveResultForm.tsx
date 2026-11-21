@@ -7,16 +7,17 @@ import {
 
 import {
   getAchievementLabel,
+  getPlacementsForAchievement,
   normalizeAchievement,
-  TOURNAMENT_PLACEMENTS,
+  normalizePlacement,
   type DeckAchievement,
-  type TournamentPlacement,
+  type DeckPlacement,
 } from "@/lib/decks/achievements";
 
 export interface CompetitiveResultValue {
   achievement: DeckAchievement;
 
-  placement: TournamentPlacement | "";
+  placement: DeckPlacement | "";
 
   notes: string;
 
@@ -52,8 +53,8 @@ export function toCompetitiveResultValue(
     return EMPTY_COMPETITIVE_RESULT;
   }
 
-  const placement = TOURNAMENT_PLACEMENTS.find(
-    (value) => value === source.placement
+  const placement = normalizePlacement(
+    source.placement
   );
 
   return {
@@ -114,6 +115,10 @@ export default function CompetitiveResultForm({
   className = "",
 }: CompetitiveResultFormProps) {
   const hasResult = value.achievement !== "NONE";
+
+  const placements = getPlacementsForAchievement(
+    value.achievement
+  );
 
   function patch(
     next: Partial<CompetitiveResultValue>
@@ -197,13 +202,28 @@ export default function CompetitiveResultForm({
 
           <select
             value={value.achievement}
-            onChange={(event) =>
+            onChange={(event) => {
+              const achievement = event.target
+                .value as DeckAchievement;
+
+              const allowed =
+                getPlacementsForAchievement(
+                  achievement
+                );
+
+              const current = value.placement;
+
               patch({
-                achievement:
-                  event.target
-                    .value as DeckAchievement,
-              })
-            }
+                achievement,
+
+                placement:
+                  allowed &&
+                  current !== "" &&
+                  allowed.includes(current)
+                    ? current
+                    : "",
+              });
+            }}
             disabled={disabled}
             className={FIELD_CLASS}
           >
@@ -225,7 +245,7 @@ export default function CompetitiveResultForm({
           </select>
         </label>
 
-        {value.achievement === "TOURNAMENT" ? (
+        {placements ? (
           <label className="block">
             <span className="mb-1 block text-[9px] font-black uppercase tracking-[0.14em] text-foreground-muted">
               Placement
@@ -236,7 +256,7 @@ export default function CompetitiveResultForm({
               onChange={(event) =>
                 patch({
                   placement: event.target
-                    .value as TournamentPlacement | "",
+                    .value as DeckPlacement | "",
                 })
               }
               disabled={disabled}
@@ -246,16 +266,14 @@ export default function CompetitiveResultForm({
                 Select placement
               </option>
 
-              {TOURNAMENT_PLACEMENTS.map(
-                (placement) => (
-                  <option
-                    key={placement}
-                    value={placement}
-                  >
-                    {placement}
-                  </option>
-                )
-              )}
+              {placements.map((placement) => (
+                <option
+                  key={placement}
+                  value={placement}
+                >
+                  {placement}
+                </option>
+              ))}
             </select>
           </label>
         ) : (

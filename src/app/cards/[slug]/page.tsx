@@ -691,9 +691,9 @@ export default async function CardDetailPage({
                       gap-1.5
                     "
                   >
-                    {card.obtain.map((entry) => (
+                    {card.obtain.map((entry, index) => (
                       <li
-                        key={`${entry.type ?? "set"}-${entry.name}`}
+                        key={`${entry.type ?? "set"}-${entry.name}-${index}`}
                         className="max-w-full"
                       >
                         <Link

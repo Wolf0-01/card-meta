@@ -226,8 +226,8 @@ model Deck {
   achievement String @default("NONE")
 
   /**
-   * Puesto del torneo: "1st" | "2nd" | "Top 4" | "Top 8".
-   * Solo se usa cuando achievement = "TOURNAMENT".
+   * Puesto competitivo. Torneos: "1st" | "2nd" | "Top 4" | "Top 8".
+   * KC Cup: "DLv. MAX" | "Top 100 Global" | "Global Rank 1/2/3".
    */
   placement String?
 
@@ -392,6 +392,26 @@ model TierEntry {
   @@unique([format, archetype])
   @@index([format])
   @@index([tier])
+}
+
+/// Catálogo de Skills sincronizado desde Duel Links Meta.
+/// `id` es el identificador estable de la API (`_id`).
+model SkillMeta {
+  id String @id
+
+  name String
+
+  description String
+
+  /// Formato normalizado: "speed" | "rush".
+  format String @default("speed")
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([format])
 }
 
 model DeckCard {
