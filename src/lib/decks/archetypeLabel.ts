@@ -13,8 +13,7 @@ export function getDeckArchetypeLabel(
     MetaDeck,
     "archetype" | "archetypeName" | "name" | "cards"
   >
-): string {
-  const explicit = deck.archetype?.name?.trim();
+): string {  const explicit = deck.archetype?.name?.trim();
 
   if (
     explicit &&
@@ -97,5 +96,57 @@ export function getDeckArchetypeLabel(
     deck.name.trim() ||
     topType ||
     "Deck"
+  );
+}
+
+/**
+ * Convierte cualquier nombre o slug de arquetipo en un slug
+ * URL-safe: "Dark Magician" y "Dark%20Magician" producen
+ * "dark-magician".
+ */
+export function slugifyArchetypeLabel(
+  value: string
+): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Slug canónico del arquetipo de un mazo. Prioriza la
+ * relación explícita y, si no existe, deriva el slug del
+ * nombre visible para que los enlaces nunca envíen el
+ * nombre crudo codificado.
+ */
+export function getDeckArchetypeSlug(
+  deck: Pick<
+    MetaDeck,
+    | "archetype"
+    | "archetypeSlug"
+    | "archetypeName"
+    | "name"
+    | "cards"
+  >
+): string {
+  const explicit =
+    deck.archetype?.slug?.trim() ||
+    deck.archetypeSlug?.trim();
+
+  if (explicit) {
+    const slug = slugifyArchetypeLabel(explicit);
+
+    if (slug) {
+      return slug;
+    }
+  }
+
+  return (
+    slugifyArchetypeLabel(
+      getDeckArchetypeLabel(deck)
+    ) || "deck"
   );
 }

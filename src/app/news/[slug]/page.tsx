@@ -9,12 +9,11 @@ import {
   BookOpen,
   CalendarDays,
   Clock3,
-  Sparkles,
   Tag,
   UserRound,
 } from "lucide-react";
 
-import CatalogCardTile from "@/components/cards/CatalogCardTile";
+import MultilineText from "@/components/cards/MultilineText";
 
 import SectionCardStrip from "@/components/cards/SectionCardStrip";
 
@@ -309,13 +308,7 @@ export default async function NewsArticlePage({
           </div>
         </header>
 
-        <div
-          className="
-            grid
-            gap-4
-            lg:grid-cols-[minmax(0,1fr)_280px]
-          "
-        >
+        <div className="space-y-4">
           <article className="space-y-3">
             {article.sections.map(
               (section, index) => (
@@ -383,7 +376,9 @@ export default async function NewsArticlePage({
                             text-slate-300
                           "
                         >
-                          {paragraph}
+                          <MultilineText
+                            text={paragraph}
+                          />
                         </p>
                       )
                     )}
@@ -419,7 +414,9 @@ export default async function NewsArticlePage({
                                   "
                                 />
 
-                                {bullet}
+                                <MultilineText
+                                  text={bullet}
+                                />
                               </li>
                             )
                           )}
@@ -523,120 +520,6 @@ export default async function NewsArticlePage({
               </Link>
             </div>
           </article>
-
-          <aside
-            className="
-              space-y-3
-              lg:sticky
-              lg:top-20
-              lg:self-start
-            "
-          >
-            <section
-              aria-label="Featured cards from the article"
-              className="
-                rounded-xl
-                border
-                border-slate-700/60
-                bg-[#0B132B]
-                p-3
-                ring-1
-                ring-inset
-                ring-white/5
-              "
-            >
-              <div className="flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-
-                <h2
-                  className="
-                    text-[10px]
-                    font-black
-                    uppercase
-                    tracking-[0.16em]
-                    text-slate-200
-                  "
-                >
-                  Featured cards
-                </h2>
-
-                <span
-                  className="
-                    ml-auto
-                    text-[8px]
-                    font-black
-                    tabular-nums
-                    text-slate-500
-                  "
-                >
-                  {article.featuredCards.length}
-                </span>
-              </div>
-
-              {article.featuredCards.length > 0 ? (
-                <div
-                  className="
-                    mt-2.5
-                    grid
-                    grid-cols-2
-                    gap-2
-                  "
-                >
-                  {article.featuredCards.map(
-                    (card) => (
-                      <div key={card.id}>
-                        <CatalogCardTile
-                          card={card}
-                          prefetch={false}
-                        />
-
-                        <p
-                          className="
-                            mt-1
-                            truncate
-                            text-[9px]
-                            font-bold
-                            text-slate-400
-                          "
-                          title={card.name}
-                        >
-                          {card.name}
-                        </p>
-                      </div>
-                    )
-                  )}
-                </div>
-              ) : (
-                <p
-                  className="
-                    mt-2
-                    text-[10px]
-                    leading-relaxed
-                    text-slate-500
-                  "
-                >
-                  This article has no featured cards
-                  associated with it.
-                </p>
-              )}
-
-              <p
-                className="
-                  mt-2.5
-                  border-t
-                  border-slate-700/50
-                  pt-2
-                  text-[9px]
-                  leading-relaxed
-                  text-slate-500
-                "
-              >
-                Hover over a card to see its full
-                information.
-              </p>
-            </section>
-
-          </aside>
         </div>
 
         {related.length > 0 && (

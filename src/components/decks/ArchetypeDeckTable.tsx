@@ -116,57 +116,27 @@ function TopEmblem({
 
   if (achievement === "KOG") {
     return (
-      <span
+      <Image
+        src="/icons/kog-lion.png"
+        alt={emblem.label}
         title={emblem.label}
-        aria-label={emblem.label}
-        className={`
-          inline-flex
-          h-7
-          w-7
-          items-center
-          justify-center
-          rounded-full
-          border
-          p-0.5
-          ${tone}
-        `}
-      >
-        <Image
-          src="/icons/kog-lion.png"
-          alt=""
-          width={28}
-          height={28}
-          className="h-full w-full object-contain"
-        />
-      </span>
+        width={32}
+        height={32}
+        className="h-8 w-8 object-contain"
+      />
     );
   }
 
   if (achievement === "KC_MAX") {
     return (
-      <span
+      <Image
+        src="/icons/kc-cup.png"
+        alt={emblem.label}
         title={emblem.label}
-        aria-label={emblem.label}
-        className={`
-          inline-flex
-          h-7
-          w-7
-          items-center
-          justify-center
-          rounded-full
-          border
-          p-0.5
-          ${tone}
-        `}
-      >
-        <Image
-          src="/icons/kc-cup.png"
-          alt=""
-          width={28}
-          height={28}
-          className="h-full w-full object-contain"
-        />
-      </span>
+        width={32}
+        height={32}
+        className="h-8 w-8 object-contain"
+      />
     );
   }
 

@@ -590,6 +590,10 @@ interface TestSortableCard {
     race: string | null;
 
     frameType: string | null;
+
+    level: number | null;
+
+    linkRating: number | null;
   };
 }
 
@@ -604,6 +608,10 @@ function sortableCard(
     race?: string | null;
 
     frameType?: string | null;
+
+    level?: number | null;
+
+    linkRating?: number | null;
   } = {}
 ): TestSortableCard {
   return {
@@ -615,6 +623,8 @@ function sortableCard(
       rarity,
       race: options.race ?? null,
       frameType: options.frameType ?? null,
+      level: options.level ?? null,
+      linkRating: options.linkRating ?? null,
     },
   };
 }
@@ -628,109 +638,82 @@ function sortedNames(
 }
 
 describe("sortDeckCards (Duel Links Meta)", () => {
-  it("ordena por bloque y subtipo oficial", () => {
+  it("ordena el Main Deck Monsters → Spells → Traps", () => {
     const cards = [
-      sortableCard(
-        "Trap Counter",
-        "Trap Card",
-        "UR",
-        3,
-        { race: "Counter" }
-      ),
       sortableCard(
         "Trap Normal",
         "Trap Card",
         "UR",
         1,
-        { race: "Normal" }
-      ),
-      sortableCard(
-        "Spell Field",
-        "Spell Card",
-        "UR",
-        1,
-        { race: "Field" }
-      ),
-      sortableCard(
-        "Spell Quick",
-        "Spell Card",
-        "UR",
-        1,
-        { race: "Quick-Play" }
+        { level: null }
       ),
       sortableCard(
         "Spell Normal",
         "Spell Card",
         "UR",
         1,
-        { race: "Normal" }
+        { level: null }
       ),
       sortableCard(
-        "Monster Normal",
+        "Monster Level 4",
         "Normal Monster",
-        "UR"
+        "UR",
+        1,
+        { level: 4 }
       ),
       sortableCard(
-        "Monster Effect",
+        "Monster Level 8",
         "Effect Monster",
-        "UR"
-      ),
-      sortableCard(
-        "Monster Ritual",
-        "Ritual Monster",
-        "UR"
+        "UR",
+        1,
+        { level: 8 }
       ),
     ];
 
     assert.deepEqual(sortedNames(cards), [
-      "Monster Ritual",
-      "Monster Effect",
-      "Monster Normal",
+      "Monster Level 8",
+      "Monster Level 4",
       "Spell Normal",
-      "Spell Quick",
-      "Spell Field",
       "Trap Normal",
-      "Trap Counter",
     ]);
   });
 
-  it("aplica rareza, copias y nombre dentro del subtipo", () => {
+  it("ordena monstruos por nivel, rareza y nombre", () => {
     const cards = [
       sortableCard(
         "Alpha",
         "Effect Monster",
         "N",
-        3
+        3,
+        { level: 4 }
       ),
       sortableCard(
         "Bravo",
         "Effect Monster",
         "UR",
-        1
+        1,
+        { level: 4 }
       ),
       sortableCard(
         "Charlie",
         "Effect Monster",
         "UR",
-        3
+        3,
+        { level: 8 }
       ),
       sortableCard(
         "Delta",
         "Effect Monster",
-        "UR",
-        2
+        "SR",
+        2,
+        { level: 8 }
       ),
       sortableCard(
         "Echo",
         "Effect Monster",
-        "UR",
-        2
-      ),
-      sortableCard(
-        "Foxtrot",
-        "Effect Monster",
         "SR",
-        1
+        2,
+        { level: 8 }
       ),
     ];
 
@@ -739,48 +722,103 @@ describe("sortDeckCards (Duel Links Meta)", () => {
       "Delta",
       "Echo",
       "Bravo",
-      "Foxtrot",
       "Alpha",
     ]);
   });
 
-  it("ordena el Extra Deck Fusion → Synchro → Xyz → Link", () => {
+  it("ordena mágicas y trampas por rareza y nombre", () => {
     const cards = [
       sortableCard(
-        "Link",
-        "Link Monster",
-        "UR",
-        1,
-        { zone: "extra", frameType: "Link" }
+        "Zeta Spell",
+        "Spell Card",
+        "N"
       ),
       sortableCard(
-        "Xyz",
-        "Xyz Monster",
-        "UR",
-        1,
-        { zone: "extra", frameType: "Xyz" }
+        "Eta Spell",
+        "Spell Card",
+        "UR"
       ),
       sortableCard(
-        "Synchro",
-        "Synchro Monster",
-        "UR",
-        1,
-        { zone: "extra", frameType: "Synchro" }
+        "Beta Trap",
+        "Trap Card",
+        "SR"
       ),
       sortableCard(
-        "Fusion",
-        "Fusion Monster",
-        "UR",
-        1,
-        { zone: "extra", frameType: "Fusion" }
+        "Alpha Trap",
+        "Trap Card",
+        "SR"
       ),
     ];
 
     assert.deepEqual(sortedNames(cards), [
-      "Fusion",
-      "Synchro",
-      "Xyz",
-      "Link",
+      "Eta Spell",
+      "Zeta Spell",
+      "Alpha Trap",
+      "Beta Trap",
+    ]);
+  });
+
+  it("ordena el Extra Deck Fusion → Synchro → Xyz → Link y luego nivel/rareza", () => {
+    const cards = [
+      sortableCard(
+        "Link 3",
+        "Link Monster",
+        "UR",
+        1,
+        {
+          zone: "extra",
+          frameType: "Link",
+          linkRating: 3,
+        }
+      ),
+      sortableCard(
+        "Xyz 4",
+        "Xyz Monster",
+        "UR",
+        1,
+        { zone: "extra", frameType: "Xyz", level: 4 }
+      ),
+      sortableCard(
+        "Synchro 8 SR",
+        "Synchro Monster",
+        "SR",
+        1,
+        {
+          zone: "extra",
+          frameType: "Synchro",
+          level: 8,
+        }
+      ),
+      sortableCard(
+        "Synchro 8 UR",
+        "Synchro Monster",
+        "UR",
+        1,
+        {
+          zone: "extra",
+          frameType: "Synchro",
+          level: 8,
+        }
+      ),
+      sortableCard(
+        "Fusion 4",
+        "Fusion Monster",
+        "UR",
+        1,
+        {
+          zone: "extra",
+          frameType: "Fusion",
+          level: 4,
+        }
+      ),
+    ];
+
+    assert.deepEqual(sortedNames(cards), [
+      "Fusion 4",
+      "Synchro 8 UR",
+      "Synchro 8 SR",
+      "Xyz 4",
+      "Link 3",
     ]);
   });
 });
@@ -798,7 +836,7 @@ describe("suggestArchetypeName", () => {
     };
   }
 
-  it("prioriza el arquetipo mencionado en el t�tulo", () => {
+  it("prioriza el arquetipo mencionado en el t�tulo", () => {
     const cards = [
       archetypeCard("Centur-Ion", 4),
       archetypeCard("Stardust", 4),
@@ -815,7 +853,7 @@ describe("suggestArchetypeName", () => {
     );
   });
 
-  it("usa la Skill cuando el t�tulo no menciona el arquetipo", () => {
+  it("usa la Skill cuando el t�tulo no menciona el arquetipo", () => {
     const cards = [
       archetypeCard("Stardust", 2),
       archetypeCard("Centur-Ion", 3),

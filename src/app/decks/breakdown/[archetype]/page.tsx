@@ -22,15 +22,25 @@ interface ArchetypeBreakdownPageProps {
   }>;
 }
 
+function decodeArchetype(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export async function generateMetadata({
   params,
 }: ArchetypeBreakdownPageProps): Promise<Metadata> {
   const { archetype } = await params;
 
-  return {
-    title: `${archetype} Deck Breakdown | Card Meta`,
+  const name = decodeArchetype(archetype);
 
-    description: `Main Deck, Extra Deck and popular Skills for the ${archetype} archetype, with a sample deck ready to build in the Deck Builder.`,
+  return {
+    title: `${name} Deck Breakdown | Card Meta`,
+
+    description: `Main Deck, Extra Deck and popular Skills for the ${name} archetype, with a sample deck ready to build in the Deck Builder.`,
   };
 }
 
@@ -40,6 +50,8 @@ export default async function ArchetypeBreakdownPage({
 }: ArchetypeBreakdownPageProps) {
   const { archetype } = await params;
 
+  const archetypeName = decodeArchetype(archetype);
+
   const query = await searchParams;
 
   const format =
@@ -47,7 +59,7 @@ export default async function ArchetypeBreakdownPage({
 
   const breakdown = await findArchetypeBreakdown(
     format,
-    archetype
+    archetypeName
   );
 
   if (!breakdown) {

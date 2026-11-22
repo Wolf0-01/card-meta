@@ -10,6 +10,8 @@ import { normalizeBanlistStatus } from "@/lib/banlist";
 
 import { normalizeAchievement } from "@/lib/decks/achievements";
 
+import { sortDeckCards } from "@/lib/decks/rarityOrder";
+
 import type { LinkMarker } from "@/types/card";
 import type {
   DeckCard,
@@ -204,8 +206,9 @@ card: {
 export function mapPrismaDeck(
   deck: PrismaDeckWithRelations
 ): MetaDeck {
-  const cards =
-    deck.cards.map(mapPrismaDeckCard);
+  const cards = sortDeckCards(
+    deck.cards.map(mapPrismaDeckCard)
+  );
 
   const wins = deck.wins ?? 0;
 

@@ -7,6 +7,8 @@ import type {
 
 import { mapPrismaCardPreview } from "@/lib/mappers/cardMapper";
 
+import { normalizeMultilineText } from "@/lib/multiline";
+
 import type { NewsCategoryKey } from "@/lib/newsCategories";
 
 import { newsCategoryKeyFromEnum } from "@/lib/newsCategories";
@@ -149,13 +151,15 @@ function parseSection(
 
   const paragraphs = asStringArray(
     record.paragraphs
-  );
+  ).map(normalizeMultilineText);
 
   if (!heading || paragraphs.length === 0) {
     return null;
   }
 
-  const bullets = asStringArray(record.bullets);
+  const bullets = asStringArray(
+    record.bullets
+  ).map(normalizeMultilineText);
 
   const featuredCardNames = asStringArray(
     record.featuredCardNames
@@ -256,21 +260,35 @@ function toNewsArticle(
     article.content
   );
 
-  const sections: NewsSectionDetail[] =
-    content.sections.map((section) => ({
-      ...section,
+  const hasSectionCards =
+    content.sections.some(
+      (section) =>
+        (section.featuredCardNames ?? []).length >
+        0
+    );
 
-      featuredCards: (
-        section.featuredCardNames ?? []
-      )
-        .map((name) => cardsByName.get(name))
-        .filter(
-          (
-            card
-          ): card is CardPreviewData =>
-            card !== undefined
-        ),
-    }));
+  const sections: NewsSectionDetail[] =
+    content.sections.map((section, index) => {
+      const names =
+        (section.featuredCardNames ?? []).length > 0
+          ? section.featuredCardNames ?? []
+          : !hasSectionCards && index === 0
+            ? content.featuredCardNames
+            : [];
+
+      return {
+        ...section,
+
+        featuredCards: names
+          .map((name) => cardsByName.get(name))
+          .filter(
+            (
+              card
+            ): card is CardPreviewData =>
+              card !== undefined
+          ),
+      };
+    });
 
   return {
     id: article.id,

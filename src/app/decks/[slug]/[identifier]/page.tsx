@@ -8,7 +8,9 @@ import { getCurrentUser } from "@/lib/auth/currentUser";
 
 import { canManageGuides } from "@/lib/auth/roles";
 
-import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
+import {
+  getDeckArchetypeSlug,
+} from "@/lib/decks/archetypeLabel";
 
 import { calculateDeckGemEstimate } from "@/lib/decks/gemCalculator";
 
@@ -76,8 +78,8 @@ export default async function DeckPage({
   const gemEstimate =
     await calculateDeckGemEstimate(deck);
 
-  const archetypeLabel =
-    getDeckArchetypeLabel(deck);
+  const archetypeSlug =
+    getDeckArchetypeSlug(deck);
 
   const breakdownParams = new URLSearchParams();
 
@@ -88,9 +90,9 @@ export default async function DeckPage({
   const breakdownQuery =
     breakdownParams.toString();
 
-  const breakdownHref = `/decks/breakdown/${encodeURIComponent(
-    archetypeLabel
-  )}${breakdownQuery ? `?${breakdownQuery}` : ""}`;
+  const breakdownHref = `/decks/breakdown/${archetypeSlug}${
+    breakdownQuery ? `?${breakdownQuery}` : ""
+  }`;
 
   return (
     <main

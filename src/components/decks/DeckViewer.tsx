@@ -16,7 +16,10 @@ import DeckMatchups from "./DeckMatchups";
 import RelatedDecks from "./RelatedDecks";
 import SkillHoverCard from "./SkillHoverCard";
 
-import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
+import {
+  getDeckArchetypeLabel,
+  getDeckArchetypeSlug,
+} from "@/lib/decks/archetypeLabel";
 
 import { getDuelFormatLabel } from "@/lib/duelFormat";
 
@@ -99,8 +102,8 @@ export default function DeckViewer({
 
   const resolvedBreakdownHref =
     breakdownHref ??
-    `/decks/breakdown/${encodeURIComponent(
-      getDeckArchetypeLabel(deck)
+    `/decks/breakdown/${getDeckArchetypeSlug(
+      deck
     )}${deck.format === "rush" ? "?format=rush" : ""}`;
 
   return (

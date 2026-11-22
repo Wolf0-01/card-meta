@@ -5,7 +5,10 @@ import { getCardImageSrc } from "@/lib/cards/image";
 
 import { normalizeAchievement } from "@/lib/decks/achievements";
 
-import { getDeckArchetypeLabel } from "@/lib/decks/archetypeLabel";
+import {
+  getDeckArchetypeLabel,
+  slugifyArchetypeLabel,
+} from "@/lib/decks/archetypeLabel";
 
 import { pickDeckEmblem } from "@/lib/decks/emblem";
 
@@ -375,44 +378,76 @@ export interface PublicDeckExplorerResult {
   skills: string[];
 }
 
+function decodeArchetypeTerm(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 /**
  * Condiciones compartidas para localizar los mazos de un
  * arquetipo: nombre del mazo, relación de arquetipo o
  * arquetipo de las cartas del Main Deck.
+ *
+ * El término puede llegar como nombre visible
+ * ("Dark Magician") o como slug ("dark-magician"); ambos
+ * se normalizan para que el Breakdown nunca devuelva 404.
  */
 function buildArchetypeMatch(
   term: string
 ): Prisma.DeckWhereInput {
-  return {
-    OR: [
-      {
+  const normalized = term
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const slug = slugifyArchetypeLabel(term);
+
+  const conditions: Prisma.DeckWhereInput[] = [
+    {
+      name: {
+        contains: normalized,
+        mode: "insensitive",
+      },
+    },
+    {
+      archetype: {
         name: {
-          contains: term,
+          contains: normalized,
           mode: "insensitive",
         },
       },
-      {
-        archetype: {
-          name: {
-            contains: term,
-            mode: "insensitive",
-          },
-        },
-      },
-      {
-        cards: {
-          some: {
-            zone: "main",
-            card: {
-              archetype: {
-                contains: term,
-                mode: "insensitive",
-              },
+    },
+    {
+      cards: {
+        some: {
+          zone: "main",
+          card: {
+            archetype: {
+              contains: normalized,
+              mode: "insensitive",
             },
           },
         },
       },
-    ],
+    },
+  ];
+
+  if (slug) {
+    conditions.push({
+      archetype: {
+        slug: {
+          equals: slug,
+          mode: "insensitive",
+        },
+      },
+    });
+  }
+
+  return {
+    OR: conditions,
   };
 }
 
@@ -790,7 +825,10 @@ export async function getArchetypeBreakdown(
   format: DuelFormat = "speed",
   archetype = ""
 ): Promise<ArchetypeBreakdown | null> {
-  const term = archetype.trim();
+  const term = decodeArchetypeTerm(archetype)
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
   if (!term) {
     return null;
@@ -892,7 +930,7 @@ export async function getArchetypeBreakdown(
     );
 
   return {
-    archetype: term,
+    archetype: getDeckArchetypeLabel(decks[0]),
 
     deckCount,
 

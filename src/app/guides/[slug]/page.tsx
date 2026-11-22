@@ -16,6 +16,8 @@ import {
 
 import CatalogCardTile from "@/components/cards/CatalogCardTile";
 
+import MultilineText from "@/components/cards/MultilineText";
+
 import SectionCardStrip from "@/components/cards/SectionCardStrip";
 
 import GuideActions from "@/components/guides/GuideActions";
@@ -390,7 +392,9 @@ export default async function GuidePage({
                             text-slate-300
                           "
                         >
-                          {paragraph}
+                          <MultilineText
+                            text={paragraph}
+                          />
                         </p>
                       )
                     )}
@@ -426,7 +430,9 @@ export default async function GuidePage({
                                   "
                                 />
 
-                                {bullet}
+                                <MultilineText
+                                  text={bullet}
+                                />
                               </li>
                             )
                           )}

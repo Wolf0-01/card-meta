@@ -4,6 +4,8 @@ import type { Guide, Prisma } from "@prisma/client";
 
 import { mapPrismaCardPreview } from "@/lib/mappers/cardMapper";
 
+import { normalizeMultilineText } from "@/lib/multiline";
+
 import { prisma } from "@/lib/prisma";
 
 import type { CardPreviewData } from "@/types/CardPreviewData";
@@ -136,13 +138,15 @@ function parseSection(
 
   const paragraphs = asStringArray(
     record.paragraphs
-  );
+  ).map(normalizeMultilineText);
 
   if (!heading || paragraphs.length === 0) {
     return null;
   }
 
-  const bullets = asStringArray(record.bullets);
+  const bullets = asStringArray(
+    record.bullets
+  ).map(normalizeMultilineText);
 
   const featuredCardNames = asStringArray(
     record.featuredCardNames
