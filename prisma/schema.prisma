@@ -351,6 +351,9 @@ model Tournament {
   /// Banner opcional mostrado en la cabecera de la tarjeta del torneo.
   bannerUrl String?
 
+  /// Información editorial opcional: reglas, etapas, recompensas, etc.
+  description String?
+
   standings Json
 
   createdAt DateTime @default(now())

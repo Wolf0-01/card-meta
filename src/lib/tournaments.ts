@@ -83,6 +83,9 @@ export interface TournamentEvent {
 
   bannerUrl: string | null;
 
+  /** Reglas, etapas o recompensas del torneo. */
+  description: string | null;
+
   placements: TournamentPlacement[];
 
   champion: TournamentPlacement;
@@ -264,6 +267,8 @@ interface TournamentRow {
   format: string;
 
   bannerUrl: string | null;
+
+  description: string | null;
 }
 
 function buildTournamentEvent(
@@ -317,6 +322,8 @@ function buildTournamentEvent(
     format: tournament.format,
 
     bannerUrl: tournament.bannerUrl,
+
+    description: tournament.description,
 
     placements,
 

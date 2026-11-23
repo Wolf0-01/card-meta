@@ -275,6 +275,8 @@ function toEditorData(
 
     bannerUrl: tournament.bannerUrl ?? "",
 
+    description: tournament.description ?? "",
+
     standings: parseEditorStandings(
       tournament.standings
     ),
@@ -409,6 +411,9 @@ export async function createTournament(
 
       bannerUrl: input.bannerUrl?.trim() || null,
 
+      description:
+        input.description?.trim() || null,
+
       standings: buildStandings(standings),
     },
 
@@ -492,6 +497,11 @@ export async function updateTournament(
         patch.bannerUrl === undefined
           ? existing.bannerUrl
           : patch.bannerUrl?.trim() || null,
+
+      description:
+        patch.description === undefined
+          ? existing.description
+          : patch.description?.trim() || null,
 
       standings: standings
         ? buildStandings(standings)

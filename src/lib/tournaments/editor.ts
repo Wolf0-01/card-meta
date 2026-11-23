@@ -25,6 +25,9 @@ export interface TournamentEditorData {
 
   bannerUrl: string;
 
+  /** Reglas, etapas o recompensas del torneo. */
+  description: string;
+
   standings: TournamentEditorStanding[];
 }
 

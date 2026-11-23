@@ -103,6 +103,16 @@ const tournamentFields = {
     .optional()
     .nullable(),
 
+  description: z
+    .string()
+    .trim()
+    .max(
+      4000,
+      "The tournament information cannot exceed 4000 characters"
+    )
+    .optional()
+    .nullable(),
+
   standings: z
     .array(tournamentStandingSchema)
     .min(

@@ -200,6 +200,11 @@ export default function TournamentEditor({
       initialTournament?.bannerUrl ?? ""
     );
 
+  const [description, setDescription] =
+    useState(
+      initialTournament?.description ?? ""
+    );
+
   const [standings, setStandings] = useState<
     DraftStanding[]
   >(() => toDraftStandings(initialTournament));
@@ -359,6 +364,8 @@ export default function TournamentEditor({
             date,
 
             bannerUrl: bannerUrl.trim(),
+
+            description: description.trim(),
 
             standings: payloadStandings,
           }),
@@ -691,6 +698,37 @@ export default function TournamentEditor({
                     />
                   </span>
                 )}
+              </label>
+
+              <label className="space-y-0.5 lg:col-span-2">
+                <span className={labelClass}>
+                  Tournament information / notes
+                  (optional)
+                </span>
+
+                <textarea
+                  value={description}
+                  onChange={(event) =>
+                    setDescription(event.target.value)
+                  }
+                  placeholder={
+                    "Rules, stages, schedule or rewards.\nOne line per bullet, e.g.:\n• Stage 1: DLv. 1–15\n• Stage 2: DLv. MAX\n• Rewards: 500 gems + icon"
+                  }
+                  rows={5}
+                  maxLength={4000}
+                  className={`
+                    ${inputClass}
+                    min-h-[120px]
+                    resize-y
+                    py-2
+                    leading-relaxed
+                  `}
+                />
+
+                <span className="mt-1 block text-[9px] leading-relaxed text-slate-500">
+                  Shown on the public tournament page. Line
+                  breaks and bullet points are preserved.
+                </span>
               </label>
             </div>
           </section>

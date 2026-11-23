@@ -8,12 +8,15 @@ import {
   ArrowLeft,
   ArrowUpRight,
   CalendarDays,
+  Info,
   Layers,
   Pencil,
   Swords,
   Trophy,
   Users,
 } from "lucide-react";
+
+import MultilineText from "@/components/cards/MultilineText";
 
 import TournamentDeckLists from "@/components/tournaments/TournamentDeckLists";
 
@@ -322,6 +325,62 @@ export default async function TournamentPage({
             </p>
           </div>
         </header>
+
+        {tournament.description?.trim() && (
+          <section
+            aria-label="Tournament information"
+            className="
+              overflow-hidden
+              rounded-xl
+              border
+              border-slate-700/60
+              bg-[#0B132B]
+              ring-1
+              ring-inset
+              ring-white/5
+            "
+          >
+            <div
+              className="
+                flex
+                items-center
+                gap-2
+                border-b
+                border-slate-800
+                px-3
+                py-2.5
+              "
+            >
+              <Info className="h-4 w-4 text-blue-300" />
+
+              <h2
+                className="
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-[0.2em]
+                  text-slate-200
+                "
+              >
+                Tournament Information
+              </h2>
+            </div>
+
+            <div
+              className="
+                px-3
+                py-3
+                text-[12.5px]
+                leading-7
+                text-slate-300
+              "
+            >
+              <MultilineText
+                text={tournament.description}
+              />
+            </div>
+          </section>
+        )}
 
         <section
           aria-label="Standings"
