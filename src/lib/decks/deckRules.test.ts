@@ -696,7 +696,7 @@ describe("sortDeckCards (Duel Links Meta)", () => {
     ]);
   });
 
-  it("ordena mágicas por subtipo Normal → Ritual → Quick-Play → Continuous → Equip → Field", () => {
+  it("ordena mágicas y trampas por rareza, copias y nombre sin separar subtipos", () => {
     const cards = [
       sortableCard(
         "Field Spell",
@@ -708,14 +708,14 @@ describe("sortDeckCards (Duel Links Meta)", () => {
       sortableCard(
         "Equip Spell",
         "Spell Card",
-        "UR",
+        "N",
         1,
         { race: "Equip" }
       ),
       sortableCard(
         "Continuous Spell",
         "Spell Card",
-        "UR",
+        "SR",
         1,
         { race: "Continuous" }
       ),
@@ -723,48 +723,27 @@ describe("sortDeckCards (Duel Links Meta)", () => {
         "Quick Spell",
         "Spell Card",
         "UR",
-        1,
+        3,
         { race: "Quick-Play" }
-      ),
-      sortableCard(
-        "Ritual Spell",
-        "Spell Card",
-        "UR",
-        1,
-        { race: "Ritual" }
       ),
       sortableCard(
         "Normal Spell",
         "Spell Card",
-        "UR",
-        1,
+        "SR",
+        2,
         { race: "Normal" }
       ),
-    ];
-
-    assert.deepEqual(sortedNames(cards), [
-      "Normal Spell",
-      "Ritual Spell",
-      "Quick Spell",
-      "Continuous Spell",
-      "Equip Spell",
-      "Field Spell",
-    ]);
-  });
-
-  it("ordena trampas por subtipo Normal → Continuous → Counter", () => {
-    const cards = [
       sortableCard(
         "Counter Trap",
         "Trap Card",
         "UR",
-        1,
+        3,
         { race: "Counter" }
       ),
       sortableCard(
         "Continuous Trap",
         "Trap Card",
-        "UR",
+        "SR",
         1,
         { race: "Continuous" }
       ),
@@ -778,9 +757,14 @@ describe("sortDeckCards (Duel Links Meta)", () => {
     ];
 
     assert.deepEqual(sortedNames(cards), [
+      "Quick Spell",
+      "Field Spell",
+      "Normal Spell",
+      "Continuous Spell",
+      "Equip Spell",
+      "Counter Trap",
       "Normal Trap",
       "Continuous Trap",
-      "Counter Trap",
     ]);
   });
 

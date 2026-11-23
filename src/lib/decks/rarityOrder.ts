@@ -86,26 +86,6 @@ const EXTRA_DECK_BLOCK_ORDER = [
 ] as const;
 
 /**
- * Subtipos oficiales dentro de cada bloque del Main Deck.
- * El índice define el orden; los subtipos desconocidos
- * quedan al final del bloque.
- */
-const SPELL_SUBTYPE_ORDER = [
-  "normal",
-  "ritual",
-  "quick-play",
-  "continuous",
-  "equip",
-  "field",
-] as const;
-
-const TRAP_SUBTYPE_ORDER = [
-  "normal",
-  "continuous",
-  "counter",
-] as const;
-
-/**
  * Devuelve el bloque del Extra Deck. Los monstruos se
  * separan por su marco: Fusion → Synchro → Xyz → Link.
  */
@@ -156,44 +136,13 @@ function getDeckBlockRank(
 }
 
 /**
- * Normaliza el texto de subtipo para compararlo sin
- * depender de guiones, espacios o mayúsculas.
- */
-function normalizeSubtype(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z]+/g, " ")
-    .trim();
-}
-
-function getSubtypeIndex(
-  card: DeckSortableCard,
-  order: readonly string[]
-): number {
-  const haystack = normalizeSubtype(
-    `${card.card.race ?? ""} ${card.card.type ?? ""}`
-  );
-
-  const index = order.findIndex((subtype) =>
-    haystack.includes(
-      normalizeSubtype(subtype)
-    )
-  );
-
-  return index === -1 ? order.length : index;
-}
-
-/**
- * Subtipo oficial del Main Deck:
+ * Subtipo oficial de los monstruos del Main Deck:
+ * Ritual → Effect → Normal.
  *
- * - Monsters: Ritual → Effect → Normal.
- * - Spells: Normal → Ritual → Quick-Play → Continuous →
- *   Equip → Field.
- * - Traps: Normal → Continuous → Counter.
- *
- * El Extra Deck ya queda separado por bloque, así que sus
- * cartas comparten el mismo subtipo y pasan directo a la
- * rareza.
+ * Duel Links Meta no separa las Mágicas ni las Trampas por
+ * subtipo: dentro de cada bloque pasan directo a rareza,
+ * copias y nombre. El Extra Deck ya queda separado por su
+ * bloque (Fusion → Synchro → Xyz → Link).
  */
 function getDeckSubtypeRank(
   card: DeckSortableCard
@@ -202,42 +151,30 @@ function getDeckSubtypeRank(
     return 0;
   }
 
-  switch (getDeckCardTypeGroup(card.card.type)) {
-    case "monsters": {
-      const type = (
-        card.card.type ?? ""
-      ).toLowerCase();
-
-      if (type.includes("ritual")) {
-        return 0;
-      }
-
-      if (type.includes("effect")) {
-        return 1;
-      }
-
-      if (type.includes("normal")) {
-        return 2;
-      }
-
-      return 3;
-    }
-
-    case "spells":
-      return getSubtypeIndex(
-        card,
-        SPELL_SUBTYPE_ORDER
-      );
-
-    case "traps":
-      return getSubtypeIndex(
-        card,
-        TRAP_SUBTYPE_ORDER
-      );
-
-    default:
-      return 0;
+  if (
+    getDeckCardTypeGroup(card.card.type) !==
+    "monsters"
+  ) {
+    return 0;
   }
+
+  const type = (
+    card.card.type ?? ""
+  ).toLowerCase();
+
+  if (type.includes("ritual")) {
+    return 0;
+  }
+
+  if (type.includes("effect")) {
+    return 1;
+  }
+
+  if (type.includes("normal")) {
+    return 2;
+  }
+
+  return 3;
 }
 
 /** 0 para el Main Deck y 1 para el Extra Deck. */
@@ -271,7 +208,8 @@ export function sortCardsByRarity<
  *
  * 1. Main Deck: Monsters → Spells → Traps.
  *    Extra Deck: Fusion → Synchro → Xyz → Link.
- * 2. Subtipo oficial dentro de cada bloque.
+ * 2. Monsters: Ritual → Effect → Normal. Las Mágicas y
+ *    Trampas no se separan por subtipo.
  * 3. Rareza UR → SR → R → N.
  * 4. Copias 3x → 2x → 1x.
  * 5. Nombre A → Z.

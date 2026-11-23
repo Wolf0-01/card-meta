@@ -10,9 +10,9 @@ interface Props {
 
 /**
  * Main Deck en una única cuadrícula continua, sin títulos
- * internos. El orden es Monsters → Spells → Traps, luego
- * subtipo oficial, rareza, copias y nombre (ver
- * `sortDeckCards`).
+ * internos. El orden es Monsters → Spells → Traps; los
+ * monstruos se separan por subtipo y después todo el bloque
+ * sigue por rareza, copias y nombre (ver `sortDeckCards`).
  */
 export default function DeckMainDeck({
   deck,
