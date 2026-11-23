@@ -643,30 +643,22 @@ describe("sortDeckCards (Duel Links Meta)", () => {
       sortableCard(
         "Trap Normal",
         "Trap Card",
-        "UR",
-        1,
-        { level: null }
+        "UR"
       ),
       sortableCard(
         "Spell Normal",
         "Spell Card",
-        "UR",
-        1,
-        { level: null }
+        "UR"
       ),
       sortableCard(
         "Monster Level 4",
         "Normal Monster",
-        "UR",
-        1,
-        { level: 4 }
+        "UR"
       ),
       sortableCard(
         "Monster Level 8",
         "Effect Monster",
-        "UR",
-        1,
-        { level: 8 }
+        "UR"
       ),
     ];
 
@@ -678,42 +670,157 @@ describe("sortDeckCards (Duel Links Meta)", () => {
     ]);
   });
 
-  it("ordena monstruos por nivel, rareza y nombre", () => {
+  it("ordena monstruos por subtipo Ritual → Effect → Normal", () => {
+    const cards = [
+      sortableCard(
+        "Zeta Normal",
+        "Normal Monster",
+        "UR"
+      ),
+      sortableCard(
+        "Alpha Effect",
+        "Effect Monster",
+        "N"
+      ),
+      sortableCard(
+        "Ritual Monster",
+        "Ritual Monster",
+        "SR"
+      ),
+    ];
+
+    assert.deepEqual(sortedNames(cards), [
+      "Ritual Monster",
+      "Alpha Effect",
+      "Zeta Normal",
+    ]);
+  });
+
+  it("ordena mágicas por subtipo Normal → Ritual → Quick-Play → Continuous → Equip → Field", () => {
+    const cards = [
+      sortableCard(
+        "Field Spell",
+        "Spell Card",
+        "UR",
+        1,
+        { race: "Field" }
+      ),
+      sortableCard(
+        "Equip Spell",
+        "Spell Card",
+        "UR",
+        1,
+        { race: "Equip" }
+      ),
+      sortableCard(
+        "Continuous Spell",
+        "Spell Card",
+        "UR",
+        1,
+        { race: "Continuous" }
+      ),
+      sortableCard(
+        "Quick Spell",
+        "Spell Card",
+        "UR",
+        1,
+        { race: "Quick-Play" }
+      ),
+      sortableCard(
+        "Ritual Spell",
+        "Spell Card",
+        "UR",
+        1,
+        { race: "Ritual" }
+      ),
+      sortableCard(
+        "Normal Spell",
+        "Spell Card",
+        "UR",
+        1,
+        { race: "Normal" }
+      ),
+    ];
+
+    assert.deepEqual(sortedNames(cards), [
+      "Normal Spell",
+      "Ritual Spell",
+      "Quick Spell",
+      "Continuous Spell",
+      "Equip Spell",
+      "Field Spell",
+    ]);
+  });
+
+  it("ordena trampas por subtipo Normal → Continuous → Counter", () => {
+    const cards = [
+      sortableCard(
+        "Counter Trap",
+        "Trap Card",
+        "UR",
+        1,
+        { race: "Counter" }
+      ),
+      sortableCard(
+        "Continuous Trap",
+        "Trap Card",
+        "UR",
+        1,
+        { race: "Continuous" }
+      ),
+      sortableCard(
+        "Normal Trap",
+        "Trap Card",
+        "UR",
+        1,
+        { race: "Normal" }
+      ),
+    ];
+
+    assert.deepEqual(sortedNames(cards), [
+      "Normal Trap",
+      "Continuous Trap",
+      "Counter Trap",
+    ]);
+  });
+
+  it("aplica rareza, copias 3x → 2x → 1x y nombre", () => {
     const cards = [
       sortableCard(
         "Alpha",
         "Effect Monster",
         "N",
-        3,
-        { level: 4 }
+        3
       ),
       sortableCard(
         "Bravo",
         "Effect Monster",
         "UR",
-        1,
-        { level: 4 }
+        1
       ),
       sortableCard(
         "Charlie",
         "Effect Monster",
         "UR",
-        3,
-        { level: 8 }
+        3
       ),
       sortableCard(
         "Delta",
         "Effect Monster",
-        "SR",
-        2,
-        { level: 8 }
+        "UR",
+        2
       ),
       sortableCard(
         "Echo",
         "Effect Monster",
+        "UR",
+        2
+      ),
+      sortableCard(
+        "Foxtrot",
+        "Effect Monster",
         "SR",
-        2,
-        { level: 8 }
+        1
       ),
     ];
 
@@ -722,43 +829,12 @@ describe("sortDeckCards (Duel Links Meta)", () => {
       "Delta",
       "Echo",
       "Bravo",
+      "Foxtrot",
       "Alpha",
     ]);
   });
 
-  it("ordena mágicas y trampas por rareza y nombre", () => {
-    const cards = [
-      sortableCard(
-        "Zeta Spell",
-        "Spell Card",
-        "N"
-      ),
-      sortableCard(
-        "Eta Spell",
-        "Spell Card",
-        "UR"
-      ),
-      sortableCard(
-        "Beta Trap",
-        "Trap Card",
-        "SR"
-      ),
-      sortableCard(
-        "Alpha Trap",
-        "Trap Card",
-        "SR"
-      ),
-    ];
-
-    assert.deepEqual(sortedNames(cards), [
-      "Eta Spell",
-      "Zeta Spell",
-      "Alpha Trap",
-      "Beta Trap",
-    ]);
-  });
-
-  it("ordena el Extra Deck Fusion → Synchro → Xyz → Link y luego nivel/rareza", () => {
+  it("ordena el Extra Deck Fusion → Synchro → Xyz → Link y luego rareza", () => {
     const cards = [
       sortableCard(
         "Link 3",
@@ -768,7 +844,6 @@ describe("sortDeckCards (Duel Links Meta)", () => {
         {
           zone: "extra",
           frameType: "Link",
-          linkRating: 3,
         }
       ),
       sortableCard(
@@ -776,28 +851,26 @@ describe("sortDeckCards (Duel Links Meta)", () => {
         "Xyz Monster",
         "UR",
         1,
-        { zone: "extra", frameType: "Xyz", level: 4 }
+        { zone: "extra", frameType: "Xyz" }
       ),
       sortableCard(
-        "Synchro 8 SR",
+        "Synchro SR",
         "Synchro Monster",
         "SR",
         1,
         {
           zone: "extra",
           frameType: "Synchro",
-          level: 8,
         }
       ),
       sortableCard(
-        "Synchro 8 UR",
+        "Synchro UR",
         "Synchro Monster",
         "UR",
         1,
         {
           zone: "extra",
           frameType: "Synchro",
-          level: 8,
         }
       ),
       sortableCard(
@@ -808,15 +881,14 @@ describe("sortDeckCards (Duel Links Meta)", () => {
         {
           zone: "extra",
           frameType: "Fusion",
-          level: 4,
         }
       ),
     ];
 
     assert.deepEqual(sortedNames(cards), [
       "Fusion 4",
-      "Synchro 8 UR",
-      "Synchro 8 SR",
+      "Synchro UR",
+      "Synchro SR",
       "Xyz 4",
       "Link 3",
     ]);

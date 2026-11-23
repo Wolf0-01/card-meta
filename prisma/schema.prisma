@@ -231,6 +231,13 @@ model Deck {
    */
   placement String?
 
+  /**
+   * Nombre del duelista mostrado en la tabla y el detalle del
+   * mazo. Solo el staff puede sobrescribirlo para publicar
+   * resultados de terceros.
+   */
+  playerName String?
+
   /** Notas breves del jugador sobre el mazo. */
   notes String?
 

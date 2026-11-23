@@ -21,10 +21,49 @@ import {
   Trophy,
 } from "lucide-react";
 
+import {
+  getAchievementLabel,
+  normalizeAchievement,
+} from "@/lib/decks/achievements";
+
 import type {
   TournamentDeckOption,
   TournamentEditorData,
 } from "@/lib/tournaments/editor";
+
+/**
+ * Etiqueta compacta del selector de mazos:
+ * `<Archetype> — <playerName || author> (<placement || achievement> · <skill>)`.
+ */
+function formatDeckOptionLabel(
+  deck: TournamentDeckOption
+): string {
+  const archetype =
+    deck.archetype?.trim() ||
+    deck.name.trim() ||
+    "Deck";
+
+  const player =
+    deck.playerName?.trim() ||
+    deck.author?.trim() ||
+    "Anonymous";
+
+  const achievement = normalizeAchievement(
+    deck.achievement
+  );
+
+  const result =
+    deck.placement?.trim() ||
+    getAchievementLabel(achievement);
+
+  const skill = deck.skill?.trim();
+
+  const details = skill
+    ? `${result} · ${skill}`
+    : result;
+
+  return `${archetype} — ${player} (${details})`;
+}
 
 const labelClass = `
   block
@@ -832,13 +871,7 @@ export default function TournamentEditor({
                           key={deck.id}
                           value={deck.id}
                         >
-                          {deck.name}
-                          {deck.archetype
-                            ? ` · ${deck.archetype}`
-                            : ""}
-                          {deck.author
-                            ? ` · ${deck.author}`
-                            : ""}
+                          {formatDeckOptionLabel(deck)}
                         </option>
                       ))}
                     </select>

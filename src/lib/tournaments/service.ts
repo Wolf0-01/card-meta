@@ -334,6 +334,14 @@ export async function getTournamentDeckOptions(): Promise<
       deck.archetype?.name ??
       deck.archetypeName ??
       null,
+
+    playerName: deck.playerName ?? null,
+
+    achievement: deck.achievement ?? "NONE",
+
+    placement: deck.placement ?? null,
+
+    skill: deck.skill ?? null,
   }));
 }
 

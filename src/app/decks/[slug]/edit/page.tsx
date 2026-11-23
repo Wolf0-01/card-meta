@@ -88,6 +88,8 @@ export default async function EditDeckPage({
 
     placement: deck.placement,
 
+    playerName: deck.playerName,
+
     notes: deck.notes,
 
     proofUrl: deck.proofUrl,

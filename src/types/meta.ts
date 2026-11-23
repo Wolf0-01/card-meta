@@ -61,6 +61,12 @@ author?: DeckAuthor | null;
 
 isPublic?: boolean;
 
+/**
+ * Nombre de duelista personalizado por staff. Cuando está
+ * presente reemplaza al autor en la tabla y el detalle.
+ */
+playerName?: string | null;
+
 archetype:
 | ArchetypeData
 | null;

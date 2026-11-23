@@ -181,9 +181,13 @@ export default async function DecksPage({
         deck.author?.username ?? null,
 
       playerName:
+        deck.playerName ??
         deck.author?.displayName ??
         deck.author?.username ??
         null,
+
+      customPlayerName:
+        deck.playerName ?? null,
 
       cardIds: deck.cards.map(
         (deckCard) => deckCard.card.id

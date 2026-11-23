@@ -51,6 +51,8 @@ export interface EditableDeckData
 
   placement?: string | null;
 
+  playerName?: string | null;
+
   notes?: string | null;
 
   proofUrl?: string | null;
@@ -348,6 +350,11 @@ export default function DeckBuilderWorkspace({
                 ? competitiveResult.placement ||
                   null
                 : null,
+
+            playerName: isStaff
+              ? competitiveResult.playerName.trim() ||
+                null
+              : undefined,
 
             notes:
               competitiveResult.notes.trim() ||

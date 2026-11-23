@@ -128,6 +128,8 @@ export interface UserDeckDTO {
 
   placement: string | null;
 
+  playerName: string | null;
+
   notes: string | null;
 
   proofUrl: string | null;
@@ -173,6 +175,8 @@ export interface UserDeckSummary {
   achievement: string;
 
   placement: string | null;
+
+  playerName: string | null;
 
   notes: string | null;
 
@@ -233,6 +237,8 @@ function mapUserDeck(
     ),
 
     placement: deck.placement,
+
+    playerName: deck.playerName,
 
     notes: deck.notes,
 
@@ -605,6 +611,8 @@ interface PrismaDeckSummary {
 
   placement: string | null;
 
+  playerName: string | null;
+
   notes: string | null;
 
   proofUrl: string | null;
@@ -652,6 +660,8 @@ function mapUserDeckSummary(
     ),
 
     placement: deck.placement,
+
+    playerName: deck.playerName,
 
     notes: deck.notes,
 
@@ -732,6 +742,14 @@ export async function createUserDeck(
       ? null
       : input.skill?.trim() || null;
 
+  /*
+   * El nombre de duelista es una etiqueta editorial: solo
+   * ADMIN/EDITOR pueden sobrescribir al autor del mazo.
+   */
+  const playerName = options.isStaff
+    ? input.playerName?.trim() || null
+    : null;
+
   const archetypeId =
     await resolveDeckArchetype({
       archetypeId: input.archetypeId,
@@ -775,6 +793,8 @@ export async function createUserDeck(
       achievement: result.achievement,
 
       placement: result.placement,
+
+      playerName,
 
       notes: result.notes,
 
@@ -833,6 +853,8 @@ export async function updateUserDeck(
         achievement: true,
 
         placement: true,
+
+        playerName: true,
 
         notes: true,
 
@@ -899,6 +921,16 @@ export async function updateUserDeck(
       : patch.skill !== undefined
         ? patch.skill?.trim() || null
         : existing.skill;
+
+  /*
+   * Un USER no puede cambiar la etiqueta de duelista; si
+   * edita su mazo se conserva el nombre asignado por staff.
+   */
+  const playerName = options.isStaff
+    ? patch.playerName !== undefined
+      ? patch.playerName?.trim() || null
+      : existing.playerName
+    : existing.playerName;
 
   const archetypeCards = cards.map((card) => ({
     id: card.cardId,
@@ -1024,6 +1056,8 @@ export async function updateUserDeck(
           achievement: nextResult.achievement,
 
           placement: nextResult.placement,
+
+          playerName,
 
           notes: nextResult.notes,
 

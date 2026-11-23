@@ -61,6 +61,8 @@ interface DeckMutationResponse {
 
     placement?: string | null;
 
+    playerName?: string | null;
+
     notes?: string | null;
 
     proofUrl?: string | null;
@@ -293,6 +295,11 @@ export default function MyDecksGrid({
                   null
                 : null,
 
+            playerName: isStaff
+              ? resultDraft.playerName.trim() ||
+                null
+              : undefined,
+
             notes:
               resultDraft.notes.trim() ||
               null,
@@ -340,6 +347,11 @@ export default function MyDecksGrid({
                     ? resultDraft.placement ||
                       null
                     : null),
+
+                playerName:
+                  updated?.playerName ??
+                  (resultDraft.playerName.trim() ||
+                    null),
 
                 notes:
                   updated?.notes ??

@@ -64,10 +64,6 @@ interface DeckSortableCard {
     race?: string | null;
 
     frameType?: string | null;
-
-    level?: number | null;
-
-    linkRating?: number | null;
   };
 }
 
@@ -87,6 +83,26 @@ const EXTRA_DECK_BLOCK_ORDER = [
   "synchro",
   "xyz",
   "link",
+] as const;
+
+/**
+ * Subtipos oficiales dentro de cada bloque del Main Deck.
+ * El índice define el orden; los subtipos desconocidos
+ * quedan al final del bloque.
+ */
+const SPELL_SUBTYPE_ORDER = [
+  "normal",
+  "ritual",
+  "quick-play",
+  "continuous",
+  "equip",
+  "field",
+] as const;
+
+const TRAP_SUBTYPE_ORDER = [
+  "normal",
+  "continuous",
+  "counter",
 ] as const;
 
 /**
@@ -140,15 +156,88 @@ function getDeckBlockRank(
 }
 
 /**
- * Nivel, Rango o Link Rating de mayor a menor. Se niega
- * para que el comparador ascendente coloque primero los
- * valores más altos.
+ * Normaliza el texto de subtipo para compararlo sin
+ * depender de guiones, espacios o mayúsculas.
  */
-function getLevelRank(card: DeckSortableCard): number {
-  const rating =
-    card.card.linkRating ?? card.card.level ?? 0;
+function normalizeSubtype(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z]+/g, " ")
+    .trim();
+}
 
-  return -rating;
+function getSubtypeIndex(
+  card: DeckSortableCard,
+  order: readonly string[]
+): number {
+  const haystack = normalizeSubtype(
+    `${card.card.race ?? ""} ${card.card.type ?? ""}`
+  );
+
+  const index = order.findIndex((subtype) =>
+    haystack.includes(
+      normalizeSubtype(subtype)
+    )
+  );
+
+  return index === -1 ? order.length : index;
+}
+
+/**
+ * Subtipo oficial del Main Deck:
+ *
+ * - Monsters: Ritual → Effect → Normal.
+ * - Spells: Normal → Ritual → Quick-Play → Continuous →
+ *   Equip → Field.
+ * - Traps: Normal → Continuous → Counter.
+ *
+ * El Extra Deck ya queda separado por bloque, así que sus
+ * cartas comparten el mismo subtipo y pasan directo a la
+ * rareza.
+ */
+function getDeckSubtypeRank(
+  card: DeckSortableCard
+): number {
+  if ((card.zone ?? "main") === "extra") {
+    return 0;
+  }
+
+  switch (getDeckCardTypeGroup(card.card.type)) {
+    case "monsters": {
+      const type = (
+        card.card.type ?? ""
+      ).toLowerCase();
+
+      if (type.includes("ritual")) {
+        return 0;
+      }
+
+      if (type.includes("effect")) {
+        return 1;
+      }
+
+      if (type.includes("normal")) {
+        return 2;
+      }
+
+      return 3;
+    }
+
+    case "spells":
+      return getSubtypeIndex(
+        card,
+        SPELL_SUBTYPE_ORDER
+      );
+
+    case "traps":
+      return getSubtypeIndex(
+        card,
+        TRAP_SUBTYPE_ORDER
+      );
+
+    default:
+      return 0;
+  }
 }
 
 /** 0 para el Main Deck y 1 para el Extra Deck. */
@@ -180,19 +269,16 @@ export function sortCardsByRarity<
  * Ordena las cartas de un mazo replicando estrictamente el
  * orden de Duel Links Meta:
  *
- * Main Deck:
- * 1. Monsters → Spells → Traps.
- * 2. Monsters: Level descendente → Rareza → Nombre.
- * 3. Spells y Traps: Rareza → Nombre.
+ * 1. Main Deck: Monsters → Spells → Traps.
+ *    Extra Deck: Fusion → Synchro → Xyz → Link.
+ * 2. Subtipo oficial dentro de cada bloque.
+ * 3. Rareza UR → SR → R → N.
+ * 4. Copias 3x → 2x → 1x.
+ * 5. Nombre A → Z.
  *
- * Extra Deck:
- * 1. Fusion → Synchro → Xyz → Link.
- * 2. Level / Rank / Link Rating descendente → Rareza →
- *    Nombre.
- *
- * Las copias de una misma carta ya viven en una sola fila
- * con su `quantity`, por lo que el nombre las mantiene
- * juntas. No muta la colección original.
+ * Se aplica sobre las cartas agrupadas (con su `quantity`)
+ * antes de expandir las copias individuales. No muta la
+ * colección original.
  */
 export function sortDeckCards<
   T extends DeckSortableCard,
@@ -211,20 +297,12 @@ export function sortDeckCards<
       return blockDiff;
     }
 
-    const isExtra =
-      (a.zone ?? "main") === "extra";
+    const subtypeDiff =
+      getDeckSubtypeRank(a) -
+      getDeckSubtypeRank(b);
 
-    const groupA = getDeckCardTypeGroup(
-      a.card.type
-    );
-
-    if (isExtra || groupA === "monsters") {
-      const levelDiff =
-        getLevelRank(a) - getLevelRank(b);
-
-      if (levelDiff !== 0) {
-        return levelDiff;
-      }
+    if (subtypeDiff !== 0) {
+      return subtypeDiff;
     }
 
     const rarityDiff =
@@ -233,6 +311,13 @@ export function sortDeckCards<
 
     if (rarityDiff !== 0) {
       return rarityDiff;
+    }
+
+    const copiesDiff =
+      (b.quantity ?? 1) - (a.quantity ?? 1);
+
+    if (copiesDiff !== 0) {
+      return copiesDiff;
     }
 
     return a.card.name.localeCompare(b.card.name);

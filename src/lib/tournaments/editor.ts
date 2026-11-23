@@ -40,6 +40,15 @@ export interface TournamentDeckOption {
   author: string | null;
 
   archetype: string | null;
+
+  /** Etiqueta de staff que reemplaza al autor. */
+  playerName: string | null;
+
+  achievement: string;
+
+  placement: string | null;
+
+  skill: string | null;
 }
 
 export interface TournamentMutationResult {

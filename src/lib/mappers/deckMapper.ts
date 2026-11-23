@@ -234,6 +234,8 @@ export function mapPrismaDeck(
 
     isPublic: deck.isPublic,
 
+    playerName: deck.playerName ?? null,
+
     archetype,
 
     archetypeName:

@@ -100,6 +100,13 @@ export default function DeckViewer({
     author?.username ||
     "Anonymous creator";
 
+  /*
+   * El nombre de duelista asignado por staff reemplaza al
+   * autor y se muestra como texto plano, sin enlace.
+   */
+  const customPlayerName =
+    deck.playerName?.trim() || null;
+
   const resolvedBreakdownHref =
     breakdownHref ??
     `/decks/breakdown/${getDeckArchetypeSlug(
@@ -150,7 +157,11 @@ export default function DeckViewer({
           "
         >
           from{" "}
-          {canViewPlayerProfile &&
+          {customPlayerName ? (
+            <span className="font-semibold text-foreground-secondary">
+              {customPlayerName}
+            </span>
+          ) : canViewPlayerProfile &&
           author?.username ? (
             <Link
               href={`/user/${author.username}`}

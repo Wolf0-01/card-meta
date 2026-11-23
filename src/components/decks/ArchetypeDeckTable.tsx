@@ -42,6 +42,12 @@ export interface ArchetypeDeckRow {
 
   playerName: string | null;
 
+  /**
+   * Etiqueta de staff que reemplaza al autor. Se muestra en
+   * texto plano, sin enlace al perfil del jugador.
+   */
+  customPlayerName?: string | null;
+
   /** Cartas del mazo, usadas para filtrar por Core Card. */
   cardIds: number[];
 
@@ -388,7 +394,11 @@ export default function ArchetypeDeckTable({
               </tr>
             ) : (
               visibleRows.map((row) => {
+                const customPlayerName =
+                  row.customPlayerName?.trim() || null;
+
                 const playerLabel =
+                  customPlayerName ??
                   row.playerName ??
                   row.playerUsername ??
                   "Anonymous";
@@ -488,7 +498,23 @@ export default function ArchetypeDeckTable({
                     </td>
 
                     <td className="max-w-[160px] px-3 py-2.5">
-                      {canViewPlayerProfile &&
+                      {customPlayerName ? (
+                        <span
+                          onClick={(event) =>
+                            event.stopPropagation()
+                          }
+                          title={customPlayerName}
+                          className="
+                            block
+                            truncate
+                            text-[11px]
+                            font-semibold
+                            text-slate-300
+                          "
+                        >
+                          {customPlayerName}
+                        </span>
+                      ) : canViewPlayerProfile &&
                       row.playerUsername ? (
                         <Link
                           href={`/user/${row.playerUsername}`}

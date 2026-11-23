@@ -130,6 +130,16 @@ const deckFields = {
     .nullable()
     .optional(),
 
+  playerName: z
+    .string()
+    .trim()
+    .max(
+      80,
+      "The player name cannot exceed 80 characters"
+    )
+    .nullable()
+    .optional(),
+
   notes: z
     .string()
     .trim()

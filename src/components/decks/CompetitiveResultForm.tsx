@@ -19,6 +19,9 @@ export interface CompetitiveResultValue {
 
   placement: DeckPlacement | "";
 
+  /** Etiqueta de staff que reemplaza al autor del mazo. */
+  playerName: string;
+
   notes: string;
 
   proofUrl: string;
@@ -29,6 +32,8 @@ export const EMPTY_COMPETITIVE_RESULT: CompetitiveResultValue =
     achievement: "NONE",
 
     placement: "",
+
+    playerName: "",
 
     notes: "",
 
@@ -41,6 +46,8 @@ export function toCompetitiveResultValue(
         achievement?: string | null;
 
         placement?: string | null;
+
+        playerName?: string | null;
 
         notes?: string | null;
 
@@ -63,6 +70,8 @@ export function toCompetitiveResultValue(
     ),
 
     placement: placement ?? "",
+
+    playerName: source.playerName ?? "",
 
     notes: source.notes ?? "",
 
@@ -280,6 +289,31 @@ export default function CompetitiveResultForm({
           <div className="hidden sm:block" />
         )}
       </div>
+
+      {isStaff && (
+        <label className="block">
+          <span className="mb-1 block text-[9px] font-black uppercase tracking-[0.14em] text-foreground-muted">
+            Player Name{" "}
+            <span className="font-semibold normal-case tracking-normal text-foreground-muted/70">
+              (optional — overrides author name)
+            </span>
+          </span>
+
+          <input
+            type="text"
+            value={value.playerName}
+            onChange={(event) =>
+              patch({
+                playerName: event.target.value,
+              })
+            }
+            placeholder="e.g. Kevin"
+            maxLength={80}
+            disabled={disabled}
+            className={FIELD_CLASS}
+          />
+        </label>
+      )}
 
       {hasResult && (
         <>
