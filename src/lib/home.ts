@@ -285,9 +285,10 @@ export async function getHomeData(): Promise<HomeData> {
 
         date: tournament.date.toISOString(),
 
-        href: `/tournaments/${tournament.slug}`,
+                href: `/tournaments/${tournament.slug}`,
 
-        image: championArt ?? tournamentArt,
+        image: tournament.bannerUrl || championArt || tournamentArt,
+
 
       };
     });
