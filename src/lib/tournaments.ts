@@ -537,7 +537,6 @@ export const getTournamentBySlug = cache(
       event.placements
         .filter(
           (placement) =>
-            placement.place <= 3 &&
             placement.deckId !== null
         )
         .flatMap((placement) => {
