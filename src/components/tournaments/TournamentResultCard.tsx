@@ -47,6 +47,8 @@ export default function TournamentResultCard({
   const championHref =
     championDeck?.href ?? champion.archetypeHref;
 
+  const reportHref = `/tournaments/${event.slug}`;
+
   return (
     <article
       className="
@@ -69,14 +71,33 @@ export default function TournamentResultCard({
         "
       >
         {event.bannerUrl && (
-          <div className="relative h-24 w-full overflow-hidden bg-slate-900">
+          <Link
+            href={reportHref}
+            aria-label={`Open the ${event.name} report`}
+            className="
+              group
+              relative
+              block
+              h-24
+              w-full
+              overflow-hidden
+              bg-slate-900
+            "
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={event.bannerUrl}
               alt={`${event.name} banner`}
               loading="lazy"
               referrerPolicy="no-referrer"
-              className="h-full w-full object-cover"
+              className="
+                h-full
+                w-full
+                object-cover
+                transition-transform
+                duration-300
+                group-hover:scale-[1.03]
+              "
             />
 
             <span
@@ -91,7 +112,48 @@ export default function TournamentResultCard({
                 to-transparent
               "
             />
-          </div>
+
+            <span
+              aria-hidden
+              className="
+                pointer-events-none
+                absolute
+                inset-0
+                flex
+                items-center
+                justify-center
+                bg-blue-950/0
+                opacity-0
+                transition-all
+                duration-200
+                group-hover:bg-blue-950/40
+                group-hover:opacity-100
+              "
+            >
+              <span
+                className="
+                  inline-flex
+                  items-center
+                  gap-1
+                  rounded-full
+                  border
+                  border-blue-300/50
+                  bg-blue-500/20
+                  px-2.5
+                  py-1
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.14em]
+                  text-white
+                  backdrop-blur-sm
+                "
+              >
+                View report
+                <ArrowUpRight className="h-3 w-3" />
+              </span>
+            </span>
+          </Link>
         )}
 
         <div
@@ -104,88 +166,111 @@ export default function TournamentResultCard({
             py-2.5
           "
         >
-        <span
-          aria-hidden
+        <Link
+          href={reportHref}
+          aria-label={`Open the ${event.name} report`}
           className="
+            group
             flex
-            h-8
-            w-8
-            shrink-0
+            min-w-0
+            flex-1
             items-center
-            justify-center
+            gap-2
             rounded-lg
-            border
-            border-blue-500/30
-            bg-blue-500/10
-            text-blue-300
+            px-1
+            py-1
+            transition-colors
+            hover:bg-blue-500/10
           "
         >
-          <Trophy className="h-4 w-4" />
-        </span>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <Link
-              href={`/tournaments/${event.slug}`}
-              className="
-                truncate
-                text-sm
-                font-black
-                text-white
-                transition-colors
-                hover:text-blue-200
-              "
-            >
-              {event.name}
-            </Link>
-
-            <span
-              className={`
-                rounded
-                border
-                px-1
-                py-0.5
-                text-[7px]
-                font-black
-                uppercase
-                tracking-[0.12em]
-                ${
-                  event.organizer === "Meta Weekly"
-                    ? "border-violet-400/30 bg-violet-400/10 text-violet-200"
-                    : "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
-                }
-              `}
-            >
-              {event.organizer}
-            </span>
-          </div>
-
-          <p
+          <span
+            aria-hidden
             className="
-              mt-0.5
               flex
-              flex-wrap
+              h-8
+              w-8
+              shrink-0
               items-center
-              gap-x-2
-              gap-y-0.5
-              text-[8px]
-              font-bold
-              uppercase
-              tracking-[0.14em]
-              text-slate-500
+              justify-center
+              rounded-lg
+              border
+              border-blue-500/30
+              bg-blue-500/10
+              text-blue-300
+              transition-colors
+              group-hover:border-blue-400/60
+              group-hover:bg-blue-500/20
+              group-hover:text-blue-200
             "
           >
-            <span className="inline-flex items-center gap-1">
-              <Swords className="h-2.5 w-2.5" />
-              {event.format}
-            </span>
+            <Trophy className="h-4 w-4" />
+          </span>
 
-            <span className="inline-flex items-center gap-1">
-              <CalendarDays className="h-2.5 w-2.5" />
-              {formatDate(event.date)}
-            </span>
-          </p>
-        </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span
+                className="
+                  truncate
+                  text-sm
+                  font-black
+                  text-white
+                  underline-offset-4
+                  transition-colors
+                  group-hover:text-blue-200
+                  group-hover:underline
+                "
+              >
+                {event.name}
+              </span>
+
+              <span
+                className={`
+                  rounded
+                  border
+                  px-1
+                  py-0.5
+                  text-[7px]
+                  font-black
+                  uppercase
+                  tracking-[0.12em]
+                  ${
+                    event.organizer === "Meta Weekly"
+                      ? "border-violet-400/30 bg-violet-400/10 text-violet-200"
+                      : "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
+                  }
+                `}
+              >
+                {event.organizer}
+              </span>
+            </div>
+
+            <p
+              className="
+                mt-0.5
+                flex
+                flex-wrap
+                items-center
+                gap-x-2
+                gap-y-0.5
+                text-[8px]
+                font-bold
+                uppercase
+                tracking-[0.14em]
+                text-slate-500
+              "
+            >
+              <span className="inline-flex items-center gap-1">
+                <Swords className="h-2.5 w-2.5" />
+                {event.format}
+              </span>
+
+              <span className="inline-flex items-center gap-1">
+                <CalendarDays className="h-2.5 w-2.5" />
+                {formatDate(event.date)}
+              </span>
+            </p>
+          </div>
+        </Link>
 
         <div className="flex shrink-0 items-center gap-1.5">
           <span
