@@ -5,7 +5,7 @@ import GlobalCardSearch from "@/components/search/GlobalCardSearch";
 import UserMenu from "@/components/auth/UserMenu";
 
 const navigation = [
-  { href: "/decks", label: "Decks" },
+  { href: "/decks", label: "Top Decks" },
   { href: "/tier-list", label: "Tier List" },
   { href: "/tournaments", label: "Tournaments" },
   { href: "/guides", label: "Guides" },
