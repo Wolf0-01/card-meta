@@ -1,7 +1,4 @@
-import Link from "next/link";
-
 import {
-  ArrowUpRight,
   Layers,
   Sparkles,
   Trophy,
@@ -27,8 +24,8 @@ const RANK_STYLES: Record<number, string> = {
 
 /**
  * Sección Top Deck Lists del detalle de un torneo.
- * Renderiza una tarjeta compacta por cada lista del podio
- * que tenga un mazo público vinculado.
+ * Renderiza una columna alineada a la izquierda por cada
+ * lista del podio que tenga un mazo público vinculado.
  */
 export default function TournamentDeckLists({
   decks,
@@ -40,7 +37,7 @@ export default function TournamentDeckLists({
   return (
     <section
       aria-label="Top Deck Lists"
-      className="space-y-3"
+      className="space-y-4"
     >
       <div
         className="
@@ -83,46 +80,40 @@ export default function TournamentDeckLists({
 
       <div
         className="
-          mx-auto
-          max-w-md
+          max-w-lg
           space-y-8
           divide-y
           divide-slate-800
         "
       >
         {decks.map(({ placement, deck }) => {
-          const author =
-            deck.author?.displayName?.trim() ||
-            deck.author?.username?.trim() ||
-            placement.player;
+          const rankLabel =
+            deck.placement?.trim() ||
+            `Rank ${placement.place}`;
 
           return (
             <article
               key={`${placement.place}-${deck.identifier}`}
-              className="space-y-3 pt-2"
+              className="space-y-3 pt-6 first:pt-1"
             >
-              <header
-                className="
-                  space-y-1.5
-                "
-              >
-                <div className="flex items-center gap-2">
+              <header className="space-y-1.5">
+                <div className="flex items-center gap-2.5">
                   <span
                     className={`
                       flex
-                      h-6
-                      w-6
+                      h-7
+                      w-7
                       shrink-0
                       items-center
                       justify-center
-                      rounded
+                      rounded-md
                       border
-                      text-[10px]
+                      text-xs
                       font-black
                       tabular-nums
                       ${
                         RANK_STYLES[placement.place] ??
-                        "border-slate-700 bg-slate-800/80 text-slate-400"
+                        "border-slate-700 bg-slate-800/80 text-slate-300"
                       }
                     `}
                   >
@@ -130,66 +121,33 @@ export default function TournamentDeckLists({
                   </span>
 
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-black text-white">
+                    <p className="truncate text-base font-black text-white">
                       {placement.player}
                     </p>
 
                     <p
                       className="
                         truncate
-                        text-[8px]
+                        text-[10px]
                         font-bold
                         uppercase
                         tracking-[0.12em]
-                        text-slate-500
+                        text-slate-400
                       "
                     >
+                      {rankLabel} ·{" "}
                       {placement.archetype}
-                      {author !== placement.player
-                        ? ` · ${author}`
-                        : ""}
                     </p>
                   </div>
-
-                  <Link
-                    href={deckIdentifierHref(
-                      deck.slug,
-                      deck.identifier
-                    )}
-                    aria-label={`Open ${placement.player}'s deck list`}
-                    className="
-                      inline-flex
-                      h-7
-                      shrink-0
-                      items-center
-                      gap-1
-                      rounded-md
-                      border
-                      border-blue-500/30
-                      bg-blue-500/10
-                      px-1.5
-                      text-[8px]
-                      font-black
-                      uppercase
-                      tracking-[0.1em]
-                      text-blue-200
-                      transition-colors
-                      hover:border-blue-400/70
-                      hover:text-white
-                    "
-                  >
-                    Open
-                    <ArrowUpRight className="h-2.5 w-2.5" />
-                  </Link>
                 </div>
 
-                <div className="flex items-center gap-1.5">
-                  <Sparkles className="h-3 w-3 shrink-0 text-amber-300" />
+                <div className="flex items-center gap-1.5 pt-0.5">
+                  <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-300" />
 
                   <span
                     className="
                       truncate
-                      text-[9px]
+                      text-[10px]
                       font-bold
                       uppercase
                       tracking-[0.12em]
@@ -221,7 +179,7 @@ export default function TournamentDeckLists({
                     inline-flex
                     items-center
                     gap-1
-                    text-[8px]
+                    text-[9px]
                     font-black
                     uppercase
                     tracking-[0.12em]
@@ -248,11 +206,4 @@ export default function TournamentDeckLists({
       </div>
     </section>
   );
-}
-
-function deckIdentifierHref(
-  slug: string,
-  identifier: string
-) {
-  return `/decks/${slug}/${identifier}`;
 }
