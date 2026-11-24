@@ -200,7 +200,7 @@ interface CardsApiResponse {
   pages?: number;
 }
 
-interface CardSearchSidebarProps {
+interface CatalogPaneProps {
   format: DuelFormat;
 
   onAddCard: (
@@ -244,13 +244,13 @@ const tabButtonClasses = `
   transition-colors
 `;
 
-export default function CardSearchSidebar({
+export default function CatalogPane({
   format,
   onAddCard,
   activeSkill = "",
   onSelectSkill,
   className = "",
-}: CardSearchSidebarProps) {
+}: CatalogPaneProps) {
   const [tab, setTab] =
     useState<CatalogTab>("cards");
 

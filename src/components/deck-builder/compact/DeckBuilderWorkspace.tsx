@@ -39,7 +39,7 @@ import type {
 
 import type { DeckZone } from "@/types/deck";
 
-import CardSearchSidebar from "./CardSearchSidebar";
+import CatalogPane from "./CatalogPane";
 
 import DraftZone from "./DraftZone";
 
@@ -764,7 +764,7 @@ export default function DeckBuilderWorkspace({
             lg:flex-row
           "
         >
-          <CardSearchSidebar
+          <CatalogPane
             format={draft.format}
             onAddCard={handleAddCard}
             activeSkill={draft.skill}

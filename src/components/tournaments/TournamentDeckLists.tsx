@@ -83,10 +83,11 @@ export default function TournamentDeckLists({
 
       <div
         className="
-          grid
-          gap-3
-          lg:grid-cols-2
-          xl:grid-cols-3
+          mx-auto
+          max-w-md
+          space-y-8
+          divide-y
+          divide-slate-800
         "
       >
         {decks.map(({ placement, deck }) => {
@@ -98,24 +99,11 @@ export default function TournamentDeckLists({
           return (
             <article
               key={`${placement.place}-${deck.identifier}`}
-              className="
-                overflow-hidden
-                rounded-xl
-                border
-                border-slate-700/60
-                bg-[#0B132B]
-                ring-1
-                ring-inset
-                ring-white/5
-              "
+              className="space-y-3 pt-2"
             >
               <header
                 className="
                   space-y-1.5
-                  border-b
-                  border-slate-800
-                  px-3
-                  py-2.5
                 "
               >
                 <div className="flex items-center gap-2">
@@ -214,7 +202,7 @@ export default function TournamentDeckLists({
                 </div>
               </header>
 
-              <div className="px-3 py-3">
+              <div className="py-1">
                 <DeckMainDeck deck={deck} />
 
                 <DeckExtraDeck deck={deck} />
@@ -223,12 +211,9 @@ export default function TournamentDeckLists({
               <footer
                 className="
                   flex
-                  items-center
-                  gap-2
-                  border-t
-                  border-slate-800
-                  px-3
-                  py-2.5
+                  flex-col
+                  items-start
+                  gap-3
                 "
               >
                 <span
@@ -252,7 +237,7 @@ export default function TournamentDeckLists({
                   variant="primary"
                   size="sm"
                   href={`/decks/new?clone=${deck.identifier}`}
-                  className="ml-auto"
+                  className="w-full"
                 >
                   Build in Deck Builder
                 </Button>
