@@ -5,14 +5,11 @@ import Link from "next/link";
 import {
   ArrowLeft,
   CalendarDays,
-  Layers,
+  History,
+  Pencil,
   Plus,
-  Swords,
   Trophy,
-  Users,
 } from "lucide-react";
-
-import TournamentResultCard from "@/components/tournaments/TournamentResultCard";
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
 
@@ -32,13 +29,8 @@ export const metadata: Metadata = {
   title: "Tournaments & Results | Card Meta",
 
   description:
-    "Yu-Gi-Oh! Duel Links tournament results. Top 4 and Top 8 standings linked to real public deck lists.",
+    "Yu-Gi-Oh! Duel Links tournament reports, KC Cup rankings, and community Speed Duel results.",
 };
-
-type OrganizerFilter =
-  | "all"
-  | "meta-weekly"
-  | "community";
 
 interface TournamentsPageProps {
   searchParams: Promise<{
@@ -46,102 +38,59 @@ interface TournamentsPageProps {
   }>;
 }
 
-const ORGANIZER_TABS: {
-  key: OrganizerFilter;
-
-  label: string;
-
-  href: string;
-}[] = [
-  {
-    key: "all",
-    label: "All",
-    href: "/tournaments",
-  },
-  {
-    key: "meta-weekly",
-    label: "Meta Weekly",
-    href: "/tournaments?org=meta-weekly",
-  },
-  {
-    key: "community",
-    label: "Community",
-    href: "/tournaments?org=community",
-  },
-];
-
-function resolveFilter(
-  value?: string
-): OrganizerFilter {
-  if (
-    value === "meta-weekly" ||
-    value === "community"
-  ) {
-    return value;
-  }
-
-  return "all";
+function slugifyOrganizer(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
-function matchesFilter(
-  event: TournamentEvent,
-  filter: OrganizerFilter
-): boolean {
-  if (filter === "meta-weekly") {
-    return event.organizer === "Meta Weekly";
-  }
+interface ReportTileProps {
+  event: TournamentEvent;
 
-  if (filter === "community") {
-    return event.organizer === "Community";
-  }
+  canEdit: boolean;
 
-  return true;
+  variant?: "recent" | "archive";
 }
 
-interface MetricProps {
-  value: string;
-
-  label: string;
-}
-
-function Metric({ value, label }: MetricProps) {
+function ReportTile({
+  event,
+  canEdit,
+  variant = "recent",
+}: ReportTileProps) {
   return (
-    <span
-      className="
-        inline-flex
-        items-center
-        gap-1.5
-        rounded-md
-        border
-        border-slate-700/70
-        bg-[#0B132B]
-        px-2
-        py-1
-      "
-    >
-      <span
-        className="
-          text-xs
-          font-black
-          tabular-nums
-          text-white
-        "
+    <div className="group relative flex items-stretch overflow-hidden rounded-lg border border-slate-700/70 bg-[#0B132B] transition-colors hover:border-sky-400/60 hover:bg-[#101C3D]">
+      <Link
+        href={"/tournaments/" + event.slug}
+        className="flex min-w-0 flex-1 flex-col items-center justify-center px-3 py-2.5 text-center"
       >
-        {value}
-      </span>
+        <span
+          className="line-clamp-1 text-xs font-bold text-sky-300 transition-colors group-hover:text-white"
+          title={event.name}
+        >
+          {event.name}
+        </span>
 
-      <span
-        className="
-          text-[8px]
-          font-black
-          uppercase
-          tracking-[0.14em]
-          text-slate-500
-        "
-      >
-        {label}
-      </span>
-    </span>
+        <span className="mt-0.5 text-[10px] italic text-slate-400">
+          {formatDate(event.date)}
+          {variant === "archive"
+            ? " · " + formatNumber(event.players) + " players"
+            : ""}
+        </span>
+      </Link>
+
+      {canEdit && (
+        <Link
+          href={"/tournaments/" + event.slug + "/edit"}
+          title={"Edit " + event.name}
+          aria-label={"Edit " + event.name}
+          className="flex w-8 shrink-0 items-center justify-center border-l border-slate-800 text-slate-500 transition-colors hover:bg-slate-800/70 hover:text-amber-300"
+        >
+          <Pencil className="h-3 w-3" />
+        </Link>
+      )}
+    </div>
   );
 }
 
@@ -150,145 +99,93 @@ export default async function TournamentsPage({
 }: TournamentsPageProps) {
   const params = await searchParams;
 
-  const filter = resolveFilter(params.org);
+  const activeOrg = params.org?.trim().toLowerCase() || "all";
 
   const [data, user] = await Promise.all([
     getTournamentData(),
     getCurrentUser(),
   ]);
 
-  const events = data.events.filter((event) =>
-    matchesFilter(event, filter)
-  );
+  const isStaff = canManageGuides(user);
 
-  const metaWeeklyCount = data.events.filter(
-    (event) => event.organizer === "Meta Weekly"
-  ).length;
+  const organizerMap = new Map<
+    string,
+    { key: string; label: string; count: number }
+  >();
 
-  const communityCount = data.events.filter(
-    (event) => event.organizer === "Community"
-  ).length;
+  for (const event of data.events) {
+    const key = slugifyOrganizer(event.organizer) || "other";
 
-  const counts: Record<OrganizerFilter, number> = {
-    all: data.events.length,
-    "meta-weekly": metaWeeklyCount,
-    community: communityCount,
-  };
+    const existing = organizerMap.get(key);
+
+    if (existing) {
+      existing.count += 1;
+    } else {
+      organizerMap.set(key, {
+        key,
+        label: event.organizer,
+        count: 1,
+      });
+    }
+  }
+
+  const tabs = [
+    {
+      key: "all",
+      label: "All",
+      count: data.events.length,
+      href: "/tournaments",
+    },
+    ...[...organizerMap.values()].map((item) => ({
+      key: item.key,
+      label: item.label,
+      count: item.count,
+      href: "/tournaments?org=" + encodeURIComponent(item.key),
+    })),
+  ];
+
+  const recentEvents = data.events.slice(0, 10);
+
+  const archiveEvents =
+    activeOrg === "all"
+      ? data.events
+      : data.events.filter(
+          (event) =>
+            slugifyOrganizer(event.organizer) === activeOrg
+        );
 
   const hasAnyEvents = data.events.length > 0;
 
   return (
-    <main
-      className="
-        min-h-screen
-        bg-[#070D1F]
-        px-3
-        py-5
-        text-slate-100
-        sm:px-6
-        sm:py-7
-      "
-    >
-      <div
-        className="
-          mx-auto
-          w-full
-          max-w-6xl
-          space-y-4
-        "
-      >
+    <main className="min-h-screen bg-[#070D1F] px-3 py-5 text-slate-100 sm:px-6 sm:py-7">
+      <div className="mx-auto w-full max-w-6xl space-y-6">
         <header className="space-y-3">
-          <div
-            className="
-              flex
-              flex-wrap
-              items-start
-              justify-between
-              gap-3
-            "
-          >
+          <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <Link
                 href="/"
-                className="
-                  inline-flex
-                  items-center
-                  gap-1
-                  text-[9px]
-                  font-black
-                  uppercase
-                  tracking-[0.18em]
-                  text-slate-500
-                  transition-colors
-                  hover:text-blue-300
-                "
+                className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.18em] text-slate-500 transition-colors hover:text-blue-300"
               >
                 <ArrowLeft className="h-3 w-3" />
                 Home
               </Link>
 
-              <h1
-                className="
-                  mt-1
-                  text-2xl
-                  font-black
-                  uppercase
-                  tracking-tight
-                  text-white
-                  sm:text-3xl
-                "
-              >
+              <h1 className="mt-1 text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">
                 Tournaments
               </h1>
 
-              <p
-                className="
-                  mt-1
-                  max-w-xl
-                  text-[11px]
-                  leading-relaxed
-                  text-slate-400
-                "
-              >
-                Meta Weekly and community Speed Duel
-                results. Every podium links the
-                player&apos;s public deck list when it is
-                available.
+              <p className="mt-1 max-w-xl text-[11px] leading-relaxed text-slate-400">
+                Competitive tournament reports, KC Cup
+                rankings, and Speed Duel results linked to
+                public deck lists.
               </p>
             </div>
 
-            <div
-              className="
-                flex
-                flex-col
-                items-start
-                gap-2
-                sm:items-end
-              "
-            >
-              {canManageGuides(user) && (
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              {isStaff && (
                 <Link
                   href="/tournaments/new"
-                  className="
-                    inline-flex
-                    h-8
-                    items-center
-                    gap-1.5
-                    rounded-lg
-                    border
-                    border-blue-500/40
-                    bg-blue-500/10
-                    px-3
-                    text-[9px]
-                    font-black
-                    uppercase
-                    tracking-[0.14em]
-                    text-blue-200
-                    transition-colors
-                    hover:border-blue-400
-                    hover:bg-blue-500/20
-                    hover:text-white
-                  "
+                  className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-blue-500/40 bg-blue-500/10 px-3 text-[9px] font-black uppercase tracking-[0.14em] text-blue-200 transition-colors hover:border-blue-400 hover:bg-blue-500/20 hover:text-white"
                 >
                   <Plus className="h-3 w-3" />
                   Add Tournament
@@ -296,303 +193,106 @@ export default async function TournamentsPage({
               )}
 
               {hasAnyEvents && (
-                <span
-                  className="
-                    inline-flex
-                    items-center
-                    gap-1.5
-                    rounded-md
-                    border
-                    border-slate-700/70
-                    bg-[#0B132B]
-                    px-2
-                    py-1
-                    text-[9px]
-                    font-bold
-                    uppercase
-                    tracking-[0.12em]
-                    text-slate-400
-                  "
-                >
+                <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-700/70 bg-[#0B132B] px-2 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">
                   <CalendarDays className="h-3 w-3 text-blue-300" />
-
-                  Last event{" "}
-                  {formatDate(data.updatedAt)}
+                  Last event {formatDate(data.updatedAt)}
                 </span>
               )}
-
-              <div className="flex flex-wrap items-center gap-1.5">
-                <Metric
-                  value={String(data.events.length)}
-                  label="events"
-                />
-
-                <Metric
-                  value={formatNumber(
-                    data.totalPlayers
-                  )}
-                  label="players"
-                />
-
-                <Metric
-                  value={String(
-                    data.totalPublicLists
-                  )}
-                  label="public decks"
-                />
-              </div>
             </div>
           </div>
-
-          <section
-            aria-label="About the results"
-            className="
-              rounded-xl
-              border
-              border-slate-700/60
-              bg-[#0B132B]
-              p-3
-              ring-1
-              ring-inset
-              ring-white/5
-            "
-          >
-            <div className="flex items-start gap-2.5">
-              <span
-                aria-hidden
-                className="
-                  flex
-                  h-7
-                  w-7
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-md
-                  border
-                  border-emerald-500/30
-                  bg-emerald-500/10
-                  text-emerald-300
-                "
-              >
-                <Layers className="h-4 w-4" />
-              </span>
-
-              <div className="min-w-0 flex-1">
-                <p
-                  className="
-                    text-[10px]
-                    font-black
-                    uppercase
-                    tracking-[0.16em]
-                    text-slate-300
-                  "
-                >
-                  Standings linked to public decks
-                </p>
-
-                <p
-                  className="
-                    mt-1
-                    max-w-3xl
-                    text-[11px]
-                    leading-relaxed
-                    text-slate-400
-                  "
-                >
-                  When a player publishes their deck,
-                  the placement opens the exact list and
-                  keeps the clone button. If a list is not
-                  public, the placement links to the
-                  archetype explorer instead.
-                </p>
-              </div>
-
-              <div
-                className="
-                  hidden
-                  shrink-0
-                  items-center
-                  gap-1.5
-                  sm:flex
-                "
-              >
-                <Metric
-                  value={String(metaWeeklyCount)}
-                  label="meta weekly"
-                />
-
-                <Metric
-                  value={String(communityCount)}
-                  label="community"
-                />
-              </div>
-            </div>
-          </section>
         </header>
 
-        {hasAnyEvents && (
-          <div
-            className="
-              flex
-              flex-wrap
-              items-center
-              justify-between
-              gap-2
-              border-b
-              border-slate-800
-              pb-2
-            "
-          >
-            <div className="flex flex-wrap items-center gap-1.5">
-              {ORGANIZER_TABS.map((tab) => {
-                const active = tab.key === filter;
-
-                return (
-                  <Link
-                    key={tab.key}
-                    href={tab.href}
-                    aria-current={
-                      active ? "page" : undefined
-                    }
-                    className={`
-                      inline-flex
-                      items-center
-                      gap-1.5
-                      rounded-md
-                      border
-                      px-2.5
-                      py-1.5
-                      text-[9px]
-                      font-black
-                      uppercase
-                      tracking-[0.14em]
-                      transition-colors
-                      ${
-                        active
-                          ? "border-blue-400/60 bg-blue-500/15 text-white"
-                          : "border-slate-700/70 bg-[#0B132B] text-slate-400 hover:border-blue-400/40 hover:text-slate-200"
-                      }
-                    `}
-                  >
-                    {tab.key === "meta-weekly" ? (
-                      <Trophy className="h-3 w-3" />
-                    ) : tab.key === "community" ? (
-                      <Users className="h-3 w-3" />
-                    ) : (
-                      <Swords className="h-3 w-3" />
-                    )}
-
-                    {tab.label}
-
-                    <span
-                      className={`
-                        rounded
-                        px-1
-                        text-[8px]
-                        tabular-nums
-                        ${
-                          active
-                            ? "bg-white/10 text-white"
-                            : "bg-slate-800 text-slate-500"
-                        }
-                      `}
-                    >
-                      {counts[tab.key]}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-
-            <span
-              className="
-                inline-flex
-                items-center
-                gap-1
-                px-1
-                text-[9px]
-                font-black
-                uppercase
-                tracking-[0.16em]
-                text-slate-500
-              "
-            >
-              <Layers className="h-3 w-3" />
-
-              {events.length}{" "}
-              {events.length === 1
-                ? "event"
-                : "events"}
-            </span>
-          </div>
-        )}
-
-        {events.length === 0 ? (
-          <section
-            className="
-              flex
-              flex-col
-              items-center
-              justify-center
-              gap-2
-              rounded-xl
-              border
-              border-dashed
-              border-slate-700
-              bg-[#0B132B]/60
-              px-6
-              py-14
-              text-center
-            "
-          >
-            <Trophy className="h-8 w-8 text-slate-600" />
-
-            <p className="text-sm font-bold text-slate-300">
-              {hasAnyEvents
-                ? "No tournaments in this category yet."
-                : "No tournaments yet."}
+        {!hasAnyEvents ? (
+          <section className="rounded-xl border border-slate-700/60 bg-[#0B132B] p-8 text-center">
+            <p className="text-sm font-black uppercase tracking-wider text-slate-300">
+              No tournament reports published yet
             </p>
 
-            <p className="max-w-sm text-xs text-slate-500">
-              {hasAnyEvents
-                ? "Try another organizer or return to the full list."
-                : "The next community tournaments will be published here soon."}
+            <p className="mt-1 text-xs text-slate-500">
+              Published events and KC Cup reports will
+              appear here.
             </p>
-
-            {hasAnyEvents && (
-              <Link
-                href="/tournaments"
-                className="
-                  mt-1
-                  inline-flex
-                  items-center
-                  gap-1
-                  text-[10px]
-                  font-black
-                  uppercase
-                  tracking-[0.14em]
-                  text-blue-300
-                  transition-colors
-                  hover:text-blue-200
-                "
-              >
-                View all tournaments
-              </Link>
-            )}
           </section>
         ) : (
-          <section
-            aria-label="Tournament results"
-            className="space-y-3"
-          >
-            {events.map((event) => (
-              <TournamentResultCard
-                key={event.slug}
-                event={event}
-                canManage={canManageGuides(user)}
-              />
-            ))}
-          </section>
+          <>
+            <section
+              aria-label="Recent Events"
+              className="space-y-3"
+            >
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+                <Trophy className="h-4 w-4 text-amber-300" />
+
+                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white">
+                  Recent Events
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                {recentEvents.map((event) => (
+                  <ReportTile
+                    key={"recent-" + event.id}
+                    event={event}
+                    canEdit={isStaff}
+                    variant="recent"
+                  />
+                ))}
+              </div>
+            </section>
+
+            <section
+              aria-label="Past Reports"
+              className="space-y-3"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                <div className="flex items-center gap-2">
+                  <History className="h-4 w-4 text-sky-300" />
+
+                  <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white">
+                    Past Reports
+                  </h2>
+                </div>
+
+                <nav
+                  aria-label="Filter reports by organizer"
+                  className="flex flex-wrap items-center gap-1.5"
+                >
+                  {tabs.map((tab) => {
+                    const isActive =
+                      activeOrg === tab.key;
+
+                    const tabClass = isActive
+                      ? "inline-flex items-center gap-1.5 rounded-md border border-sky-400/70 bg-sky-500/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-sky-200 transition-colors"
+                      : "inline-flex items-center gap-1.5 rounded-md border border-slate-700/70 bg-[#0B132B] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-slate-400 transition-colors hover:border-slate-600 hover:text-slate-200";
+
+                    return (
+                      <Link
+                        key={tab.key}
+                        href={tab.href}
+                        className={tabClass}
+                      >
+                        <span>{tab.label}</span>
+
+                        <span className="tabular-nums opacity-75">
+                          {tab.count}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {archiveEvents.map((event) => (
+                  <ReportTile
+                    key={"archive-" + event.id}
+                    event={event}
+                    canEdit={isStaff}
+                    variant="archive"
+                  />
+                ))}
+              </div>
+            </section>
+          </>
         )}
       </div>
     </main>
