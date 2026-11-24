@@ -1,5 +1,4 @@
 import {
-  Layers,
   Sparkles,
   Trophy,
 } from "lucide-react";
@@ -87,16 +86,14 @@ export default function TournamentDeckLists({
         "
       >
         {decks.map(({ placement, deck }) => {
-          const rankLabel =
-            deck.placement?.trim() ||
-            `Rank ${placement.place}`;
+          const totalMain = deck.mainCards ?? 0;
 
           return (
             <article
               key={`${placement.place}-${deck.identifier}`}
               className="space-y-3 pt-6 first:pt-1"
             >
-              <header className="space-y-1.5">
+              <header className="space-y-2.5">
                 <div className="flex items-center gap-2.5">
                   <span
                     className={`
@@ -120,42 +117,56 @@ export default function TournamentDeckLists({
                     {placement.place}
                   </span>
 
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-base font-black text-white">
-                      {placement.player}
-                    </p>
-
-                    <p
-                      className="
-                        truncate
-                        text-[10px]
-                        font-bold
-                        uppercase
-                        tracking-[0.12em]
-                        text-slate-400
-                      "
-                    >
-                      {rankLabel} ·{" "}
-                      {placement.archetype}
-                    </p>
-                  </div>
+                  <p className="min-w-0 flex-1 truncate text-base font-black text-white">
+                    {placement.player}
+                  </p>
                 </div>
 
-                <div className="flex items-center gap-1.5 pt-0.5">
-                  <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-300" />
+                <div
+                  className="
+                    grid
+                    grid-cols-[1fr_auto_1fr]
+                    items-center
+                    gap-2
+                    pt-0.5
+                  "
+                >
+                  <span aria-hidden />
+
+                  <div
+                    className="
+                      inline-flex
+                      items-center
+                      justify-center
+                      gap-1.5
+                      text-center
+                    "
+                  >
+                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-300" />
+
+                    <span
+                      className="
+                        text-xs
+                        font-bold
+                        tracking-wide
+                        text-sky-300
+                      "
+                      title={deck.skill ?? "No Skill"}
+                    >
+                      {deck.skill?.trim() || "No Skill"}
+                    </span>
+                  </div>
 
                   <span
                     className="
-                      truncate
-                      text-[10px]
+                      text-right
+                      text-[11px]
                       font-bold
-                      uppercase
-                      tracking-[0.12em]
-                      text-amber-200
+                      tabular-nums
+                      text-slate-300
                     "
-                    title={deck.skill ?? "No Skill"}
                   >
-                    {deck.skill?.trim() || "No Skill"}
+                    {totalMain} cards
                   </span>
                 </div>
               </header>
@@ -166,31 +177,7 @@ export default function TournamentDeckLists({
                 <DeckExtraDeck deck={deck} />
               </div>
 
-              <footer
-                className="
-                  flex
-                  flex-col
-                  items-start
-                  gap-3
-                "
-              >
-                <span
-                  className="
-                    inline-flex
-                    items-center
-                    gap-1
-                    text-[9px]
-                    font-black
-                    uppercase
-                    tracking-[0.12em]
-                    text-slate-500
-                  "
-                >
-                  <Layers className="h-3 w-3" />
-                  {deck.mainCards ?? 0} main ·{" "}
-                  {deck.extraCards ?? 0} extra
-                </span>
-
+              <footer>
                 <Button
                   variant="primary"
                   size="sm"
