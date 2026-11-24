@@ -192,12 +192,6 @@ export default async function TournamentsPage({
                 </Link>
               )}
 
-              {hasAnyEvents && (
-                <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-700/70 bg-[#0B132B] px-2 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">
-                  <CalendarDays className="h-3 w-3 text-blue-300" />
-                  Last event {formatDate(data.updatedAt)}
-                </span>
-              )}
             </div>
           </div>
         </header>
