@@ -124,6 +124,8 @@ export interface UserDeckDTO {
 
   isPublic: boolean;
 
+  noLimits: boolean;
+
   achievement: string;
 
   placement: string | null;
@@ -171,6 +173,8 @@ export interface UserDeckSummary {
   format: string;
 
   isPublic: boolean;
+
+  noLimits: boolean;
 
   achievement: string;
 
@@ -231,6 +235,8 @@ function mapUserDeck(
     format: normalizeDuelFormat(deck.format),
 
     isPublic: deck.isPublic,
+
+    noLimits: deck.noLimits,
 
     achievement: normalizeAchievement(
       deck.achievement
@@ -607,6 +613,8 @@ interface PrismaDeckSummary {
 
   isPublic: boolean;
 
+  noLimits: boolean;
+
   achievement: string;
 
   placement: string | null;
@@ -655,6 +663,8 @@ function mapUserDeckSummary(
 
     isPublic: deck.isPublic,
 
+    noLimits: deck.noLimits,
+
     achievement: normalizeAchievement(
       deck.achievement
     ),
@@ -702,6 +712,8 @@ export async function createUserDeck(
 
   const isPublic = input.isPublic ?? false;
 
+  const noLimits = input.noLimits ?? false;
+
   const result = sanitizeResultFields({
     achievement: normalizeAchievement(
       input.achievement
@@ -734,7 +746,8 @@ export async function createUserDeck(
   validateDeckCards(
     withBanlistStatus(cards, banlistByCard),
     isPublic,
-    format
+    format,
+    noLimits
   );
 
   const skill =
@@ -783,6 +796,8 @@ export async function createUserDeck(
       authorId: userId,
 
       isPublic,
+
+      noLimits,
 
       format,
 
@@ -850,6 +865,8 @@ export async function updateUserDeck(
 
         isPublic: true,
 
+        noLimits: true,
+
         achievement: true,
 
         placement: true,
@@ -893,6 +910,9 @@ export async function updateUserDeck(
   const isPublic =
     patch.isPublic ?? existing.isPublic;
 
+  const noLimits =
+    patch.noLimits ?? existing.noLimits;
+
   const format = normalizeDuelFormat(
     patch.format ?? existing.format
   );
@@ -905,7 +925,8 @@ export async function updateUserDeck(
   validateDeckCards(
     withBanlistStatus(cards, banlistByCard),
     isPublic,
-    format
+    format,
+    noLimits
   );
 
   const name = patch.name ?? existing.name;
@@ -1052,6 +1073,8 @@ export async function updateUserDeck(
           format,
 
           isPublic,
+
+          noLimits,
 
           achievement: nextResult.achievement,
 

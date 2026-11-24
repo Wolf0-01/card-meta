@@ -61,6 +61,9 @@ author?: DeckAuthor | null;
 
 isPublic?: boolean;
 
+/** Modo No limits: el mazo ignora la banlist. */
+noLimits?: boolean;
+
 /**
  * Nombre de duelista personalizado por staff. Cuando está
  * presente reemplaza al autor en la tabla y el detalle.

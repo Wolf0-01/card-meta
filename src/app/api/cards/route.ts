@@ -63,6 +63,14 @@ export async function GET(
         "monsterType"
       ) ?? undefined;
 
+    const subtype =
+      searchParams.get("subtype") ??
+      undefined;
+
+    const banlist =
+      searchParams.get("banlist") ??
+      undefined;
+
     const sort =
       searchParams.get("sort") ??
       undefined;
@@ -97,6 +105,9 @@ export async function GET(
     const maxLevel =
       numberParam("maxLevel");
 
+    const rank =
+      numberParam("rank");
+
     const minAttack =
       numberParam("minAtk");
 
@@ -122,6 +133,9 @@ export async function GET(
         level,
         minLevel,
         maxLevel,
+        levelOrLink: rank,
+        subtype,
+        banlist,
         minAttack,
         maxAttack,
         minDefense,

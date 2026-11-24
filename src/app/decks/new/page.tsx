@@ -70,6 +70,8 @@ export default async function NewDeckPage({
 
         isPublic: false,
 
+        noLimits: deck.noLimits,
+
         cards: deck.cards.map(
           (deckCard) => ({
             id: deckCard.card.id,

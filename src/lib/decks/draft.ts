@@ -146,6 +146,23 @@ function describeDraftCardLimit(
 }
 
 /**
+ * En el modo No limits todas las cartas comparten el máximo
+ * general de copias (3) e ignoran la banlist.
+ */
+function getDraftMaxCopies(
+  card: CardPreviewData,
+  noLimits: boolean
+): number {
+  if (noLimits) {
+    return DECK_RULES.maxCopies;
+  }
+
+  return getBanlistMaxCopies(
+    card.banlistStatus ?? null
+  );
+}
+
+/**
  * Explica por qué no se puede añadir una carta al
  * borrador. Devuelve `null` cuando la acción es válida.
  */
@@ -153,7 +170,8 @@ export function getDraftAddIssue(
   cards: DraftCard[],
   card: CardPreviewData,
   zone?: DeckZone,
-  format: DuelFormat = "speed"
+  format: DuelFormat = "speed",
+  noLimits = false
 ): string | null {
   const targetZone =
     format === "rush"
@@ -162,13 +180,16 @@ export function getDraftAddIssue(
 
   const status = card.banlistStatus ?? null;
 
-  const maxCopies = getBanlistMaxCopies(status);
+  const maxCopies = getDraftMaxCopies(
+    card,
+    noLimits
+  );
 
   if (maxCopies === 0) {
     return `${card.name} is Forbidden in Duel Links decks`;
   }
 
-  if (status) {
+  if (!noLimits && status) {
     const groupTotal =
       getDraftBanlistGroupTotal(cards, status);
 
@@ -208,7 +229,8 @@ export function getDraftQuantityIssue(
   cards: DraftCard[],
   cardId: number,
   zone: DeckZone,
-  quantity: number
+  quantity: number,
+  noLimits = false
 ): string | null {
   const current = cards.find(
     (card) =>
@@ -229,7 +251,10 @@ export function getDraftQuantityIssue(
   const status =
     current.card.banlistStatus ?? null;
 
-  const maxCopies = getBanlistMaxCopies(status);
+  const maxCopies = getDraftMaxCopies(
+    current.card,
+    noLimits
+  );
 
   const copiesInOtherZones =
     getDraftCardCopies(cards, cardId) -
@@ -242,7 +267,7 @@ export function getDraftQuantityIssue(
     );
   }
 
-  if (status) {
+  if (!noLimits && status) {
     const groupInOtherCards =
       getDraftBanlistGroupTotal(
         cards,
@@ -278,14 +303,23 @@ export function addDraftCard(
   cards: DraftCard[],
   card: CardPreviewData,
   zone?: DeckZone,
-  format: DuelFormat = "speed"
+  format: DuelFormat = "speed",
+  noLimits = false
 ): DraftCard[] {
   const targetZone =
     format === "rush"
       ? "main"
       : zone ?? getDefaultDraftZone(card);
 
-  if (getDraftAddIssue(cards, card, zone, format)) {
+  if (
+    getDraftAddIssue(
+      cards,
+      card,
+      zone,
+      format,
+      noLimits
+    )
+  ) {
     return cards;
   }
 
@@ -346,7 +380,8 @@ export function setDraftCardQuantity(
   cards: DraftCard[],
   cardId: number,
   zone: DeckZone,
-  quantity: number
+  quantity: number,
+  noLimits = false
 ): DraftCard[] {
   const current = cards.find(
     (card) =>
@@ -369,18 +404,22 @@ export function setDraftCardQuantity(
   const status =
     current.card.banlistStatus ?? null;
 
-  const maxCopies = getBanlistMaxCopies(status);
+  const maxCopies = getDraftMaxCopies(
+    current.card,
+    noLimits
+  );
 
-  const groupInOtherCards = status
-    ? getDraftBanlistGroupTotal(
-        cards,
-        status,
-        {
-          cardId,
-          zone,
-        }
-      )
-    : 0;
+  const groupInOtherCards =
+    !noLimits && status
+      ? getDraftBanlistGroupTotal(
+          cards,
+          status,
+          {
+            cardId,
+            zone,
+          }
+        )
+      : 0;
 
   const maxQuantity = Math.max(
     0,
@@ -504,7 +543,8 @@ export function clearDraftCards(): DraftCard[] {
 
 export function validateDraft(
   cards: DraftCard[],
-  format: DuelFormat = "speed"
+  format: DuelFormat = "speed",
+  noLimits = false
 ): DraftValidation {
   const stats = getDraftStats(cards);
 
@@ -546,8 +586,9 @@ export function validateDraft(
     const status =
       statusByCard.get(cardId) ?? null;
 
-    const maxCopies =
-      getBanlistMaxCopies(status);
+    const maxCopies = noLimits
+      ? DECK_RULES.maxCopies
+      : getBanlistMaxCopies(status);
 
     if (maxCopies === 0) {
       issues.push({
@@ -588,30 +629,33 @@ export function validateDraft(
    * Duel Links comparte el cupo entre todas las cartas de
    * un mismo grupo de la banlist (Main + Extra). Solo se
    * avisa del grupo cuando ninguna carta concreta lo
-   * explica ya, para no duplicar mensajes.
+   * explica ya, para no duplicar mensajes. El modo No
+   * limits omite por completo estas restricciones.
    */
-  for (const status of BANLIST_GROUP_STATUSES) {
-    if (
-      status === "forbidden" ||
-      statusesWithCardIssue.has(status)
-    ) {
-      continue;
-    }
+  if (!noLimits) {
+    for (const status of BANLIST_GROUP_STATUSES) {
+      if (
+        status === "forbidden" ||
+        statusesWithCardIssue.has(status)
+      ) {
+        continue;
+      }
 
-    const groupTotal =
-      getDraftBanlistGroupTotal(cards, status);
+      const groupTotal =
+        getDraftBanlistGroupTotal(cards, status);
 
-    const maxCopies =
-      getBanlistMaxCopies(status);
+      const maxCopies =
+        getBanlistMaxCopies(status);
 
-    if (groupTotal > maxCopies) {
-      issues.push({
-        path: "cards",
+      if (groupTotal > maxCopies) {
+        issues.push({
+          path: "cards",
 
-        message: `${describeBanlistGroupLimit(
-          status
-        )} (current: ${groupTotal})`,
-      });
+          message: `${describeBanlistGroupLimit(
+            status
+          )} (current: ${groupTotal})`,
+        });
+      }
     }
   }
 

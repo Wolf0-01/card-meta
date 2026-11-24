@@ -63,6 +63,9 @@ export interface DeckDraftSeed {
 
   isPublic: boolean;
 
+  /** Modo No limits: ignora la banlist al validar. */
+  noLimits?: boolean;
+
   skill: string;
 
   archetype?: string;
@@ -146,6 +149,12 @@ function readStoredDraft(
           ? parsed.isPublic
           : false,
 
+      noLimits:
+        typeof parsed.noLimits ===
+        "boolean"
+          ? parsed.noLimits
+          : false,
+
       skill:
         typeof parsed.skill === "string"
           ? parsed.skill
@@ -203,6 +212,10 @@ export default function useDeckDraft({
       () => initialDraft?.isPublic ?? false
     );
 
+  const [noLimits, setNoLimits] = useState(
+    () => initialDraft?.noLimits ?? false
+  );
+
   const [skill, setSkill] = useState(
     () => initialDraft?.skill ?? ""
   );
@@ -247,6 +260,7 @@ export default function useDeckDraft({
           name,
           description,
           isPublic,
+          noLimits,
           skill,
           archetype,
           format,
@@ -263,6 +277,7 @@ export default function useDeckDraft({
     name,
     description,
     isPublic,
+    noLimits,
     skill,
     archetype,
     format,
@@ -319,8 +334,12 @@ export default function useDeckDraft({
 
   const validation = useMemo(
     () =>
-      validateDraft(visibleCards, format),
-    [visibleCards, format]
+      validateDraft(
+        visibleCards,
+        format,
+        noLimits
+      ),
+    [visibleCards, format, noLimits]
   );
 
   function addCard(
@@ -331,7 +350,8 @@ export default function useDeckDraft({
       cards,
       card,
       zone,
-      format
+      format,
+      noLimits
     );
 
     if (issue) {
@@ -343,7 +363,8 @@ export default function useDeckDraft({
         current,
         card,
         zone,
-        format
+        format,
+        noLimits
       )
     );
 
@@ -372,7 +393,8 @@ export default function useDeckDraft({
       cards,
       cardId,
       zone,
-      quantity
+      quantity,
+      noLimits
     );
 
     if (issue) {
@@ -384,7 +406,8 @@ export default function useDeckDraft({
         current,
         cardId,
         zone,
-        quantity
+        quantity,
+        noLimits
       )
     );
 
@@ -434,6 +457,8 @@ export default function useDeckDraft({
 
     setIsPublic(false);
 
+    setNoLimits(false);
+
     setSkill("");
 
     setArchetype("");
@@ -481,6 +506,10 @@ export default function useDeckDraft({
       : false,
 
     setIsPublic,
+
+    noLimits: isReady ? noLimits : false,
+
+    setNoLimits,
 
     skill: isReady ? skill : "",
 

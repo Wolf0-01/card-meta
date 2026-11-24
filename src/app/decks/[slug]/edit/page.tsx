@@ -84,6 +84,8 @@ export default async function EditDeckPage({
 
     isPublic: deck.isPublic,
 
+    noLimits: deck.noLimits,
+
     achievement: deck.achievement,
 
     placement: deck.placement,

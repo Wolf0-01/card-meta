@@ -339,6 +339,8 @@ export default function DeckBuilderWorkspace({
 
             isPublic: makePublic,
 
+            noLimits: draft.noLimits,
+
             achievement:
               competitiveResult.achievement,
 
@@ -547,6 +549,73 @@ export default function DeckBuilderWorkspace({
                 );
               })}
             </div>
+
+            <button
+              type="button"
+              role="switch"
+              aria-checked={draft.noLimits}
+              onClick={() =>
+                draft.setNoLimits(!draft.noLimits)
+              }
+              title="Ignore the Duel Links banlist (max. 3 copies per card)"
+              className={`
+                mt-2
+                ml-2
+                inline-flex
+                items-center
+                gap-2
+                rounded-lg
+                border
+                px-2.5
+                py-1.5
+                text-[10px]
+                font-black
+                uppercase
+                tracking-[0.14em]
+                transition-colors
+                ${
+                  draft.noLimits
+                    ? "border-amber-400/60 bg-amber-500/10 text-amber-200"
+                    : "border-border bg-background-secondary text-foreground-muted hover:text-foreground"
+                }
+              `}
+            >
+              <span
+                aria-hidden
+                className={`
+                  relative
+                  h-3.5
+                  w-6
+                  shrink-0
+                  rounded-full
+                  transition-colors
+                  ${
+                    draft.noLimits
+                      ? "bg-amber-400"
+                      : "bg-surface-hover"
+                  }
+                `}
+              >
+                <span
+                  className={`
+                    absolute
+                    top-0.5
+                    h-2.5
+                    w-2.5
+                    rounded-full
+                    bg-white
+                    shadow-sm
+                    transition-transform
+                    ${
+                      draft.noLimits
+                        ? "translate-x-3"
+                        : "translate-x-0.5"
+                    }
+                  `}
+                />
+              </span>
+              No limits
+            </button>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -1003,6 +1072,7 @@ export default function DeckBuilderWorkspace({
               total={draft.stats.main}
               limit={DECK_RULES.mainMax}
               min={DECK_RULES.mainMin}
+              noLimits={draft.noLimits}
               onAddCard={handleAddCard}
               onMoveCard={draft.moveCard}
               onRemoveOne={draft.removeCard}

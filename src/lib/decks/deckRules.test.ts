@@ -259,6 +259,112 @@ describe("validateDraft", () => {
   });
 });
 
+describe("modo No limits", () => {
+  it("permite 3 copias de una carta Forbidden y bloquea la cuarta", () => {
+    let cards: DraftCard[] = [];
+
+    for (let copy = 0; copy < 3; copy += 1) {
+      cards = addDraftCard(
+        cards,
+        previewCard(9, "forbidden"),
+        "main",
+        "speed",
+        true
+      );
+    }
+
+    assert.equal(cards.length, 1);
+    assert.equal(cards[0]?.quantity, 3);
+
+    const issue = getDraftAddIssue(
+      cards,
+      previewCard(9, "forbidden"),
+      "main",
+      "speed",
+      true
+    );
+
+    assert.ok(issue?.includes("more than 3"));
+  });
+
+  it("permite Limited 1 y Limited 2 hasta 3 copias ignorando el cupo de grupo", () => {
+    const cards: DraftCard[] = [
+      {
+        id: 1,
+        quantity: 3,
+        zone: "main",
+        card: previewCard(1, "limited1"),
+      },
+      {
+        id: 2,
+        quantity: 3,
+        zone: "extra",
+        card: previewCard(2, "limited2"),
+      },
+    ];
+
+    const result = validateDraft(
+      cards,
+      "speed",
+      true
+    );
+
+    assert.equal(result.issues.length, 0);
+    assert.equal(result.canSave, true);
+  });
+
+  it("mantiene los límites de tamaño del mazo", () => {
+    const result = validateDraft(
+      draftCards("main", 31),
+      "speed",
+      true
+    );
+
+    assert.equal(result.canSave, false);
+    assert.ok(
+      result.issues.some((issue) =>
+        issue.message.includes("30")
+      )
+    );
+  });
+
+  it("el servidor ignora la banlist y conserva el máximo de 3 copias", () => {
+    const counts = validateDeckCards(
+      [
+        {
+          cardId: 1,
+          quantity: 3,
+          zone: "main",
+          banlistStatus: "forbidden",
+        },
+      ],
+      false,
+      "speed",
+      true
+    );
+
+    assert.equal(counts.main, 3);
+
+    expectDeckError(
+      () =>
+        validateDeckCards(
+          [
+            {
+              cardId: 1,
+              quantity: 3,
+              zone: "main",
+              banlistStatus: "forbidden",
+            },
+          ],
+          false,
+          "speed",
+          false
+        ),
+      "Forbidden"
+    );
+  });
+});
+
 describe("validateDeckCards", () => {
   it("acepta un mazo público de 20 Main y 9 Extra", () => {
     const cards = [
@@ -696,7 +802,7 @@ describe("sortDeckCards (Duel Links Meta)", () => {
     ]);
   });
 
-  it("ordena mágicas y trampas por rareza, copias y nombre sin separar subtipos", () => {
+  it("ordena mágicas y trampas por rareza y nombre sin separar subtipos", () => {
     const cards = [
       sortableCard(
         "Field Spell",
@@ -757,10 +863,10 @@ describe("sortDeckCards (Duel Links Meta)", () => {
     ];
 
     assert.deepEqual(sortedNames(cards), [
-      "Quick Spell",
       "Field Spell",
-      "Normal Spell",
+      "Quick Spell",
       "Continuous Spell",
+      "Normal Spell",
       "Equip Spell",
       "Counter Trap",
       "Normal Trap",
@@ -768,57 +874,63 @@ describe("sortDeckCards (Duel Links Meta)", () => {
     ]);
   });
 
-  it("aplica rareza, copias 3x → 2x → 1x y nombre", () => {
+  it("aplica rareza, nivel descendente y nombre sin agrupar copias", () => {
     const cards = [
       sortableCard(
         "Alpha",
         "Effect Monster",
         "N",
-        3
+        3,
+        { level: 4 }
       ),
       sortableCard(
         "Bravo",
         "Effect Monster",
         "UR",
-        1
+        1,
+        { level: 4 }
       ),
       sortableCard(
         "Charlie",
         "Effect Monster",
         "UR",
-        3
+        3,
+        { level: 8 }
       ),
       sortableCard(
         "Delta",
         "Effect Monster",
         "UR",
-        2
+        2,
+        { level: 4 }
       ),
       sortableCard(
         "Echo",
         "Effect Monster",
         "UR",
-        2
+        2,
+        { level: 4 }
       ),
       sortableCard(
         "Foxtrot",
         "Effect Monster",
         "SR",
-        1
+        1,
+        { level: 6 }
       ),
     ];
 
     assert.deepEqual(sortedNames(cards), [
       "Charlie",
+      "Bravo",
       "Delta",
       "Echo",
-      "Bravo",
       "Foxtrot",
       "Alpha",
     ]);
   });
 
-  it("ordena el Extra Deck Fusion → Synchro → Xyz → Link y luego rareza", () => {
+  it("ordena el Extra Deck Fusion → Synchro → Xyz → Link y luego rareza y nivel", () => {
     const cards = [
       sortableCard(
         "Link 3",
@@ -828,6 +940,7 @@ describe("sortDeckCards (Duel Links Meta)", () => {
         {
           zone: "extra",
           frameType: "Link",
+          linkRating: 3,
         }
       ),
       sortableCard(
@@ -835,7 +948,11 @@ describe("sortDeckCards (Duel Links Meta)", () => {
         "Xyz Monster",
         "UR",
         1,
-        { zone: "extra", frameType: "Xyz" }
+        {
+          zone: "extra",
+          frameType: "Xyz",
+          level: 4,
+        }
       ),
       sortableCard(
         "Synchro SR",
@@ -845,6 +962,7 @@ describe("sortDeckCards (Duel Links Meta)", () => {
         {
           zone: "extra",
           frameType: "Synchro",
+          level: 8,
         }
       ),
       sortableCard(
@@ -855,6 +973,7 @@ describe("sortDeckCards (Duel Links Meta)", () => {
         {
           zone: "extra",
           frameType: "Synchro",
+          level: 8,
         }
       ),
       sortableCard(
@@ -865,6 +984,7 @@ describe("sortDeckCards (Duel Links Meta)", () => {
         {
           zone: "extra",
           frameType: "Fusion",
+          level: 4,
         }
       ),
     ];

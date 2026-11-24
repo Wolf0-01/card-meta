@@ -64,6 +64,10 @@ interface DeckSortableCard {
     race?: string | null;
 
     frameType?: string | null;
+
+    level?: number | null;
+
+    linkRating?: number | null;
   };
 }
 
@@ -183,6 +187,18 @@ function getZoneRank(card: DeckSortableCard): number {
 }
 
 /**
+ * Nivel, Rango o Link de la carta. Los Xyz guardan su
+ * Rango en `level`, mientras que los Link usan
+ * `linkRating`; ambos comparten la misma jerarquía.
+ */
+function getCardLevel(card: DeckSortableCard): number {
+  return Math.max(
+    card.card.level ?? 0,
+    card.card.linkRating ?? 0
+  );
+}
+
+/**
  * Compara dos cartas de mazo por rareza y, como desempate
  * estable, por nombre. No muta la colección original.
  */
@@ -211,7 +227,7 @@ export function sortCardsByRarity<
  * 2. Monsters: Ritual → Effect → Normal. Las Mágicas y
  *    Trampas no se separan por subtipo.
  * 3. Rareza UR → SR → R → N.
- * 4. Copias 3x → 2x → 1x.
+ * 4. Nivel / Rango / Link descendente (12 → 1).
  * 5. Nombre A → Z.
  *
  * Se aplica sobre las cartas agrupadas (con su `quantity`)
@@ -251,11 +267,11 @@ export function sortDeckCards<
       return rarityDiff;
     }
 
-    const copiesDiff =
-      (b.quantity ?? 1) - (a.quantity ?? 1);
+    const levelDiff =
+      getCardLevel(b) - getCardLevel(a);
 
-    if (copiesDiff !== 0) {
-      return copiesDiff;
+    if (levelDiff !== 0) {
+      return levelDiff;
     }
 
     return a.card.name.localeCompare(b.card.name);

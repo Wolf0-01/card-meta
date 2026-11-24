@@ -121,6 +121,12 @@ const deckFields = {
 
   isPublic: z.boolean().optional(),
 
+  /**
+   * Modo No limits: permite hasta 3 copias de cualquier
+   * carta ignorando Forbidden / Limited de la banlist.
+   */
+  noLimits: z.boolean().optional(),
+
   achievement: z
     .enum(DECK_ACHIEVEMENTS)
     .optional(),
@@ -299,7 +305,8 @@ export function countDeckCards(
 export function validateDeckCards(
   cards: NormalizedDeckCard[],
   isPublic: boolean,
-  format: DuelFormat = "speed"
+  format: DuelFormat = "speed",
+  noLimits = false
 ): DeckCounts {
   const issues: DeckIssue[] = [];
 
@@ -360,8 +367,9 @@ export function validateDeckCards(
       ? `"${name}"`
       : `#${cardId}`;
 
-    const maxCopies =
-      getBanlistMaxCopies(status);
+    const maxCopies = noLimits
+      ? DECK_RULES.maxCopies
+      : getBanlistMaxCopies(status);
 
     if (maxCopies === 0) {
       issues.push({
@@ -400,50 +408,53 @@ export function validateDeckCards(
 
   /*
    * Cupo global por grupo de la banlist: todas las cartas
-   * de un mismo grupo suman entre Main y Extra.
+   * de un mismo grupo suman entre Main y Extra. El modo No
+   * limits omite estas restricciones.
    */
-  const groupTotals = new Map<
-    BanlistStatus,
-    number
-  >();
+  if (!noLimits) {
+    const groupTotals = new Map<
+      BanlistStatus,
+      number
+    >();
 
-  for (const card of cards) {
-    const status =
-      card.banlistStatus ?? null;
+    for (const card of cards) {
+      const status =
+        card.banlistStatus ?? null;
 
-    if (!status) {
-      continue;
+      if (!status) {
+        continue;
+      }
+
+      groupTotals.set(
+        status,
+        (groupTotals.get(status) ?? 0) +
+          card.quantity
+      );
     }
 
-    groupTotals.set(
-      status,
-      (groupTotals.get(status) ?? 0) +
-        card.quantity
-    );
-  }
+    for (const status of BANLIST_GROUP_STATUSES) {
+      if (
+        status === "forbidden" ||
+        statusesWithCardIssue.has(status)
+      ) {
+        continue;
+      }
 
-  for (const status of BANLIST_GROUP_STATUSES) {
-    if (
-      status === "forbidden" ||
-      statusesWithCardIssue.has(status)
-    ) {
-      continue;
-    }
+      const groupTotal =
+        groupTotals.get(status) ?? 0;
 
-    const groupTotal =
-      groupTotals.get(status) ?? 0;
+      const maxCopies =
+        getBanlistMaxCopies(status);
 
-    const maxCopies =
-      getBanlistMaxCopies(status);
+      if (groupTotal > maxCopies) {
+        issues.push({
+          path: "cards",
 
-    if (groupTotal > maxCopies) {
-      issues.push({
-        path: "cards",
-
-        message: `${describeBanlistGroupLimit(
-          status
-        )} (current: ${groupTotal})`,
-      });
+          message: `${describeBanlistGroupLimit(
+            status
+          )} (current: ${groupTotal})`,
+        });
+      }
     }
   }
 

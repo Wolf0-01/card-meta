@@ -213,6 +213,12 @@ model Deck {
 
   format String @default("speed")
 
+  /**
+   * Modo "No limits": permite hasta 3 copias de cualquier
+   * carta ignorando la banlist (Forbidden / Limited).
+   */
+  noLimits Boolean @default(false)
+
   description String?
 
   skill String?

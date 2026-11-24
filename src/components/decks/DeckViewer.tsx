@@ -150,6 +150,26 @@ export default function DeckViewer({
           · {getDuelFormatLabel(deck.format)}
         </p>
 
+        {deck.noLimits && (
+          <span
+            className="
+              rounded
+              border
+              border-amber-400/40
+              bg-amber-500/10
+              px-2
+              py-0.5
+              text-[9px]
+              font-black
+              uppercase
+              tracking-wide
+              text-amber-300
+            "
+          >
+            No Limits · Banlist ignored
+          </span>
+        )}
+
         <p
           className="
             text-xs

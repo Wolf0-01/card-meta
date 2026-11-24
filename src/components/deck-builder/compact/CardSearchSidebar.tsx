@@ -84,6 +84,110 @@ const ATTRIBUTE_OPTIONS = [
   },
 ] as const;
 
+const LEVEL_OPTIONS = [
+  {
+    value: "",
+    label: "Level / Rank / Link",
+  },
+  ...Array.from({ length: 13 }, (_, level) => ({
+    value: String(level),
+    label: `Level ${level}`,
+  })),
+] as const;
+
+const SUBTYPE_OPTIONS = [
+  {
+    value: "",
+    label: "Subtype",
+  },
+  {
+    value: "fusion",
+    label: "Fusion",
+  },
+  {
+    value: "synchro",
+    label: "Synchro",
+  },
+  {
+    value: "xyz",
+    label: "Xyz",
+  },
+  {
+    value: "link",
+    label: "Link",
+  },
+  {
+    value: "ritual",
+    label: "Ritual",
+  },
+  {
+    value: "tuner",
+    label: "Tuner",
+  },
+  {
+    value: "quick-play",
+    label: "Quick-Play",
+  },
+  {
+    value: "continuous",
+    label: "Continuous",
+  },
+  {
+    value: "counter",
+    label: "Counter",
+  },
+] as const;
+
+const BANLIST_OPTIONS = [
+  {
+    value: "",
+    label: "Banlist",
+  },
+  {
+    value: "unlimited",
+    label: "Unlimited",
+  },
+  {
+    value: "limited1",
+    label: "Limited 1",
+  },
+  {
+    value: "limited2",
+    label: "Limited 2",
+  },
+  {
+    value: "limited3",
+    label: "Limited 3",
+  },
+  {
+    value: "forbidden",
+    label: "Forbidden",
+  },
+] as const;
+
+const RARITY_OPTIONS = [
+  {
+    value: "",
+    label: "Rarity",
+  },
+  {
+    value: "UR",
+    label: "UR",
+  },
+  {
+    value: "SR",
+    label: "SR",
+  },
+  {
+    value: "R",
+    label: "R",
+  },
+  {
+    value: "N",
+    label: "N",
+  },
+] as const;
+
 type CatalogTab = "cards" | "skills";
 
 interface CardsApiResponse {
@@ -161,6 +265,14 @@ export default function CardSearchSidebar({
 
   const [attribute, setAttribute] =
     useState("");
+
+  const [rank, setRank] = useState("");
+
+  const [subtype, setSubtype] = useState("");
+
+  const [banlist, setBanlist] = useState("");
+
+  const [rarity, setRarity] = useState("");
 
   const [page, setPage] = useState(1);
 
@@ -300,6 +412,22 @@ export default function CardSearchSidebar({
           );
         }
 
+        if (rank) {
+          params.set("rank", rank);
+        }
+
+        if (subtype) {
+          params.set("subtype", subtype);
+        }
+
+        if (banlist) {
+          params.set("banlist", banlist);
+        }
+
+        if (rarity) {
+          params.set("rarity", rarity);
+        }
+
         const response = await fetch(
           `/api/cards?${params.toString()}`,
           {
@@ -364,6 +492,10 @@ export default function CardSearchSidebar({
     debouncedSearch,
     type,
     attribute,
+    rank,
+    subtype,
+    banlist,
+    rarity,
     format,
     page,
   ]);
@@ -692,6 +824,100 @@ export default function CardSearchSidebar({
               </select>
             </div>
 
+            <div className="grid grid-cols-2 gap-2">
+              <select
+                value={rank}
+                onChange={(event) => {
+                  setRank(event.target.value);
+
+                  setPage(1);
+                }}
+                className={fieldClasses}
+                aria-label="Filter by level, rank or link rating"
+              >
+                {LEVEL_OPTIONS.map((option) => (
+                  <option
+                    key={option.value}
+                    value={option.value}
+                  >
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={subtype}
+                onChange={(event) => {
+                  setSubtype(
+                    event.target.value
+                  );
+
+                  setPage(1);
+                }}
+                className={fieldClasses}
+                aria-label="Filter by subtype"
+              >
+                {SUBTYPE_OPTIONS.map(
+                  (option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  )
+                )}
+              </select>
+
+              <select
+                value={banlist}
+                onChange={(event) => {
+                  setBanlist(
+                    event.target.value
+                  );
+
+                  setPage(1);
+                }}
+                className={fieldClasses}
+                aria-label="Filter by banlist status"
+              >
+                {BANLIST_OPTIONS.map(
+                  (option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  )
+                )}
+              </select>
+
+              <select
+                value={rarity}
+                onChange={(event) => {
+                  setRarity(
+                    event.target.value
+                  );
+
+                  setPage(1);
+                }}
+                className={fieldClasses}
+                aria-label="Filter by rarity"
+              >
+                {RARITY_OPTIONS.map(
+                  (option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
             <div className="flex items-center justify-between text-[10px] text-foreground-muted">
               <span>
                 {loading
@@ -709,6 +935,14 @@ export default function CardSearchSidebar({
                   setType("");
 
                   setAttribute("");
+
+                  setRank("");
+
+                  setSubtype("");
+
+                  setBanlist("");
+
+                  setRarity("");
 
                   setPage(1);
                 }}

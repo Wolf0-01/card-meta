@@ -79,6 +79,9 @@ interface DraftZoneProps {
   showTitle?: boolean;
 
   scrollable?: boolean;
+
+  /** Marca discreta del modo No limits. */
+  noLimits?: boolean;
 }
 
 function getCountClasses(
@@ -113,6 +116,7 @@ export default function DraftZone({
   onRemoveOne,
   showTitle = true,
   scrollable = false,
+  noLimits = false,
 }: DraftZoneProps) {
   const [isDragOver, setIsDragOver] =
     useState(false);
@@ -322,6 +326,27 @@ export default function DraftZone({
             <h2 className="truncate text-xs font-black uppercase tracking-wide text-foreground">
               {DECK_ZONE_LABELS[zone]}
             </h2>
+          )}
+
+          {noLimits && (
+            <span
+              className="
+                shrink-0
+                rounded
+                border
+                border-amber-400/40
+                bg-amber-500/10
+                px-1.5
+                py-0.5
+                text-[9px]
+                font-black
+                uppercase
+                tracking-wide
+                text-amber-300
+              "
+            >
+              No Limits
+            </span>
           )}
 
           <span className="text-[10px] text-foreground-muted">

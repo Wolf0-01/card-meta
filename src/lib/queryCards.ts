@@ -21,6 +21,15 @@ export interface QueryOptions {
   minLevel?: number;
   maxLevel?: number;
 
+  /** Nivel, Rango o Link exacto (selector unificado). */
+  levelOrLink?: number;
+
+  /** Subtipo de monstruo, Mágica o Trampa. */
+  subtype?: string;
+
+  /** Estado de banlist: unlimited, forbidden o limited1-3. */
+  banlist?: string;
+
   scale?: number;
 
   linkMarkers?: Prisma.InputJsonValue;
@@ -99,6 +108,34 @@ function getOrderBy(
   }
 }
 
+const MONSTER_SUBTYPE_TYPES: Record<
+  string,
+  string
+> = {
+  fusion: "Fusion",
+  synchro: "Synchro",
+  xyz: "Xyz",
+  link: "Link",
+  ritual: "Ritual",
+  tuner: "Tuner",
+};
+
+const SPELL_TRAP_SUBTYPE_RACES: Record<
+  string,
+  string
+> = {
+  "quick-play": "Quick-Play",
+  continuous: "Continuous",
+  counter: "Counter",
+};
+
+const BANLIST_FILTER_STATUSES = new Set([
+  "forbidden",
+  "limited1",
+  "limited2",
+  "limited3",
+]);
+
 function buildWhere(
   options: QueryOptions
 ): Prisma.CardWhereInput {
@@ -113,6 +150,10 @@ function buildWhere(
     level,
     minLevel,
     maxLevel,
+
+    levelOrLink,
+    subtype,
+    banlist,
 
     scale,
     linkMarkers,
@@ -131,6 +172,18 @@ function buildWhere(
   } = options;
 
   const where: Prisma.CardWhereInput = {};
+
+  function addAnd(
+    condition: Prisma.CardWhereInput
+  ) {
+    const current = where.AND;
+
+    where.AND = Array.isArray(current)
+      ? [...current, condition]
+      : current
+        ? [current, condition]
+        : [condition];
+  }
 
   if (search) {
     where.name = {
@@ -177,6 +230,54 @@ function buildWhere(
         lte: maxLevel,
       }),
     };
+  }
+
+  if (levelOrLink !== undefined) {
+    addAnd({
+      OR: [
+        { level: levelOrLink },
+        { linkRating: levelOrLink },
+      ],
+    });
+  }
+
+  if (subtype) {
+    const key = subtype
+      .trim()
+      .toLowerCase();
+
+    const monsterType =
+      MONSTER_SUBTYPE_TYPES[key];
+
+    if (monsterType) {
+      addAnd({
+        type: {
+          contains: monsterType,
+          mode: "insensitive",
+        },
+      });
+    }
+
+    const race =
+      SPELL_TRAP_SUBTYPE_RACES[key];
+
+    if (race) {
+      addAnd({ race });
+    }
+  }
+
+  if (banlist) {
+    const key = banlist
+      .trim()
+      .toLowerCase();
+
+    if (key === "unlimited") {
+      addAnd({ banlistStatus: null });
+    } else if (
+      BANLIST_FILTER_STATUSES.has(key)
+    ) {
+      addAnd({ banlistStatus: key });
+    }
   }
 
   if (scale !== undefined) {
