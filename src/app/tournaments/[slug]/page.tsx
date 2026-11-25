@@ -14,7 +14,7 @@ import {
   Users,
 } from "lucide-react";
 
-import MultilineText from "@/components/cards/MultilineText";
+import TournamentDescription from "@/components/tournaments/TournamentDescription";
 
 import TournamentDeckLists from "@/components/tournaments/TournamentDeckLists";
 
@@ -367,9 +367,8 @@ export default async function TournamentPage({
                 text-slate-300
               "
             >
-              <MultilineText
-                text={tournament.description}
-              />
+              <TournamentDescription text=             {tournament.description} 
+             />
             </div>
           </section>
         )}
