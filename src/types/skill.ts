@@ -50,6 +50,17 @@ export interface SkillSearchResult {
   characters: string[];
 }
 
+export interface SkillCharacterImage {
+  /** Nombre del personaje tal y como lo publica DLM. */
+  name: string;
+
+  /** Slug usado por `/characters/<slug>.<ext>`. */
+  slug: string;
+
+  /** URL pública del retrato dentro de `public/characters`. */
+  src: string;
+}
+
 /**
  * Datos de una Skill listos para la ficha pública y para
  * la tarjeta emergente de SkillLink.
@@ -72,6 +83,12 @@ export interface SkillMetaSummary {
   character: string | null;
 
   characters: string[];
+
+  /** Retratos disponibles para los personajes de la Skill. */
+  characterImages: SkillCharacterImage[];
+
+  /** Primer retrato disponible, listo para la cabecera. */
+  characterImage: string | null;
 
   category: SkillCategory | null;
 

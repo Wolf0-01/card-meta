@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test src/lib/decks/deckRules.test.ts src/lib/decks/achievements.test.ts src/lib/skills/search.test.ts",
+    "test": "tsx --test src/lib/decks/deckRules.test.ts src/lib/decks/achievements.test.ts src/lib/skills/search.test.ts src/lib/skills/quotedCardNames.test.ts",
     "cards:rarities": "tsx scripts/updateRarities.ts",
     "cards:slugs": "tsx scripts/populateCardSlugs.ts",
     "cards:obtain": "tsx scripts/updateObtain.ts",

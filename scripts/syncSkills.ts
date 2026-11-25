@@ -1,8 +1,21 @@
 import "dotenv/config";
 
+import {
+  mkdir,
+  writeFile,
+} from "node:fs/promises";
+
+import path from "node:path";
+
 import type { Prisma } from "@prisma/client";
 
 import { prisma } from "../src/lib/prisma";
+
+import {
+  CHARACTERS_DIR,
+  getCharacterImage,
+  getCharacterSlug,
+} from "../src/lib/skills/characterImage";
 
 /**
  * Sincroniza el catálogo de Skills con Duel Links Meta.
@@ -23,6 +36,11 @@ const WRITE_BATCH_SIZE = 50;
 
 const REQUEST_FIELDS =
   "name,description,rush,characters";
+
+const CHARACTER_IMAGE_BASE_URL =
+  "https://s3.duellinksmeta.com";
+
+const CHARACTER_IMAGE_CONCURRENCY = 8;
 
 const dryRun = process.argv.includes("--dry-run");
 
@@ -50,19 +68,30 @@ interface SkillRecord {
   format: "speed" | "rush";
 }
 
+interface DlmCharacter {
+  name: string;
+
+  thumbnailImage: string | null;
+}
+
 function toCharacters(
   value: unknown
-): string[] {
+): DlmCharacter[] {
   if (!Array.isArray(value)) {
     return [];
   }
 
-  const names = value.flatMap((entry) => {
+  const characters = new Map<
+    string,
+    DlmCharacter
+  >();
+
+  for (const entry of value) {
     if (
       !entry ||
       typeof entry !== "object"
     ) {
-      return [];
+      continue;
     }
 
     const character = (
@@ -73,20 +102,47 @@ function toCharacters(
       !character ||
       typeof character !== "object"
     ) {
-      return [];
+      continue;
     }
 
     const name = (
       character as { name?: unknown }
     ).name;
 
-    return typeof name === "string" &&
-      name.trim()
-      ? [name.trim()]
-      : [];
-  });
+    if (
+      typeof name !== "string" ||
+      !name.trim()
+    ) {
+      continue;
+    }
 
-  return Array.from(new Set(names));
+    const thumbnailImage = (
+      character as {
+        thumbnailImage?: unknown;
+      }
+    ).thumbnailImage;
+
+    const cleanName = name.trim();
+
+    const slug = getCharacterSlug(cleanName);
+
+    if (characters.has(slug)) {
+      continue;
+    }
+
+    characters.set(slug, {
+      name: cleanName,
+
+      thumbnailImage:
+        typeof thumbnailImage ===
+          "string" &&
+        thumbnailImage.trim()
+          ? thumbnailImage.trim()
+          : null,
+    });
+  }
+
+  return [...characters.values()];
 }
 
 function sleep(ms: number) {
@@ -194,14 +250,23 @@ function toSkillRecord(
 
     characters: toCharacters(
       skill.characters
-    ),
+    ).map((character) => character.name),
 
     format: skill.rush === true ? "rush" : "speed",
   };
 }
 
-async function loadSkills(): Promise<SkillRecord[]> {
+async function loadSkills(): Promise<{
+  skills: SkillRecord[];
+
+  characters: DlmCharacter[];
+}> {
   const records = new Map<string, SkillRecord>();
+
+  const characters = new Map<
+    string,
+    DlmCharacter
+  >();
 
   for (
     let page = 1;
@@ -220,6 +285,18 @@ async function loadSkills(): Promise<SkillRecord[]> {
       if (record) {
         records.set(record.id, record);
       }
+
+      for (const character of toCharacters(
+        row.characters
+      )) {
+        const slug = getCharacterSlug(
+          character.name
+        );
+
+        if (!characters.has(slug)) {
+          characters.set(slug, character);
+        }
+      }
     }
 
     if (rows.length < PAGE_SIZE) {
@@ -227,7 +304,11 @@ async function loadSkills(): Promise<SkillRecord[]> {
     }
   }
 
-  return [...records.values()];
+  return {
+    skills: [...records.values()],
+
+    characters: [...characters.values()],
+  };
 }
 
 function isSameSkill(
@@ -247,13 +328,155 @@ function isSameSkill(
   );
 }
 
+function toAbsoluteCharacterImageUrl(
+  value: string
+): string {
+  if (/^https?:\/\//i.test(value)) {
+    return value;
+  }
+
+  return `${CHARACTER_IMAGE_BASE_URL}${
+    value.startsWith("/") ? "" : "/"
+  }${value}`;
+}
+
+function getCharacterImageExtension(
+  url: string
+): ".png" | ".webp" {
+  try {
+    const { pathname } = new URL(url);
+
+    return path.extname(pathname).toLowerCase() ===
+      ".webp"
+      ? ".webp"
+      : ".png";
+  } catch {
+    return ".png";
+  }
+}
+
+async function syncCharacterImages(
+  characters: DlmCharacter[]
+) {
+  let downloaded = 0;
+
+  let skipped = 0;
+
+  let failed = 0;
+
+  const queue = [...characters];
+
+  async function processCharacter(
+    character: DlmCharacter
+  ) {
+    if (!character.thumbnailImage) {
+      failed += 1;
+
+      return;
+    }
+
+    if (getCharacterImage(character.name)) {
+      skipped += 1;
+
+      return;
+    }
+
+    const imageUrl =
+      toAbsoluteCharacterImageUrl(
+        character.thumbnailImage
+      );
+
+    const extension =
+      getCharacterImageExtension(imageUrl);
+
+    const slug = getCharacterSlug(
+      character.name
+    );
+
+    const filePath = path.join(
+      CHARACTERS_DIR,
+      `${slug}${extension}`
+    );
+
+    try {
+      const response = await fetch(imageUrl, {
+        headers: {
+          accept: "image/*",
+
+          "user-agent":
+            "card-meta-skills-sync/1.0",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `HTTP ${response.status}`
+        );
+      }
+
+      const bytes = Buffer.from(
+        await response.arrayBuffer()
+      );
+
+      if (bytes.length === 0) {
+        throw new Error("archivo vacío");
+      }
+
+      await mkdir(CHARACTERS_DIR, {
+        recursive: true,
+      });
+
+      await writeFile(filePath, bytes);
+
+      downloaded += 1;
+    } catch (error) {
+      failed += 1;
+
+      console.warn(
+        `   ⚠️  Retrato de ${character.name}: ${String(
+          error
+        )}`
+      );
+    }
+  }
+
+  async function worker() {
+    while (queue.length > 0) {
+      const character = queue.shift();
+
+      if (character) {
+        await processCharacter(character);
+      }
+    }
+  }
+
+  await Promise.all(
+    Array.from(
+      {
+        length: Math.min(
+          CHARACTER_IMAGE_CONCURRENCY,
+          Math.max(queue.length, 1)
+        ),
+      },
+      () => worker()
+    )
+  );
+
+  console.log(
+    `🖼️  Retratos: ${downloaded} descargados · ${skipped} ya existían · ${failed} fallidos`
+  );
+}
+
 async function main() {
   console.log("✨ Sincronizando Skills y efectos…");
 
-  const skills = await loadSkills();
+  const {
+    skills,
+    characters,
+  } = await loadSkills();
 
   console.log(
-    `📚 Skills recibidas de Duel Links Meta: ${skills.length}`
+    `📚 Skills recibidas de Duel Links Meta: ${skills.length} · 👤 Personajes: ${characters.length}`
   );
 
   const existingRows =
@@ -321,6 +544,8 @@ async function main() {
 
     return;
   }
+
+  await syncCharacterImages(characters);
 
   const writes = [...created, ...updated];
 

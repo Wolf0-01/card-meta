@@ -14,6 +14,10 @@ import type {
 } from "@/types/skill";
 
 import {
+  getCharacterImages,
+} from "./characterImage";
+
+import {
   decodeSkillSlug,
   getSkillNameKey,
   getSkillSlug,
@@ -98,6 +102,9 @@ function toSkillMetaSummary(
 
   const character = characters[0] ?? null;
 
+  const characterImages =
+    getCharacterImages(characters);
+
   return {
     id: record.id,
 
@@ -112,6 +119,11 @@ function toSkillMetaSummary(
     character,
 
     characters,
+
+    characterImages,
+
+    characterImage:
+      characterImages[0]?.src ?? null,
 
     category: localSkill?.category ?? null,
 
@@ -131,6 +143,9 @@ function toLocalSkillMetaSummary(
 
   const character = characters[0] ?? null;
 
+  const characterImages =
+    getCharacterImages(characters);
+
   return {
     id: skill.id,
 
@@ -145,6 +160,11 @@ function toLocalSkillMetaSummary(
     character,
 
     characters,
+
+    characterImages,
+
+    characterImage:
+      characterImages[0]?.src ?? null,
 
     category: skill.category,
 

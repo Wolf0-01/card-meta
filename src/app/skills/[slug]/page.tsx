@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import Image from "next/image";
+
 import Link from "next/link";
 
 import { notFound } from "next/navigation";
@@ -13,6 +15,8 @@ import {
   UserRound,
 } from "lucide-react";
 
+import RelatedCardTile from "@/components/cards/RelatedCardTile";
+
 import PublicDeckCard from "@/components/decks/PublicDeckCard";
 
 import Container from "@/components/ui/Container";
@@ -22,6 +26,10 @@ import {
 } from "@/lib/decks";
 
 import { getDuelFormatLabel } from "@/lib/duelFormat";
+
+import {
+  getMentionedCards,
+} from "@/lib/skills/mentionedCards";
 
 import {
   getSkillMetaBySlug,
@@ -68,11 +76,15 @@ export default async function SkillPage({
     notFound();
   }
 
-  const recentDecks =
-    await getPublicDecksBySkill(
-      skill.name,
-      6
-    );
+  const [recentDecks, mentionedCards] =
+    await Promise.all([
+      getPublicDecksBySkill(
+        skill.name,
+        6
+      ),
+
+      getMentionedCards(skill.description),
+    ]);
 
   const formatLabel =
     getDuelFormatLabel(skill.format);
@@ -180,36 +192,92 @@ export default async function SkillPage({
           />
 
           <div className="flex flex-wrap items-start gap-3">
-            <div
-              aria-hidden
-              className="
-                flex
-                h-12
-                w-12
-                shrink-0
-                items-center
-                justify-center
-                rounded-full
-                bg-gradient-to-br
-                from-sky-500
-                to-blue-800
-                text-base
-                font-black
-                text-white
-                shadow-lg
-                ring-2
-                ring-sky-400/30
-              "
-            >
-              {characterLabel
-                .split(/\s+/)
-                .filter(Boolean)
-                .slice(0, 2)
-                .map((word) =>
-                  word[0]?.toUpperCase()
-                )
-                .join("") || "?"}
-            </div>
+            {skill.characterImages.length > 0 ? (
+              <div className="flex shrink-0 -space-x-2">
+                {skill.characterImages
+                  .slice(0, 4)
+                  .map((character) => (
+                    <Image
+                      key={character.slug}
+                      src={character.src}
+                      alt={character.name}
+                      width={48}
+                      height={48}
+                      unoptimized
+                      className="
+                        h-12
+                        w-12
+                        rounded-full
+                        border-2
+                        border-[#0B132B]
+                        bg-slate-800
+                        object-cover
+                        shadow-lg
+                        ring-2
+                        ring-sky-400/30
+                      "
+                    />
+                  ))}
+
+                {skill.characterImages.length >
+                  4 && (
+                  <span
+                    className="
+                      flex
+                      h-12
+                      w-12
+                      items-center
+                      justify-center
+                      rounded-full
+                      border-2
+                      border-[#0B132B]
+                      bg-slate-800
+                      text-[10px]
+                      font-black
+                      text-slate-300
+                      shadow-lg
+                      ring-2
+                      ring-sky-400/30
+                    "
+                  >
+                    +
+                    {skill.characterImages.length -
+                      4}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <div
+                aria-hidden
+                className="
+                  flex
+                  h-12
+                  w-12
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-gradient-to-br
+                  from-sky-500
+                  to-blue-800
+                  text-base
+                  font-black
+                  text-white
+                  shadow-lg
+                  ring-2
+                  ring-sky-400/30
+                "
+              >
+                {characterLabel
+                  .split(/\s+/)
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map((word) =>
+                    word[0]?.toUpperCase()
+                  )
+                  .join("") || "?"}
+              </div>
+            )}
 
             <div className="min-w-0 flex-1">
               <p
@@ -289,6 +357,57 @@ export default async function SkillPage({
             <p className="mt-2 text-sm font-bold text-white">
               {characterLabel}
             </p>
+
+            {skill.characterImages.length > 0 && (
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {skill.characterImages.map(
+                  (character) => (
+                    <li
+                      key={character.slug}
+                      className="
+                        flex
+                        items-center
+                        gap-2
+                        rounded-lg
+                        border
+                        border-slate-700/60
+                        bg-slate-900/50
+                        py-1
+                        pl-1
+                        pr-2.5
+                      "
+                    >
+                      <Image
+                        src={character.src}
+                        alt={character.name}
+                        width={36}
+                        height={36}
+                        unoptimized
+                        className="
+                          h-9
+                          w-9
+                          rounded-full
+                          bg-slate-800
+                          object-cover
+                          ring-1
+                          ring-sky-400/30
+                        "
+                      />
+
+                      <span
+                        className="
+                          text-[11px]
+                          font-semibold
+                          text-slate-300
+                        "
+                      >
+                        {character.name}
+                      </span>
+                    </li>
+                  )
+                )}
+              </ul>
+            )}
 
             <p className="mt-1 text-[11px] leading-5 text-slate-400">
               Character or characters that can
@@ -388,6 +507,73 @@ export default async function SkillPage({
               "No effect description available for this Skill yet."}
           </div>
         </section>
+
+        {mentionedCards.length > 0 && (
+          <section
+            className="
+              overflow-hidden
+              rounded-xl
+              border
+              border-slate-700/60
+              bg-[#0B132B]
+              ring-1
+              ring-inset
+              ring-white/5
+            "
+          >
+            <div
+              className="
+                flex
+                items-center
+                gap-2
+                border-b
+                border-slate-800
+                px-3
+                py-2.5
+              "
+            >
+              <Sparkles className="h-4 w-4 text-amber-300" />
+
+              <h2
+                className="
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-[0.2em]
+                  text-slate-200
+                "
+              >
+                Mentioned cards
+              </h2>
+
+              <span
+                className="
+                  ml-auto
+                  text-[9px]
+                  font-black
+                  tabular-nums
+                  text-slate-500
+                "
+              >
+                {mentionedCards.length}{" "}
+                {mentionedCards.length === 1
+                  ? "card"
+                  : "cards"}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-3 p-3">
+              {mentionedCards.map((card) => (
+                <div
+                  key={card.id}
+                  className="w-[84px] shrink-0 sm:w-[96px]"
+                >
+                  <RelatedCardTile card={card} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="space-y-3">
           <div

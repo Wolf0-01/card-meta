@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import Link from "next/link";
 
 import {
@@ -133,6 +135,9 @@ function SkillTooltip({
       ? meta.characters.join(" · ")
       : character ?? null;
 
+  const characterImage =
+    meta?.characterImages?.[0] ?? null;
+
   const description =
     meta?.description?.trim() ?? "";
 
@@ -178,32 +183,53 @@ function SkillTooltip({
 
       <div className="p-3.5 pt-4">
         <div className="flex items-start gap-3">
-          <div
-            aria-hidden
-            className="
-              flex
-              h-10
-              w-10
-              shrink-0
-              items-center
-              justify-center
-              rounded-full
-              bg-gradient-to-br
-              from-sky-500
-              to-blue-800
-              text-xs
-              font-black
-              leading-none
-              text-white
-              shadow-lg
-              ring-2
-              ring-sky-400/30
-            "
-          >
-            {character
-              ? userInitials(character)
-              : "?"}
-          </div>
+          {characterImage ? (
+            <Image
+              src={characterImage.src}
+              alt={characterImage.name}
+              width={40}
+              height={40}
+              unoptimized
+              className="
+                h-10
+                w-10
+                shrink-0
+                rounded-full
+                bg-slate-800
+                object-cover
+                shadow-lg
+                ring-2
+                ring-sky-400/30
+              "
+            />
+          ) : (
+            <div
+              aria-hidden
+              className="
+                flex
+                h-10
+                w-10
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                bg-gradient-to-br
+                from-sky-500
+                to-blue-800
+                text-xs
+                font-black
+                leading-none
+                text-white
+                shadow-lg
+                ring-2
+                ring-sky-400/30
+              "
+            >
+              {character
+                ? userInitials(character)
+                : "?"}
+            </div>
+          )}
 
           <div className="min-w-0 flex-1">
             <p
@@ -354,6 +380,9 @@ export default function SkillLink({
 
   const trimmedName = name.trim();
 
+  const characterImage =
+    meta?.characterImages?.[0] ?? null;
+
   const href = `/skills/${
     meta?.slug ?? getSkillSlug(trimmedName)
   }`;
@@ -445,9 +474,10 @@ export default function SkillLink({
         onFocus={showTooltip}
         onBlur={hideTooltip}
         className={`
-          inline-block
+          inline-flex
           max-w-full
-          truncate
+          items-center
+          gap-1.5
           align-baseline
           transition-colors
           hover:text-sky-300
@@ -458,7 +488,29 @@ export default function SkillLink({
           ${className}
         `}
       >
-        {trimmedName}
+        {characterImage && (
+          <Image
+            src={characterImage.src}
+            alt=""
+            width={16}
+            height={16}
+            unoptimized
+            className="
+              h-4
+              w-4
+              shrink-0
+              rounded-full
+              bg-slate-800
+              object-cover
+              ring-1
+              ring-sky-400/30
+            "
+          />
+        )}
+
+        <span className="truncate">
+          {trimmedName}
+        </span>
       </Link>
 
       {anchor && (
