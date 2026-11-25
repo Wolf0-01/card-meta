@@ -13,14 +13,6 @@ import {
   getSkillSlug,
 } from "./slug";
 
-/**
- * Retratos descargados por `scripts/syncSkills.ts`.
- *
- * El directorio vive dentro de `public/` para que las
- * imágenes se sirvan como estáticos. Su tamaño esperado es
- * pequeño (unos pocos KB por personaje), por lo que se
- * mantiene versionado en git.
- */
 export const CHARACTERS_DIR = path.join(
   process.cwd(),
   "public",
@@ -35,20 +27,12 @@ export const CHARACTER_IMAGE_EXTENSIONS = [
 export type CharacterImageExtension =
   (typeof CHARACTER_IMAGE_EXTENSIONS)[number];
 
-/**
- * Slug estable para el archivo del retrato. Coincide con
- * el slug de Skills para reutilizar la misma normalización.
- */
 export function getCharacterSlug(
   name: string
 ): string {
   return getSkillSlug(name);
 }
 
-/**
- * Detecta el texto de respaldo que usan las Skills que no
- * pertenecen a un personaje concreto.
- */
 export function isGenericCharacterName(
   name: string | null | undefined
 ): boolean {
@@ -69,14 +53,14 @@ function findCharacterImageFile(
   for (const extension of CHARACTER_IMAGE_EXTENSIONS) {
     const filePath = path.join(
       CHARACTERS_DIR,
-      `${slug}${extension}`
+      slug + extension
     );
 
     try {
       const info = statSync(filePath);
 
       if (info.isFile() && info.size > 0) {
-        return `${slug}${extension}`;
+        return slug + extension;
       }
     } catch {
       // El retrato todavía no se ha sincronizado.
@@ -86,11 +70,12 @@ function findCharacterImageFile(
   return null;
 }
 
-/**
- * Devuelve la URL pública del retrato si existe en disco y
- * pesa más de 0 bytes. Para Skills genéricas o retratos
- * ausentes devuelve `null` y la UI muestra su fallback.
- */
+export function getGenericCharacterImage(): string | null {
+  const file = findCharacterImageFile("generic");
+
+  return file ? "/characters/" + file : null;
+}
+
 export function getCharacterImage(
   name: string | null | undefined
 ): string | null {
@@ -98,20 +83,18 @@ export function getCharacterImage(
     !name ||
     isGenericCharacterName(name)
   ) {
-    return null;
+    return getGenericCharacterImage();
   }
 
   const file = findCharacterImageFile(
     getCharacterSlug(name)
   );
 
-  return file ? `/characters/${file}` : null;
+  return file
+    ? "/characters/" + file
+    : getGenericCharacterImage();
 }
 
-/**
- * Resuelve los retratos de una lista de personajes,
- * conservando el orden original y eliminando duplicados.
- */
 export function getCharacterImages(
   names: readonly string[]
 ): SkillCharacterImage[] {
@@ -135,9 +118,9 @@ export function getCharacterImages(
       continue;
     }
 
-    const src = getCharacterImage(name);
+    const file = findCharacterImageFile(slug);
 
-    if (!src) {
+    if (!file) {
       continue;
     }
 
@@ -146,8 +129,20 @@ export function getCharacterImages(
     result.push({
       name,
       slug,
-      src,
+      src: "/characters/" + file,
     });
+  }
+
+  if (result.length === 0) {
+    const genericSrc = getGenericCharacterImage();
+
+    if (genericSrc) {
+      result.push({
+        name: "Generic / multiple characters",
+        slug: "generic",
+        src: genericSrc,
+      });
+    }
   }
 
   return result;
