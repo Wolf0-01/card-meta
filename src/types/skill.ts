@@ -49,3 +49,32 @@ export interface SkillSearchResult {
 
   characters: string[];
 }
+
+/**
+ * Datos de una Skill listos para la ficha pública y para
+ * la tarjeta emergente de SkillLink.
+ *
+ * La descripción y el formato provienen de SkillMeta; el
+ * personaje se enriquece con el catálogo curado cuando la
+ * Skill también existe en `src/data/skills.ts`.
+ */
+export interface SkillMetaSummary {
+  id: string;
+
+  name: string;
+
+  description: string;
+
+  format: string;
+
+  slug: string;
+
+  character: string | null;
+
+  characters: string[];
+
+  category: SkillCategory | null;
+
+  /** Texto corto con el formato y la fuente del dato. */
+  source: string;
+}

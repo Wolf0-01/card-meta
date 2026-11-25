@@ -1078,6 +1078,40 @@ export async function getRecentPublicDecks(
 }
 
 /**
+ * Mazos públicos recientes que usan una Skill concreta.
+ * Se usa en la ficha `/skills/[slug]`.
+ */
+export async function getPublicDecksBySkill(
+  skill: string,
+  limit = 6
+) {
+  const name = skill.trim();
+
+  if (!name) {
+    return [];
+  }
+
+  const decks = await findDecks({
+    where: {
+      isPublic: true,
+
+      skill: {
+        equals: name,
+        mode: "insensitive",
+      },
+    },
+
+    take: Math.max(Math.floor(limit), 1),
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return decks.map(mapPrismaDeck);
+}
+
+/**
  * Mazos públicos creados por un jugador concreto, usados en
  * su perfil público (/user/[username]).
  */

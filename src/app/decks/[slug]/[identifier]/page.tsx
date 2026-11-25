@@ -14,6 +14,8 @@ import {
 
 import { calculateDeckGemEstimate } from "@/lib/decks/gemCalculator";
 
+import { getSkillMetaByName } from "@/lib/skills/meta";
+
 import {
   findDeckByIdentifier,
 } from "@/services/decks";
@@ -75,8 +77,14 @@ export default async function DeckPage({
     notFound();
   }
 
-  const gemEstimate =
-    await calculateDeckGemEstimate(deck);
+  const [gemEstimate, skillMeta] =
+    await Promise.all([
+      calculateDeckGemEstimate(deck),
+
+      deck.skill?.trim()
+        ? getSkillMetaByName(deck.skill)
+        : Promise.resolve(null),
+    ]);
 
   const archetypeSlug =
     getDeckArchetypeSlug(deck);
@@ -105,6 +113,7 @@ export default async function DeckPage({
         <DeckViewer
           deck={deck}
           gemEstimate={gemEstimate}
+          skillMeta={skillMeta}
           breakdownHref={breakdownHref}
           canViewPlayerProfile={canManageGuides(user)}
           isOwner={

@@ -9,6 +9,12 @@ import DeckExtraDeck from "@/components/decks/DeckExtraDeck";
 
 import DeckMainDeck from "@/components/decks/DeckMainDeck";
 
+import SkillLink from "@/components/skills/SkillLink";
+
+import { getSkillMetaByNames } from "@/lib/skills/meta";
+
+import { getSkillNameKey } from "@/lib/skills/slug";
+
 import type { TournamentDeckEntry } from "@/lib/tournaments";
 
 interface TournamentDeckListsProps {
@@ -26,12 +32,21 @@ const RANK_STYLES: Record<number, string> = {
  * Renderiza una columna alineada a la izquierda por cada
  * lista del podio que tenga un mazo público vinculado.
  */
-export default function TournamentDeckLists({
+export default async function TournamentDeckLists({
   decks,
 }: TournamentDeckListsProps) {
   if (decks.length === 0) {
     return null;
   }
+
+  const skillMetaByName =
+    await getSkillMetaByNames(
+      decks.flatMap(({ deck }) =>
+        deck.skill?.trim()
+          ? [deck.skill.trim()]
+          : []
+      )
+    );
 
   return (
     <section
@@ -87,6 +102,15 @@ export default function TournamentDeckLists({
       >
         {decks.map(({ placement, deck }) => {
           const totalMain = deck.mainCards ?? 0;
+
+          const skill =
+            deck.skill?.trim() || null;
+
+          const skillMeta = skill
+            ? skillMetaByName.get(
+                getSkillNameKey(skill)
+              ) ?? null
+            : null;
 
           return (
             <article
@@ -144,17 +168,29 @@ export default function TournamentDeckLists({
                   >
                     <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-300" />
 
-                    <span
-                      className="
-                        text-xs
-                        font-bold
-                        tracking-wide
-                        text-sky-300
-                      "
-                      title={deck.skill ?? "No Skill"}
-                    >
-                      {deck.skill?.trim() || "No Skill"}
-                    </span>
+                    {skill ? (
+                      <SkillLink
+                        name={skill}
+                        meta={skillMeta}
+                        className="
+                          text-xs
+                          font-bold
+                          tracking-wide
+                          text-sky-300
+                        "
+                      />
+                    ) : (
+                      <span
+                        className="
+                          text-xs
+                          font-bold
+                          tracking-wide
+                          text-slate-400
+                        "
+                      >
+                        No Skill
+                      </span>
+                    )}
                   </div>
 
                   <span

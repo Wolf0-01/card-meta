@@ -14,7 +14,8 @@ import DeckGuide from "./DeckGuide";
 import DeckMainDeck from "./DeckMainDeck";
 import DeckMatchups from "./DeckMatchups";
 import RelatedDecks from "./RelatedDecks";
-import SkillHoverCard from "./SkillHoverCard";
+
+import SkillLink from "@/components/skills/SkillLink";
 
 import {
   getDeckArchetypeLabel,
@@ -26,6 +27,8 @@ import { getDuelFormatLabel } from "@/lib/duelFormat";
 import type { DeckGemEstimate } from "@/lib/decks/gemCalculator";
 
 import type { MetaDeck } from "@/types/meta";
+
+import type { SkillMetaSummary } from "@/types/skill";
 
 interface Props {
   deck: MetaDeck;
@@ -52,6 +55,12 @@ interface Props {
    * propietario del mazo. Los visitantes no lo ven.
    */
   isOwner?: boolean;
+
+  /**
+   * Datos de SkillMeta cargados en el servidor para el
+   * enlace y la tarjeta emergente de la Skill.
+   */
+  skillMeta?: SkillMetaSummary | null;
 }
 
 function countQuantity(
@@ -71,6 +80,7 @@ export default function DeckViewer({
   breakdownHref,
   canViewPlayerProfile = false,
   isOwner = false,
+  skillMeta = null,
 }: Props) {
   const cards = deck.cards ?? [];
 
@@ -230,9 +240,7 @@ export default function DeckViewer({
               sm:p-4
             "
           >
-            <SkillHoverCard
-              skillName={deck.skill ?? ""}
-              cards={mainDeck}
+            <div
               className="
                 mb-3
                 flex
@@ -271,10 +279,15 @@ export default function DeckViewer({
                   Skill
                 </span>
 
-                <span className="truncate text-xs font-semibold text-foreground">
-                  {deck.skill?.trim() ||
-                    "No skill"}
-                </span>
+                <SkillLink
+                  name={deck.skill?.trim() ?? ""}
+                  meta={skillMeta}
+                  className="
+                    text-xs
+                    font-semibold
+                    text-foreground
+                  "
+                />
               </div>
 
               <span
@@ -288,7 +301,7 @@ export default function DeckViewer({
               >
                 {mainCount} cards
               </span>
-            </SkillHoverCard>
+            </div>
 
             <DeckMainDeck deck={deck} />
 

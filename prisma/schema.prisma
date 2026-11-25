@@ -419,6 +419,9 @@ model SkillMeta {
 
   description String
 
+  /// Personajes que desbloquean la Skill (Duel Links Meta).
+  characters String[] @default([])
+
   /// Formato normalizado: "speed" | "rush".
   format String @default("speed")
 

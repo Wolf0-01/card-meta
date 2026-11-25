@@ -42,6 +42,32 @@ export const tournamentStandingSchema =
       .nullable(),
   });
 
+/**
+ * Acepta URLs públicas http(s) y rutas locales servidas
+ * desde /public, por ejemplo `/banners/kc-cup-nov-2026.png`.
+ */
+function isAcceptedBannerUrl(
+  value: string
+): boolean {
+  if (value.startsWith("/")) {
+    return (
+      !value.startsWith("//") &&
+      !/\s/.test(value)
+    );
+  }
+
+  try {
+    const url = new URL(value);
+
+    return (
+      url.protocol === "http:" ||
+      url.protocol === "https:"
+    );
+  } catch {
+    return false;
+  }
+}
+
 const tournamentFields = {
   name: z
     .string()
@@ -98,7 +124,10 @@ const tournamentFields = {
           2048,
           "The banner URL is too long"
         )
-        .url("Use a valid banner URL"),
+        .refine(
+          isAcceptedBannerUrl,
+          "Use an http(s) URL or a local path starting with /"
+        ),
     ])
     .optional()
     .nullable(),

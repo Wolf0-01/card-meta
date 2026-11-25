@@ -662,13 +662,13 @@ export default function TournamentEditor({
                 </span>
 
                 <input
-                  type="url"
+                  type="text"
                   list="tournament-banner-options"
                   value={bannerUrl}
                   onChange={(event) =>
                     setBannerUrl(event.target.value)
                   }
-                  placeholder="https://example.com/banner.webp"
+                  placeholder="https://example.com/banner.webp or /banners/event-banner.png"
                   className={inputClass}
                 />
 
@@ -683,7 +683,9 @@ export default function TournamentEditor({
 
                 <span className="mt-1 block text-[9px] leading-relaxed text-slate-500">
                   Pick a banner already used by another
-                  tournament or paste a public image URL.
+                  tournament, paste a public image URL or
+                  use a local path such as
+                  /banners/kc-cup-nov-2026.png.
                 </span>
 
                 {bannerUrl.trim() && (

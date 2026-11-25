@@ -22,7 +22,7 @@ const MAX_PAGES = 25;
 const WRITE_BATCH_SIZE = 50;
 
 const REQUEST_FIELDS =
-  "name,description,rush";
+  "name,description,rush,characters";
 
 const dryRun = process.argv.includes("--dry-run");
 
@@ -34,6 +34,8 @@ interface DlmSkill {
   description?: unknown;
 
   rush?: unknown;
+
+  characters?: unknown;
 }
 
 interface SkillRecord {
@@ -43,7 +45,48 @@ interface SkillRecord {
 
   description: string;
 
+  characters: string[];
+
   format: "speed" | "rush";
+}
+
+function toCharacters(
+  value: unknown
+): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const names = value.flatMap((entry) => {
+    if (
+      !entry ||
+      typeof entry !== "object"
+    ) {
+      return [];
+    }
+
+    const character = (
+      entry as { character?: unknown }
+    ).character;
+
+    if (
+      !character ||
+      typeof character !== "object"
+    ) {
+      return [];
+    }
+
+    const name = (
+      character as { name?: unknown }
+    ).name;
+
+    return typeof name === "string" &&
+      name.trim()
+      ? [name.trim()]
+      : [];
+  });
+
+  return Array.from(new Set(names));
 }
 
 function sleep(ms: number) {
@@ -149,6 +192,10 @@ function toSkillRecord(
         ? skill.description.trim()
         : "",
 
+    characters: toCharacters(
+      skill.characters
+    ),
+
     format: skill.rush === true ? "rush" : "speed",
   };
 }
@@ -190,7 +237,13 @@ function isSameSkill(
   return (
     a.name === b.name &&
     a.description === b.description &&
-    a.format === b.format
+    a.format === b.format &&
+    a.characters.length ===
+      b.characters.length &&
+    a.characters.every(
+      (character, index) =>
+        character === b.characters[index]
+    )
   );
 }
 
@@ -209,6 +262,7 @@ async function main() {
         id: true,
         name: true,
         description: true,
+        characters: true,
         format: true,
       },
     });
@@ -223,6 +277,7 @@ async function main() {
         id: row.id,
         name: row.name,
         description: row.description,
+        characters: row.characters,
         format:
           row.format === "rush"
             ? "rush"
@@ -288,6 +343,8 @@ async function main() {
 
           description: skill.description,
 
+          characters: skill.characters,
+
           format: skill.format,
         };
 
@@ -302,6 +359,8 @@ async function main() {
             name: skill.name,
 
             description: skill.description,
+
+            characters: skill.characters,
 
             format: skill.format,
           },

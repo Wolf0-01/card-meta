@@ -28,6 +28,9 @@
 /public/cards/*
 !/public/cards/default.jpg
 
+# local tournament banners (keep out of git)
+/public/banners/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
