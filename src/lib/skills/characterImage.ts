@@ -133,17 +133,20 @@ export function getCharacterImages(
     });
   }
 
-  if (result.length === 0) {
+    if (result.length !== 1) {
     const genericSrc = getGenericCharacterImage();
 
     if (genericSrc) {
-      result.push({
-        name: "Generic / multiple characters",
-        slug: "generic",
-        src: genericSrc,
-      });
+      return [
+        {
+          name: "Generic / multiple characters",
+          slug: "generic",
+          src: genericSrc,
+        },
+      ];
     }
   }
 
   return result;
+
 }
