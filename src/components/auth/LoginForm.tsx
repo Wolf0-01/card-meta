@@ -14,11 +14,14 @@ import type {
   FormEvent,
 } from "react";
 
+import DiscordButton from "@/components/auth/DiscordButton";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 
 interface LoginFormProps {
   nextPath: string;
+  discordEnabled?: boolean;
+  oauthError?: string;
 }
 
 interface AuthErrorResponse {
@@ -32,6 +35,8 @@ interface AuthErrorResponse {
 
 export default function LoginForm({
   nextPath,
+  discordEnabled = false,
+  oauthError,
 }: LoginFormProps) {
   const router = useRouter();
 
@@ -45,7 +50,11 @@ export default function LoginForm({
     useState(false);
 
   const [error, setError] =
-    useState<string | null>(null);
+    useState<string | null>(
+      oauthError
+        ? "Could not sign in with Discord. Please try again."
+        : null
+    );
 
   const [
     fieldErrors,
@@ -116,139 +125,126 @@ export default function LoginForm({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-5"
-      noValidate
-    >
-      {error && (
-        <p
-          role="alert"
-          className="
-            rounded-lg
-            border
-            border-red-500/40
-            bg-red-500/10
-            px-4
-            py-3
-            text-sm
-            text-red-300
-          "
-        >
-          {error}
-        </p>
+    <div className="space-y-5">
+      {discordEnabled && (
+        <>
+          <DiscordButton nextPath={nextPath} />
+
+          <div className="relative flex items-center justify-center">
+            <span className="h-px w-full bg-border" />
+            <span className="bg-surface px-3 text-xs font-medium uppercase tracking-wider text-foreground-muted">
+              or
+            </span>
+            <span className="h-px w-full bg-border" />
+          </div>
+        </>
       )}
 
-      <div className="space-y-2">
-        <label
-          htmlFor="identifier"
-          className="
-            block
-            text-sm
-            font-medium
-            text-foreground-secondary
-          "
-        >
-          Email or username
-        </label>
-
-        <Input
-          id="identifier"
-          name="identifier"
-          type="text"
-          value={identifier}
-          onChange={(event) =>
-            setIdentifier(
-              event.target.value
-            )
-          }
-          placeholder="you@email.com or your_username"
-          autoComplete="username"
-          autoFocus
-          error={Boolean(
-            fieldErrors.identifier
-          )}
-          aria-invalid={Boolean(
-            fieldErrors.identifier
-          )}
-        />
-
-        {fieldErrors.identifier && (
-          <p className="text-xs text-red-400">
-            {fieldErrors.identifier}
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-5"
+        noValidate
+      >
+        {error && (
+          <p
+            role="alert"
+            className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+          >
+            {error}
           </p>
         )}
-      </div>
 
-      <div className="space-y-2">
-        <label
-          htmlFor="password"
-          className="
-            block
-            text-sm
-            font-medium
-            text-foreground-secondary
-          "
-        >
-          Password
-        </label>
+        <div className="space-y-2">
+          <label
+            htmlFor="identifier"
+            className="block text-sm font-medium text-foreground-secondary"
+          >
+            Email or username
+          </label>
 
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          value={password}
-          onChange={(event) =>
-            setPassword(
-              event.target.value
-            )
-          }
-          placeholder="••••••••"
-          autoComplete="current-password"
-          error={Boolean(
-            fieldErrors.password
+          <Input
+            id="identifier"
+            name="identifier"
+            type="text"
+            value={identifier}
+            onChange={(event) =>
+              setIdentifier(
+                event.target.value
+              )
+            }
+            placeholder="you@email.com or your_username"
+            autoComplete="username"
+            autoFocus
+            error={Boolean(
+              fieldErrors.identifier
+            )}
+            aria-invalid={Boolean(
+              fieldErrors.identifier
+            )}
+          />
+
+          {fieldErrors.identifier && (
+            <p className="text-xs text-red-400">
+              {fieldErrors.identifier}
+            </p>
           )}
-          aria-invalid={Boolean(
-            fieldErrors.password
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-foreground-secondary"
+          >
+            Password
+          </label>
+
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            value={password}
+            onChange={(event) =>
+              setPassword(
+                event.target.value
+              )
+            }
+            placeholder="••••••••"
+            autoComplete="current-password"
+            error={Boolean(
+              fieldErrors.password
+            )}
+            aria-invalid={Boolean(
+              fieldErrors.password
+            )}
+          />
+
+          {fieldErrors.password && (
+            <p className="text-xs text-red-400">
+              {fieldErrors.password}
+            </p>
           )}
-        />
+        </div>
 
-        {fieldErrors.password && (
-          <p className="text-xs text-red-400">
-            {fieldErrors.password}
-          </p>
-        )}
-      </div>
-
-      <Button
-        type="submit"
-        fullWidth
-        disabled={loading}
-      >
-        {loading
-          ? "Signing in..."
-          : "Sign in"}
-      </Button>
-
-      <p
-        className="
-          text-center
-          text-sm
-          text-foreground-muted
-        "
-      >
-        Don&apos;t have an account?{" "}
-        <Link
-          href="/register"
-          className="
-            font-medium
-            text-primary
-            hover:text-primary-hover
-          "
+        <Button
+          type="submit"
+          fullWidth
+          disabled={loading}
         >
-          Create an account
-        </Link>
-      </p>
-    </form>
+          {loading
+            ? "Signing in..."
+            : "Sign in"}
+        </Button>
+
+        <p className="text-center text-sm text-foreground-muted">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/register"
+            className="font-medium text-primary hover:text-primary-hover"
+          >
+            Create an account
+          </Link>
+        </p>
+      </form>
+    </div>
   );
 }

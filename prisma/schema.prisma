@@ -30,7 +30,11 @@ model User {
 
   username String @unique
 
-  passwordHash String
+  /// Identificador de Discord para el inicio de sesión OAuth2.
+  discordId String? @unique
+
+  /// Nulo para cuentas creadas únicamente con Discord.
+  passwordHash String?
 
   displayName String?
 

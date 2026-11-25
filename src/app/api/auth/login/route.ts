@@ -76,7 +76,7 @@ export async function POST(
       },
     });
 
-  if (!user) {
+    if (!user || !user.passwordHash) {
     return NextResponse.json(
       {
         error:

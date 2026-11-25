@@ -13,12 +13,16 @@ export default async function RegisterPage() {
     redirect("/decks");
   }
 
+  const discordEnabled = Boolean(
+    process.env.DISCORD_CLIENT_ID?.trim()
+  );
+
   return (
     <AuthCard
-      title="Create account"
-      subtitle="Sign up to save and publish your decks."
+      title="Crear cuenta"
+      subtitle="Regístrate para guardar y publicar tus mazos."
     >
-      <RegisterForm />
+      <RegisterForm discordEnabled={discordEnabled} />
     </AuthCard>
   );
 }

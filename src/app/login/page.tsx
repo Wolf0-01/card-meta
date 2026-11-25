@@ -8,6 +8,7 @@ import { getCurrentUser } from "@/lib/auth/currentUser";
 interface LoginPageProps {
   searchParams: Promise<{
     next?: string;
+    error?: string;
   }>;
 }
 
@@ -42,6 +43,10 @@ export default async function LoginPage({
     redirect(nextPath);
   }
 
+  const discordEnabled = Boolean(
+    process.env.DISCORD_CLIENT_ID?.trim()
+  );
+
   return (
     <AuthCard
       title="Sign in"
@@ -49,6 +54,8 @@ export default async function LoginPage({
     >
       <LoginForm
         nextPath={nextPath}
+        discordEnabled={discordEnabled}
+        oauthError={params.error}
       />
     </AuthCard>
   );
