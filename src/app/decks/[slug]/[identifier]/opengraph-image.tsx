@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import sharp from "sharp";
 import { findDeckByIdentifier } from "@/services/decks";
+import { calculateDeckGemEstimate } from "@/lib/decks/gemCalculator";
 
 export const runtime = "nodejs";
 export const alt = "Card Meta Deck Preview";
@@ -19,6 +20,13 @@ const BANLIST_BADGE: Record<string, { label: string; bg: string }> = {
   limited2: { label: "2", bg: "#f97316" },
   limited3: { label: "3", bg: "#eab308" },
 };
+
+function formatCompactGems(gems: number): string {
+  if (gems >= 1000) {
+    return `${Math.round(gems / 1000)}k`;
+  }
+  return String(gems);
+}
 
 async function fetchCardJpegDataUrl(
   primaryUrl: string | null,
@@ -45,8 +53,8 @@ async function fetchCardJpegDataUrl(
 
       const rawBuffer = Buffer.from(await res.arrayBuffer());
       const jpegBuffer = await sharp(rawBuffer)
-        .resize(168, 244, { fit: "cover" })
-        .jpeg({ quality: 82 })
+        .resize(300, 438, { fit: "cover" })
+        .jpeg({ quality: 92 })
         .toBuffer();
 
       return `data:image/jpeg;base64,${jpegBuffer.toString("base64")}`;
@@ -74,16 +82,18 @@ export default async function DeckOpenGraphImage({ params }: Props) {
             color: "#ffffff",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 32,
+            fontSize: 42,
             fontWeight: 900,
           }}
         >
           Card Meta
         </div>
       ),
-      { width: 600, height: 315 }
+      { width: 800, height: 420 }
     );
   }
+
+  const gemEstimate = await calculateDeckGemEstimate(deck);
 
   const uniqueCards = new Map<
     number,
@@ -135,34 +145,49 @@ export default async function DeckOpenGraphImage({ params }: Props) {
     }
   }
 
+  // Resolución HD estilo Duel Links Meta (5 columnas en Main, 1 sola fila en Extra)
   const COLS = 5;
-  const CARD_W = 84;
-  const CARD_H = 122;
-  const GAP = 6;
-  const PAD = 14;
+  const CARD_W = 148;
+  const CARD_H = 216;
+  const GAP = 10;
+  const PAD = 18;
+
+  const innerWidth = COLS * CARD_W + (COLS - 1) * GAP;
+  const width = PAD * 2 + innerWidth;
 
   const mainRows = Math.max(1, Math.ceil(mainCards.length / COLS));
-  const extraRows =
-    extraCards.length > 0 ? Math.ceil(extraCards.length / COLS) : 0;
 
-  const width = PAD * 2 + COLS * CARD_W + (COLS - 1) * GAP;
-  const headerHeight = 46;
-  const extraHeaderHeight = extraRows > 0 ? 28 : 0;
+  // Todas las cartas del Extra Deck caben en una sola tira horizontal abajo
+  const extraCount = extraCards.length;
+  const extraGap = extraCount > 0 ? 6 : 0;
+  const extraCardW =
+    extraCount > 0
+      ? Math.floor((innerWidth - (extraCount - 1) * extraGap) / Math.max(extraCount, 8))
+      : 0;
+  const extraCardH = extraCount > 0 ? Math.round(extraCardW * 1.46) : 0;
+
+  const headerHeight = 54;
+  const extraSectionHeight = extraCount > 0 ? 14 + extraCardH : 0;
+
   const height =
     PAD * 2 +
     headerHeight +
+    12 +
     mainRows * CARD_H +
     Math.max(0, mainRows - 1) * GAP +
-    extraHeaderHeight +
-    extraRows * CARD_H +
-    Math.max(0, extraRows - 1) * GAP;
+    extraSectionHeight;
 
-  const renderCard = (c: {
-    key: string;
-    src: string | null;
-    name: string;
-    banlistStatus: string | null;
-  }) => {
+  const renderCard = (
+    c: {
+      key: string;
+      src: string | null;
+      name: string;
+      banlistStatus: string | null;
+    },
+    cardWidth: number,
+    cardHeight: number,
+    badgeSize: number
+  ) => {
     const badge = c.banlistStatus ? BANLIST_BADGE[c.banlistStatus] : undefined;
     return (
       <div
@@ -170,16 +195,16 @@ export default async function DeckOpenGraphImage({ params }: Props) {
         style={{
           position: "relative",
           display: "flex",
-          width: `${CARD_W}px`,
-          height: `${CARD_H}px`,
-          borderRadius: "4px",
+          width: `${cardWidth}px`,
+          height: `${cardHeight}px`,
+          borderRadius: "6px",
           overflow: "hidden",
           backgroundColor: "#1e293b",
           alignItems: "center",
           justifyContent: "center",
-          padding: c.src ? "0px" : "4px",
+          padding: c.src ? "0px" : "6px",
           textAlign: "center",
-          fontSize: "9px",
+          fontSize: "12px",
           color: "#cbd5e1",
         }}
       >
@@ -188,8 +213,8 @@ export default async function DeckOpenGraphImage({ params }: Props) {
           <img
             src={c.src}
             alt=""
-            width={CARD_W}
-            height={CARD_H}
+            width={cardWidth}
+            height={cardHeight}
             style={{ objectFit: "cover" }}
           />
         ) : (
@@ -199,18 +224,18 @@ export default async function DeckOpenGraphImage({ params }: Props) {
           <div
             style={{
               position: "absolute",
-              top: "3px",
-              left: "3px",
+              top: "4px",
+              left: "4px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: "20px",
-              height: "20px",
+              width: `${badgeSize}px`,
+              height: `${badgeSize}px`,
               borderRadius: "9999px",
               backgroundColor: badge.bg,
               border: "2px solid #0f172a",
               color: "#ffffff",
-              fontSize: "11px",
+              fontSize: `${Math.round(badgeSize * 0.56)}px`,
               fontWeight: 900,
             }}
           >
@@ -229,58 +254,74 @@ export default async function DeckOpenGraphImage({ params }: Props) {
           flexDirection: "column",
           width: `${width}px`,
           height: `${height}px`,
-          backgroundColor: "#081229",
+          backgroundColor: "#060D1E",
           padding: `${PAD}px`,
           fontFamily: "sans-serif",
           color: "#ffffff",
         }}
       >
+        {/* Cabecera estilo Duel Links Meta: Gemas | Rombo + Skill | Total Main */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            height: "36px",
-            marginBottom: "10px",
-            padding: "0 12px",
-            borderRadius: "8px",
-            backgroundColor: "#0E2147",
+            height: `${headerHeight}px`,
+            marginBottom: "12px",
+            padding: "0 18px",
+            borderRadius: "10px",
+            backgroundColor: "#0D1E42",
             border: "1px solid rgba(56, 189, 248, 0.35)",
           }}
         >
+          <span
+            style={{
+              fontSize: "20px",
+              fontWeight: 800,
+              color: "#93c5fd",
+              minWidth: "70px",
+            }}
+          >
+            {gemEstimate.maxGems > 0
+              ? `💎 ${formatCompactGems(gemEstimate.maxGems)}`
+              : "CARD META"}
+          </span>
+
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "8px",
-              fontSize: "14px",
+              gap: "10px",
+              fontSize: "22px",
               fontWeight: 800,
-              color: "#e2e8f0",
+              color: "#f8fafc",
             }}
           >
             <span
               style={{
-                width: "10px",
-                height: "10px",
-                borderRadius: "9999px",
-                backgroundColor: "#38bdf8",
+                width: "14px",
+                height: "14px",
+                backgroundColor: "#facc15",
+                transform: "rotate(45deg)",
               }}
             />
             <span>{deck.skill?.trim() || "No Skill"}</span>
           </div>
+
           <span
             style={{
-              fontSize: "11px",
-              fontWeight: 900,
-              textTransform: "uppercase",
-              color: "#7dd3fc",
-              letterSpacing: "1px",
+              fontSize: "22px",
+              fontWeight: 800,
+              color: "#cbd5e1",
+              minWidth: "70px",
+              textAlign: "right",
             }}
           >
-            CARD META
+            {mainCards.length}
           </span>
         </div>
 
+        {/* Cuadrícula Main Deck (5 columnas HD) */}
         <div
           style={{
             display: "flex",
@@ -288,39 +329,26 @@ export default async function DeckOpenGraphImage({ params }: Props) {
             gap: `${GAP}px`,
           }}
         >
-          {mainCards.map(renderCard)}
+          {mainCards.map((c) => renderCard(c, CARD_W, CARD_H, 32))}
         </div>
 
-        {extraCards.length > 0 && (
-          <>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                height: "20px",
-                marginTop: "8px",
-                marginBottom: "6px",
-                padding: "0 6px",
-                fontSize: "10px",
-                fontWeight: 900,
-                letterSpacing: "1.2px",
-                color: "#94a3b8",
-                textTransform: "uppercase",
-              }}
-            >
-              <span>Extra Deck ({extraCards.length})</span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: `${GAP}px`,
-              }}
-            >
-              {extraCards.map(renderCard)}
-            </div>
-          </>
+        {/* Tira horizontal única del Extra Deck */}
+        {extraCount > 0 && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: `${extraGap}px`,
+              marginTop: "14px",
+              paddingTop: "10px",
+              borderTop: "1px solid rgba(148, 163, 184, 0.25)",
+            }}
+          >
+            {extraCards.map((c) =>
+              renderCard(c, extraCardW, extraCardH, 22)
+            )}
+          </div>
         )}
       </div>
     ),
