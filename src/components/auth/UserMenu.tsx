@@ -220,13 +220,16 @@ export default function UserMenu() {
     );
   }
 
-  if (user === null) {
+ if (user === null) {
     return (
-      <div className="hidden lg:block">
-        <Button href="/login">
-          Login
-        </Button>
-      </div>
+      <Link
+        href="/login"
+        aria-label="Login"
+        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background-secondary px-3 text-xs font-bold text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+      >
+        <UserRound className="h-4 w-4 text-primary" />
+        <span className="hidden sm:inline">Login</span>
+      </Link>
     );
   }
 

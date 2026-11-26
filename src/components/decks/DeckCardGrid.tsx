@@ -10,11 +10,6 @@ interface DeckCardGridProps {
   cards: DeckCard[];
 }
 
-/**
- * Cuadrícula continua de 5 columnas al estilo de Duel Links
- * Meta. Cada copia se expande como una miniatura propia, de
- * modo que un mazo con 3 copias muestra 3 cartas seguidas.
- */
 export default function DeckCardGrid({
   cards,
 }: DeckCardGridProps) {
@@ -22,12 +17,6 @@ export default function DeckCardGrid({
     return null;
   }
 
-  /*
-   * El orden jerárquico de Duel Links Meta se aplica
-   * sobre las cartas agrupadas (para conocer si tienen
-   * 3x, 2x o 1x copia) y solo después se expanden las
-   * copias individuales.
-   */
   const sortedCards = sortDeckCards(cards);
 
   return (
@@ -36,8 +25,8 @@ export default function DeckCardGrid({
         grid
         grid-cols-[repeat(5,minmax(0,72px))]
         justify-center
-        gap-x-1.5
-        gap-y-2.5
+        gap-2.5
+        sm:gap-3
       "
     >
       {sortedCards.map((deckCard) =>
