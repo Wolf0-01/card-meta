@@ -37,40 +37,40 @@ interface Props {
 
   relatedDecks?: MetaDeck[];
 
-  /**
-   * Destino de la tarjeta lateral del arquetipo: la guía
-   * publicada o el explorador filtrado por arquetipo.
-   * Si no se indica, se usa el explorador por arquetipo.
-   */
   breakdownHref?: string;
 
-  /**
-   * Solo ADMIN y EDITOR pueden abrir el perfil público
-   * del creador desde la cabecera del mazo.
-   */
   canViewPlayerProfile?: boolean;
 
-  /**
-   * Muestra el bloque lateral "Deck details" solo al
-   * propietario del mazo. Los visitantes no lo ven.
-   */
   isOwner?: boolean;
 
-  /**
-   * Datos de SkillMeta cargados en el servidor para el
-   * enlace y la tarjeta emergente de la Skill.
-   */
   skillMeta?: SkillMetaSummary | null;
+
+  tournamentInfo?: {
+    name: string;
+    slug: string;
+    placement?: string | null;
+  } | null;
+
+  prevDeckHref?: string | null;
+
+  nextDeckHref?: string | null;
 }
 
-function countQuantity(
-  cards: MetaDeck["cards"]
-) {
+function countQuantity(cards: MetaDeck["cards"]) {
   return cards.reduce(
-    (total, deckCard) =>
-      total + (deckCard.quantity ?? 1),
+    (total, deckCard) => total + (deckCard.quantity ?? 1),
     0
   );
+}
+
+function formatPlacementText(raw?: string | null): string {
+  if (!raw) return "Top Cut";
+  const clean = raw.trim();
+  if (clean === "1" || clean.toLowerCase() === "1st") return "1st Place";
+  if (clean === "2" || clean.toLowerCase() === "2nd") return "2nd Place";
+  if (clean === "3" || clean.toLowerCase() === "3rd") return "3rd Place";
+  if (/^\d+$/.test(clean)) return `Top ${clean}`;
+  return clean;
 }
 
 export default function DeckViewer({
@@ -81,27 +81,21 @@ export default function DeckViewer({
   canViewPlayerProfile = false,
   isOwner = false,
   skillMeta = null,
+  tournamentInfo = null,
+  prevDeckHref = null,
+  nextDeckHref = null,
 }: Props) {
   const cards = deck.cards ?? [];
 
-  const mainDeck = cards.filter(
-    (deckCard) =>
-      deckCard.zone === "main"
-  );
+  const mainDeck = cards.filter((deckCard) => deckCard.zone === "main");
 
-  const extraDeck = cards.filter(
-    (deckCard) =>
-      deckCard.zone === "extra"
-  );
+  const extraDeck = cards.filter((deckCard) => deckCard.zone === "extra");
 
-  const mainCount =
-    deck.mainCards ?? countQuantity(mainDeck);
+  const mainCount = deck.mainCards ?? countQuantity(mainDeck);
 
-  const extraCount =
-    deck.extraCards ?? countQuantity(extraDeck);
+  const extraCount = deck.extraCards ?? countQuantity(extraDeck);
 
-  const totalCards =
-    deck.totalCards ?? countQuantity(cards);
+  const totalCards = deck.totalCards ?? countQuantity(cards);
 
   const author = deck.author ?? null;
 
@@ -110,107 +104,161 @@ export default function DeckViewer({
     author?.username ||
     "Anonymous creator";
 
-  /*
-   * El nombre de duelista asignado por staff reemplaza al
-   * autor y se muestra como texto plano, sin enlace.
-   */
-  const customPlayerName =
-    deck.playerName?.trim() || null;
+  const customPlayerName = deck.playerName?.trim() || null;
 
   const resolvedBreakdownHref =
     breakdownHref ??
-    `/decks/breakdown/${getDeckArchetypeSlug(
-      deck
-    )}${deck.format === "rush" ? "?format=rush" : ""}`;
+    `/decks/breakdown/${getDeckArchetypeSlug(deck)}${
+      deck.format === "rush" ? "?format=rush" : ""
+    }`;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <header
-        className="
-          flex
-          flex-col
-          items-center
-          gap-1
-          border-b
-          border-border
-          pb-5
-          text-center
-        "
-      >
-        <h1
-          className="
-            text-2xl
-            font-black
-            uppercase
-            tracking-wide
-            text-foreground
-            sm:text-3xl
-          "
-        >
-          {deck.name}
-        </h1>
+      <header className="border-b border-border pb-5">
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
+          {/* Botón Previous (izquierda) */}
+          <div className="order-2 flex w-full justify-between sm:order-1 sm:w-auto">
+            {prevDeckHref ? (
+              <Link
+                href={prevDeckHref}
+                className="inline-flex min-w-[138px] items-center justify-center gap-2 rounded-md border border-slate-700/80 bg-[#08152E] px-5 py-2.5 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-500/60 hover:bg-[#0D2147] hover:text-white"
+              >
+                <span aria-hidden="true" className="text-[10px]">
+                  ◀
+                </span>
+                <span>Previous</span>
+              </Link>
+            ) : (
+              <span
+                aria-disabled="true"
+                className="inline-flex min-w-[138px] cursor-not-allowed items-center justify-center gap-2 rounded-md border border-slate-800/80 bg-[#071124]/60 px-5 py-2.5 text-xs font-semibold text-slate-600"
+              >
+                <span aria-hidden="true" className="text-[10px]">
+                  ◀
+                </span>
+                <span>Previous</span>
+              </span>
+            )}
 
-        <p
-          className="
-            text-sm
-            text-foreground-muted
-          "
-        >
-          {getDeckArchetypeLabel(deck)}{" "}
-          · {getDuelFormatLabel(deck.format)}
-        </p>
+            {/* Botón Next en móvil */}
+            {nextDeckHref ? (
+              <Link
+                href={nextDeckHref}
+                className="inline-flex min-w-[138px] items-center justify-center gap-2 rounded-md border border-sky-400/40 bg-[#1D568E] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#2569AC] sm:hidden"
+              >
+                <span>Next</span>
+                <span aria-hidden="true" className="text-[10px]">
+                  ▶
+                </span>
+              </Link>
+            ) : (
+              <span
+                aria-disabled="true"
+                className="inline-flex min-w-[138px] cursor-not-allowed items-center justify-center gap-2 rounded-md border border-slate-800/80 bg-[#071124]/60 px-5 py-2.5 text-xs font-semibold text-slate-600 sm:hidden"
+              >
+                <span>Next</span>
+                <span aria-hidden="true" className="text-[10px]">
+                  ▶
+                </span>
+              </span>
+            )}
+          </div>
 
-        {deck.noLimits && (
-          <span
-            className="
-              rounded
-              border
-              border-amber-400/40
-              bg-amber-500/10
-              px-2
-              py-0.5
-              text-[9px]
-              font-black
-              uppercase
-              tracking-wide
-              text-amber-300
-            "
-          >
-            No Limits · Banlist ignored
-          </span>
-        )}
+          {/* Bloque central: Nombre del mazo + Puesto/Torneo + Autor */}
+          <div className="order-1 flex flex-col items-center gap-1 text-center sm:order-2">
+            <h1 className="text-2xl font-black uppercase tracking-wide text-foreground sm:text-3xl">
+              {deck.name}
+            </h1>
 
-        <p
-          className="
-            text-xs
-            text-foreground-muted
-          "
-        >
-          from{" "}
-          {customPlayerName ? (
-            <span className="font-semibold text-foreground-secondary">
-              {customPlayerName}
-            </span>
-          ) : canViewPlayerProfile &&
-          author?.username ? (
-            <Link
-              href={`/user/${author.username}`}
-              className="
-                font-semibold
-                text-foreground-secondary
-                transition-colors
-                hover:text-primary
-              "
-            >
-              {authorName}
-            </Link>
-          ) : (
-            <span className="font-semibold text-foreground-secondary">
-              {authorName}
-            </span>
-          )}{" "}
-          on {formatDeckDate(deck.createdAt)}
-        </p>
+            {tournamentInfo ? (
+              <p className="text-base font-medium text-foreground-secondary sm:text-lg">
+                {formatPlacementText(
+                  tournamentInfo.placement ?? deck.placement
+                )}{" "}
+                in{" "}
+                <Link
+                  href={`/tournaments/${tournamentInfo.slug}`}
+                  className="font-semibold text-sky-400 transition-colors hover:text-sky-300 hover:underline"
+                >
+                  {tournamentInfo.name}
+                </Link>
+              </p>
+            ) : deck.achievement === "KOG" ? (
+              <p className="text-base font-medium text-foreground-secondary sm:text-lg">
+                King of Games
+              </p>
+            ) : deck.achievement === "KC_MAX" ? (
+              <p className="text-base font-medium text-foreground-secondary sm:text-lg">
+                {deck.placement
+                  ? `KC Cup · ${deck.placement}`
+                  : "KC Cup · DLv. MAX"}
+              </p>
+            ) : deck.achievement === "TOURNAMENT" ? (
+              <p className="text-base font-medium text-foreground-secondary sm:text-lg">
+                {deck.placement
+                  ? `${formatPlacementText(deck.placement)} · Tournament`
+                  : "Tournament Top"}
+              </p>
+            ) : (
+              <p className="text-sm text-foreground-muted">
+                {getDeckArchetypeLabel(deck)} ·{" "}
+                {getDuelFormatLabel(deck.format)}
+              </p>
+            )}
+
+            {deck.noLimits && (
+              <span className="rounded border border-amber-400/40 bg-amber-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-amber-300">
+                No Limits · Banlist ignored
+              </span>
+            )}
+
+            <p className="text-xs text-foreground-muted">
+              from{" "}
+              {customPlayerName ? (
+                <span className="font-semibold text-foreground-secondary">
+                  {customPlayerName}
+                </span>
+              ) : canViewPlayerProfile && author?.username ? (
+                <Link
+                  href={`/user/${author.username}`}
+                  className="font-semibold text-foreground-secondary transition-colors hover:text-primary"
+                >
+                  {authorName}
+                </Link>
+              ) : (
+                <span className="font-semibold text-foreground-secondary">
+                  {authorName}
+                </span>
+              )}{" "}
+              on {formatDeckDate(deck.createdAt)}
+            </p>
+          </div>
+
+          {/* Botón Next (derecha en escritorio) */}
+          <div className="order-3 hidden sm:block">
+            {nextDeckHref ? (
+              <Link
+                href={nextDeckHref}
+                className="inline-flex min-w-[138px] items-center justify-center gap-2 rounded-md border border-sky-400/40 bg-[#1D568E] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#2569AC]"
+              >
+                <span>Next</span>
+                <span aria-hidden="true" className="text-[10px]">
+                  ▶
+                </span>
+              </Link>
+            ) : (
+              <span
+                aria-disabled="true"
+                className="inline-flex min-w-[138px] cursor-not-allowed items-center justify-center gap-2 rounded-md border border-slate-800/80 bg-[#071124]/60 px-5 py-2.5 text-xs font-semibold text-slate-600"
+              >
+                <span>Next</span>
+                <span aria-hidden="true" className="text-[10px]">
+                  ▶
+                </span>
+              </span>
+            )}
+          </div>
+        </div>
       </header>
 
       <div

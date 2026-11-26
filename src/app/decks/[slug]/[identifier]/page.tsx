@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { prisma } from "@/lib/prisma";
+
 import Container from "@/components/ui/Container";
 import DeckViewer from "@/components/decks/DeckViewer";
 
@@ -53,8 +55,7 @@ export async function generateMetadata({
     deck.author?.username ||
     "Duelist";
 
-  const archetypeTitle =
-    deck.archetype?.name?.trim() || deck.name;
+  const archetypeTitle = deck.archetype?.name?.trim() || deck.name;
 
   const title = `${archetypeTitle} Deck from ${player} | Card Meta`;
 
@@ -78,17 +79,16 @@ export async function generateMetadata({
     parts.push(achievementText);
   }
 
-    if (gemEstimate.maxGems > 0) {
+  if (gemEstimate.maxGems > 0) {
     parts.push(`Price: ${gemEstimate.maxGems.toLocaleString("en-US")} gems`);
   }
 
   const description = parts.join(" • ");
-    const baseUrl =
+  const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
     "https://vercel.app";
 
   const imageUrl = `${baseUrl}/decks/${slug}/${identifier}/opengraph-image`;
-
 
   return {
     title,
@@ -114,28 +114,89 @@ export async function generateMetadata({
   };
 }
 
-export default async function DeckPage({
-  params,
-}: Props) {
+export default async function DeckPage({ params }: Props) {
   const { slug, identifier } = await params;
 
   const user = await getCurrentUser();
 
-  const deck = await findDeckByIdentifier(
-    identifier,
-    user?.id ?? null
-  );
+  const deck = await findDeckByIdentifier(identifier, user?.id ?? null);
 
   if (!deck || deck.slug !== slug) {
     notFound();
   }
 
-  const [gemEstimate, skillMeta] = await Promise.all([
-    calculateDeckGemEstimate(deck),
-    deck.skill?.trim()
-      ? getSkillMetaByName(deck.skill)
-      : Promise.resolve(null),
-  ]);
+  const createdAtDate = new Date(deck.createdAt);
+
+  const [tournaments, prevDeck, nextDeck, gemEstimate, skillMeta] =
+    await Promise.all([
+      prisma.tournament.findMany({
+        select: {
+          slug: true,
+          name: true,
+          standings: true,
+        },
+        orderBy: { date: "desc" },
+        take: 30,
+      }),
+      // Mazo más reciente publicado justo después que este (Previous)
+      prisma.deck.findFirst({
+        where: {
+          isPublic: true,
+          format: deck.format,
+          id: { not: deck.id },
+          OR: [
+            { createdAt: { gt: createdAtDate } },
+            { createdAt: createdAtDate, id: { gt: deck.id } },
+          ],
+        },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+        select: { slug: true, identifier: true },
+      }),
+      // Mazo anterior publicado justo antes que este (Next)
+      prisma.deck.findFirst({
+        where: {
+          isPublic: true,
+          format: deck.format,
+          id: { not: deck.id },
+          OR: [
+            { createdAt: { lt: createdAtDate } },
+            { createdAt: createdAtDate, id: { lt: deck.id } },
+          ],
+        },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        select: { slug: true, identifier: true },
+      }),
+      calculateDeckGemEstimate(deck),
+      deck.skill?.trim()
+        ? getSkillMetaByName(deck.skill)
+        : Promise.resolve(null),
+    ]);
+
+  let tournamentInfo: {
+    name: string;
+    slug: string;
+    placement?: string | null;
+  } | null = null;
+
+  for (const t of tournaments) {
+    if (!Array.isArray(t.standings)) continue;
+    const match = (t.standings as Array<Record<string, unknown>>).find(
+      (entry) => entry.deckId === deck.id
+    );
+    if (match) {
+      tournamentInfo = {
+        name: t.name,
+        slug: t.slug,
+        placement:
+          typeof match.placement === "string"
+            ? match.placement
+            : typeof match.rank === "string" || typeof match.rank === "number"
+            ? String(match.rank)
+            : null,
+      };
+      break;
+    }
+  }
 
   const archetypeSlug = getDeckArchetypeSlug(deck);
 
@@ -151,6 +212,13 @@ export default async function DeckPage({
     breakdownQuery ? `?${breakdownQuery}` : ""
   }`;
 
+  const prevDeckHref = prevDeck
+    ? `/decks/${prevDeck.slug}/${prevDeck.identifier}`
+    : null;
+  const nextDeckHref = nextDeck
+    ? `/decks/${nextDeck.slug}/${nextDeck.identifier}`
+    : null;
+
   return (
     <main className="min-h-screen py-8">
       <Container>
@@ -159,6 +227,9 @@ export default async function DeckPage({
           gemEstimate={gemEstimate}
           skillMeta={skillMeta}
           breakdownHref={breakdownHref}
+          tournamentInfo={tournamentInfo}
+          prevDeckHref={prevDeckHref}
+          nextDeckHref={nextDeckHref}
           canViewPlayerProfile={canManageGuides(user)}
           isOwner={Boolean(user) && user?.id === deck.authorId}
         />
