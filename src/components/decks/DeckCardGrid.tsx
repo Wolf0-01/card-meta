@@ -22,11 +22,13 @@ export default function DeckCardGrid({
   return (
     <div
       className="
+        mx-auto
         grid
-        grid-cols-[repeat(5,minmax(0,72px))]
-        justify-center
-        gap-2.5
-        sm:gap-3
+        w-full
+        max-w-[392px]
+        grid-cols-5
+        gap-1.5
+        sm:gap-2.5
       "
     >
       {sortedCards.map((deckCard) =>

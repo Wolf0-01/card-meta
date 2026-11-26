@@ -31,8 +31,8 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-        {/* Izquierda: Botón hamburguesa en móvil + Logo */}
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-3 sm:px-6">
+        {/* Izquierda: Botón hamburguesa en móvil + Logo en escritorio */}
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -69,11 +69,20 @@ export default function Navbar() {
           <Link
             href="/"
             onClick={() => setMobileOpen(false)}
-            className="shrink-0 text-xl font-extrabold tracking-wide text-foreground transition-colors duration-200 hover:text-primary sm:text-2xl"
+            className="hidden shrink-0 text-2xl font-extrabold tracking-wide text-foreground transition-colors duration-200 hover:text-primary md:inline-block"
           >
             Card Meta
           </Link>
         </div>
+
+        {/* Centro en móvil: Logo Card Meta centrado estilo Duel Links Meta */}
+        <Link
+          href="/"
+          onClick={() => setMobileOpen(false)}
+          className="text-lg font-extrabold tracking-wide text-foreground transition-colors duration-200 hover:text-primary md:hidden"
+        >
+          Card Meta
+        </Link>
 
         {/* Navegación central en escritorio */}
         <div className="hidden items-center gap-8 md:flex">
