@@ -83,7 +83,12 @@ export async function generateMetadata({
   }
 
   const description = parts.join(" • ");
-  const imageUrl = `/decks/${slug}/${identifier}/opengraph-image`;
+    const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+    "https://vercel.app";
+
+  const imageUrl = `${baseUrl}/decks/${slug}/${identifier}/opengraph-image`;
+
 
   return {
     title,

@@ -19,6 +19,27 @@ const BANLIST_BADGE: Record<string, { label: string; bg: string }> = {
   limited3: { label: "3", bg: "#eab308" },
 };
 
+async function fetchImageAsDataUrl(url: string): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { "User-Agent": "CardMetaOG/1.0" },
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) return null;
+    const contentTypeHeader = res.headers.get("content-type") || "image/jpeg";
+    if (!contentTypeHeader.startsWith("image/")) return null;
+
+    const buffer = Buffer.from(await res.arrayBuffer());
+    return `data:${contentTypeHeader};base64,${buffer.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
 export default async function DeckOpenGraphImage({ params }: Props) {
   const { identifier } = await params;
   const deck = await findDeckByIdentifier(identifier, null);
@@ -46,25 +67,42 @@ export default async function DeckOpenGraphImage({ params }: Props) {
     );
   }
 
-  // Expandir copias individuales como en la vista visual de Duel Links Meta
+  // Descargar cada imagen única en paralelo una sola vez
+  const uniqueUrls = Array.from(
+    new Set(
+      deck.cards
+        .map((c) => c.card.image)
+        .filter((img): img is string => Boolean(img))
+    )
+  );
+
+  const resolvedEntries = await Promise.all(
+    uniqueUrls.map(async (url) => [url, await fetchImageAsDataUrl(url)] as const)
+  );
+  const imageMap = new Map<string, string | null>(resolvedEntries);
+
   const mainCards: Array<{
     key: string;
-    image: string | null;
+    src: string | null;
+    name: string;
     banlistStatus: string | null;
   }> = [];
 
   const extraCards: Array<{
     key: string;
-    image: string | null;
+    src: string | null;
+    name: string;
     banlistStatus: string | null;
   }> = [];
 
   for (const item of deck.cards) {
     const target = item.zone === "extra" ? extraCards : mainCards;
+    const src = item.card.image ? imageMap.get(item.card.image) ?? null : null;
     for (let copy = 0; copy < item.quantity; copy++) {
       target.push({
         key: `${item.id}-${copy}`,
-        image: item.card.image ?? null,
+        src,
+        name: item.card.name,
         banlistStatus: item.card.banlistStatus ?? null,
       });
     }
@@ -91,6 +129,70 @@ export default async function DeckOpenGraphImage({ params }: Props) {
     extraRows * CARD_H +
     Math.max(0, extraRows - 1) * GAP;
 
+  const renderCard = (c: {
+    key: string;
+    src: string | null;
+    name: string;
+    banlistStatus: string | null;
+  }) => {
+    const badge = c.banlistStatus ? BANLIST_BADGE[c.banlistStatus] : undefined;
+    return (
+      <div
+        key={c.key}
+        style={{
+          position: "relative",
+          display: "flex",
+          width: `${CARD_W}px`,
+          height: `${CARD_H}px`,
+          borderRadius: "4px",
+          overflow: "hidden",
+          backgroundColor: "#1e293b",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: c.src ? "0px" : "4px",
+          textAlign: "center",
+          fontSize: "9px",
+          color: "#cbd5e1",
+        }}
+      >
+        {c.src ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={c.src}
+            alt=""
+            width={CARD_W}
+            height={CARD_H}
+            style={{ objectFit: "cover" }}
+          />
+        ) : (
+          <span>{c.name}</span>
+        )}
+        {badge && (
+          <div
+            style={{
+              position: "absolute",
+              top: "3px",
+              left: "3px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "20px",
+              height: "20px",
+              borderRadius: "9999px",
+              backgroundColor: badge.bg,
+              border: "2px solid #0f172a",
+              color: "#ffffff",
+              fontSize: "11px",
+              fontWeight: 900,
+            }}
+          >
+            {badge.label}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return new ImageResponse(
     (
       <div
@@ -105,7 +207,7 @@ export default async function DeckOpenGraphImage({ params }: Props) {
           color: "#ffffff",
         }}
       >
-        {/* Barra superior de Skill + Formato */}
+        {/* Barra superior de Skill */}
         <div
           style={{
             display: "flex",
@@ -152,7 +254,7 @@ export default async function DeckOpenGraphImage({ params }: Props) {
           </span>
         </div>
 
-        {/* Cuadrícula Main Deck */}
+        {/* Main Deck */}
         <div
           style={{
             display: "flex",
@@ -160,61 +262,10 @@ export default async function DeckOpenGraphImage({ params }: Props) {
             gap: `${GAP}px`,
           }}
         >
-          {mainCards.map((c) => {
-            const badge = c.banlistStatus
-              ? BANLIST_BADGE[c.banlistStatus]
-              : undefined;
-            return (
-              <div
-                key={c.key}
-                style={{
-                  position: "relative",
-                  display: "flex",
-                  width: `${CARD_W}px`,
-                  height: `${CARD_H}px`,
-                  borderRadius: "4px",
-                  overflow: "hidden",
-                  backgroundColor: "#1e293b",
-                }}
-              >
-                {c.image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={c.image}
-                    alt=""
-                    width={CARD_W}
-                    height={CARD_H}
-                    style={{ objectFit: "cover" }}
-                  />
-                )}
-                {badge && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "3px",
-                      left: "3px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "20px",
-                      height: "20px",
-                      borderRadius: "9999px",
-                      backgroundColor: badge.bg,
-                      border: "2px solid #0f172a",
-                      color: "#ffffff",
-                      fontSize: "11px",
-                      fontWeight: 900,
-                    }}
-                  >
-                    {badge.label}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {mainCards.map(renderCard)}
         </div>
 
-        {/* Separador y Cuadrícula Extra Deck */}
+        {/* Extra Deck */}
         {extraCards.length > 0 && (
           <>
             <div
@@ -242,58 +293,7 @@ export default async function DeckOpenGraphImage({ params }: Props) {
                 gap: `${GAP}px`,
               }}
             >
-              {extraCards.map((c) => {
-                const badge = c.banlistStatus
-                  ? BANLIST_BADGE[c.banlistStatus]
-                  : undefined;
-                return (
-                  <div
-                    key={c.key}
-                    style={{
-                      position: "relative",
-                      display: "flex",
-                      width: `${CARD_W}px`,
-                      height: `${CARD_H}px`,
-                      borderRadius: "4px",
-                      overflow: "hidden",
-                      backgroundColor: "#1e293b",
-                    }}
-                  >
-                    {c.image && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={c.image}
-                        alt=""
-                        width={CARD_W}
-                        height={CARD_H}
-                        style={{ objectFit: "cover" }}
-                      />
-                    )}
-                    {badge && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "3px",
-                          left: "3px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: "20px",
-                          height: "20px",
-                          borderRadius: "9999px",
-                          backgroundColor: badge.bg,
-                          border: "2px solid #0f172a",
-                          color: "#ffffff",
-                          fontSize: "11px",
-                          fontWeight: 900,
-                        }}
-                      >
-                        {badge.label}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {extraCards.map(renderCard)}
             </div>
           </>
         )}
