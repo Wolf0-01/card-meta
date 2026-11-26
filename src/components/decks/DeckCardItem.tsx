@@ -132,7 +132,7 @@ export default function DeckCardItem({
           hover:border-primary
           hover:shadow-lg
           hover:shadow-primary/20
-          ${compact ? "w-[72px]" : "w-full"}
+          ${compact ? "w-full max-w-[72px]" : "w-full"}
           ${className}
         `}
       >
