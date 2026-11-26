@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 
 import HomeFeedCard from "@/components/home/HomeFeedCard";
-
 import HomeShowcaseCard from "@/components/home/HomeShowcaseCard";
 
 import {
@@ -40,9 +39,10 @@ export default async function Home() {
           </p>
         </header>
 
+        {/* Grid 2x3 en móvil/tablet y 3x2 en escritorio estilo Duel Links Meta */}
         <section
           aria-label="Main sections"
-          className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3"
         >
           <HomeShowcaseCard
             title="Tier List"
@@ -87,11 +87,11 @@ export default async function Home() {
           />
         </section>
 
-          <section
+        {/* Accesos rápidos en 2 columnas desde móvil */}
+        <section
           aria-label="Quick links"
-          className="grid max-w-3xl grid-cols-1 gap-2                 sm:grid-cols-2"
+          className="grid max-w-3xl grid-cols-2 gap-2"
         >
-
           <Link
             href="/decks/new"
             className={QUICK_LINK_CLASSES}

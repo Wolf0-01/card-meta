@@ -22,7 +22,7 @@ const mobileNavigation = [
   { href: "/tournaments", label: "Tournaments" },
   { href: "/guides", label: "Guides" },
   { href: "/news", label: "News & Updates" },
-  { href: "/decks/builder", label: "Deck Builder" },
+  { href: "/decks/new", label: "Deck Builder" },
 ];
 
 export default function Navbar() {
