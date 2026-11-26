@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import sharp from "sharp";
 import { findDeckByIdentifier } from "@/services/decks";
 
 export const runtime = "nodejs";
@@ -19,25 +20,42 @@ const BANLIST_BADGE: Record<string, { label: string; bg: string }> = {
   limited3: { label: "3", bg: "#eab308" },
 };
 
-async function fetchImageAsDataUrl(url: string): Promise<string | null> {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3500);
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: { "User-Agent": "CardMetaOG/1.0" },
-    });
-    clearTimeout(timeout);
+async function fetchCardJpegDataUrl(
+  primaryUrl: string | null,
+  ygoproId: number | null
+): Promise<string | null> {
+  const candidates = [
+    primaryUrl,
+    ygoproId
+      ? `https://ygoprodeck.com{ygoproId}.jpg`
+      : null,
+  ].filter((u): u is string => Boolean(u));
 
-    if (!res.ok) return null;
-    const contentTypeHeader = res.headers.get("content-type") || "image/jpeg";
-    if (!contentTypeHeader.startsWith("image/")) return null;
+  for (const url of candidates) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3500);
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers: { "User-Agent": "CardMetaOG/1.0" },
+      });
+      clearTimeout(timeout);
 
-    const buffer = Buffer.from(await res.arrayBuffer());
-    return `data:${contentTypeHeader};base64,${buffer.toString("base64")}`;
-  } catch {
-    return null;
+      if (!res.ok) continue;
+
+      const rawBuffer = Buffer.from(await res.arrayBuffer());
+      const jpegBuffer = await sharp(rawBuffer)
+        .resize(168, 244, { fit: "cover" })
+        .jpeg({ quality: 82 })
+        .toBuffer();
+
+      return `data:image/jpeg;base64,${jpegBuffer.toString("base64")}`;
+    } catch {
+      continue;
+    }
   }
+
+  return null;
 }
 
 export default async function DeckOpenGraphImage({ params }: Props) {
@@ -67,19 +85,28 @@ export default async function DeckOpenGraphImage({ params }: Props) {
     );
   }
 
-  // Descargar cada imagen única en paralelo una sola vez
-  const uniqueUrls = Array.from(
-    new Set(
-      deck.cards
-        .map((c) => c.card.image)
-        .filter((img): img is string => Boolean(img))
-    )
-  );
+  const uniqueCards = new Map<
+    number,
+    { image: string | null; ygoproId: number | null }
+  >();
+
+  for (const item of deck.cards) {
+    const cid = item.cardId ?? item.card.id;
+    if (!uniqueCards.has(cid)) {
+      uniqueCards.set(cid, {
+        image: item.card.image ?? null,
+        ygoproId: item.card.ygoproId ?? null,
+      });
+    }
+  }
 
   const resolvedEntries = await Promise.all(
-    uniqueUrls.map(async (url) => [url, await fetchImageAsDataUrl(url)] as const)
+    Array.from(uniqueCards.entries()).map(async ([cardId, info]) => [
+      cardId,
+      await fetchCardJpegDataUrl(info.image, info.ygoproId),
+    ] as const)
   );
-  const imageMap = new Map<string, string | null>(resolvedEntries);
+  const imageMap = new Map<number, string | null>(resolvedEntries);
 
   const mainCards: Array<{
     key: string;
@@ -97,7 +124,7 @@ export default async function DeckOpenGraphImage({ params }: Props) {
 
   for (const item of deck.cards) {
     const target = item.zone === "extra" ? extraCards : mainCards;
-    const src = item.card.image ? imageMap.get(item.card.image) ?? null : null;
+    const src = imageMap.get(item.cardId ?? item.card.id) ?? null;
     for (let copy = 0; copy < item.quantity; copy++) {
       target.push({
         key: `${item.id}-${copy}`,
@@ -115,7 +142,8 @@ export default async function DeckOpenGraphImage({ params }: Props) {
   const PAD = 14;
 
   const mainRows = Math.max(1, Math.ceil(mainCards.length / COLS));
-  const extraRows = extraCards.length > 0 ? Math.ceil(extraCards.length / COLS) : 0;
+  const extraRows =
+    extraCards.length > 0 ? Math.ceil(extraCards.length / COLS) : 0;
 
   const width = PAD * 2 + COLS * CARD_W + (COLS - 1) * GAP;
   const headerHeight = 46;
@@ -207,7 +235,6 @@ export default async function DeckOpenGraphImage({ params }: Props) {
           color: "#ffffff",
         }}
       >
-        {/* Barra superior de Skill */}
         <div
           style={{
             display: "flex",
@@ -254,7 +281,6 @@ export default async function DeckOpenGraphImage({ params }: Props) {
           </span>
         </div>
 
-        {/* Main Deck */}
         <div
           style={{
             display: "flex",
@@ -265,7 +291,6 @@ export default async function DeckOpenGraphImage({ params }: Props) {
           {mainCards.map(renderCard)}
         </div>
 
-        {/* Extra Deck */}
         {extraCards.length > 0 && (
           <>
             <div
