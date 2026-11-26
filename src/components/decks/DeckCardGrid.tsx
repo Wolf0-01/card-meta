@@ -25,10 +25,10 @@ export default function DeckCardGrid({
         mx-auto
         grid
         w-full
-        max-w-[392px]
+        max-w-[404px]
         grid-cols-5
-        gap-1.5
-        sm:gap-2.5
+        gap-2.5
+        sm:gap-3
       "
     >
       {sortedCards.map((deckCard) =>
