@@ -20,6 +20,64 @@ const USERNAME_MAX_LENGTH = 24;
 
 const DISPLAY_NAME_MAX_LENGTH = 60;
 
+const DISCORD_CALLBACK_PATH =
+  "/api/auth/discord/callback";
+
+function withProtocol(value: string) {
+  return /^https?:\/\//i.test(value)
+    ? value
+    : `https://${value}`;
+}
+
+function withoutTrailingSlashes(value: string) {
+  return value.replace(/\/+$/, "");
+}
+
+/**
+ * Resuelve la URL de callback de Discord sin depender de
+ * valores fijados a mano:
+ *
+ * 1. DISCORD_REDIRECT_URI (prioridad para configuraciones
+ *    explícitas).
+ * 2. NEXT_PUBLIC_APP_URL + /api/auth/discord/callback.
+ * 3. Dominio de producción o preview de Vercel.
+ * 4. localhost:3000 durante el desarrollo local.
+ */
+function resolveDiscordRedirectUri(): string | null {
+  const explicit =
+    process.env.DISCORD_REDIRECT_URI?.trim();
+
+  if (explicit) {
+    return explicit;
+  }
+
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.trim();
+
+  if (appUrl) {
+    return `${withoutTrailingSlashes(
+      withProtocol(appUrl)
+    )}${DISCORD_CALLBACK_PATH}`;
+  }
+
+  const vercelHost =
+    process.env
+      .VERCEL_PROJECT_PRODUCTION_URL?.trim() ||
+    process.env.VERCEL_URL?.trim();
+
+  if (vercelHost) {
+    return `${withoutTrailingSlashes(
+      withProtocol(vercelHost)
+    )}${DISCORD_CALLBACK_PATH}`;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return `http://localhost:3000${DISCORD_CALLBACK_PATH}`;
+  }
+
+  return null;
+}
+
 export interface DiscordConfig {
   clientId: string;
 
@@ -41,8 +99,9 @@ export interface DiscordProfile {
 }
 
 /**
- * Discord OAuth2 solo se habilita cuando están configuradas
- * las tres variables necesarias.
+ * Discord OAuth2 se habilita cuando existen las credenciales
+ * y es posible resolver la URL de callback (explícita, por
+ * NEXT_PUBLIC_APP_URL, por Vercel o por localhost en dev).
  */
 export function getDiscordConfig(): DiscordConfig | null {
   const clientId =
@@ -52,7 +111,7 @@ export function getDiscordConfig(): DiscordConfig | null {
     process.env.DISCORD_CLIENT_SECRET?.trim();
 
   const redirectUri =
-    process.env.DISCORD_REDIRECT_URI?.trim();
+    resolveDiscordRedirectUri();
 
   if (
     !clientId ||

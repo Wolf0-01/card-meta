@@ -17,7 +17,7 @@ import {
 
 import { getHomeData } from "@/lib/home";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const QUICK_LINK_CLASSES =
   "group flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-700/70 bg-[#0B132B] px-3 text-[9px] font-black uppercase tracking-[0.14em] text-slate-300 transition-colors hover:border-blue-400/70 hover:bg-[#101A36] hover:text-white";
