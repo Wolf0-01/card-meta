@@ -1,10 +1,9 @@
 import Link from "next/link";
 
 const SOCIAL_LINKS = {
-  discord: "https://discord.gg/VpacQDFPEz",
-  twitch: "https://www.twitch.tv/thewolftp",
-  youtube: "https://www.youtube.com/@WolfTP",
-  
+  discord: "https://discord.gg",
+  twitch: "https://twitch.tv",
+  youtube: "https://youtube.com",
 };
 
 function DiscordLogo({ className = "h-12 w-12" }: { className?: string }) {
@@ -129,12 +128,12 @@ export default function Footer() {
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
             </svg>
           </a>
-
         </div>
 
-        {/* Copyright + Navegación rápida */}
-        <div className="space-y-2 text-center text-xs text-slate-400">
+        {/* Copyright + Navegación rápida y páginas legales */}
+        <div className="space-y-3 text-center text-xs text-slate-400">
           <p>© 2026 Card Meta · Competitive Yu-Gi-Oh! Duel Links Hub</p>
+
           <nav
             aria-label="Footer navigation"
             className="flex flex-wrap items-center justify-center gap-2 text-slate-400"
@@ -159,6 +158,34 @@ export default function Footer() {
               News
             </Link>
           </nav>
+
+          <nav
+            aria-label="Legal navigation"
+            className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-medium text-slate-400"
+          >
+            <Link href="/about" className="transition hover:text-sky-400">
+              About
+            </Link>
+            <span className="text-slate-600">|</span>
+            <Link href="/privacy" className="transition hover:text-sky-400">
+              Privacy Policy
+            </Link>
+            <span className="text-slate-600">|</span>
+            <Link href="/terms" className="transition hover:text-sky-400">
+              Terms of Service
+            </Link>
+            <span className="text-slate-600">|</span>
+            <Link href="/contact" className="transition hover:text-sky-400">
+              Contact
+            </Link>
+          </nav>
+
+          <p className="mx-auto max-w-3xl border-t border-slate-800/80 pt-4 text-[11px] leading-relaxed text-slate-500">
+            Card Meta is an unofficial community fan site and is not affiliated
+            with, endorsed, or sponsored by Konami Digital Entertainment.
+            Yu-Gi-Oh! and all related card names, artwork, and trademarks are
+            property of Studio Dice / SHUEISHA, TV TOKYO, and KONAMI.
+          </p>
         </div>
       </div>
     </footer>
