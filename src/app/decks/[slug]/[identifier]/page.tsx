@@ -127,6 +127,10 @@ export default async function DeckPage({ params }: Props) {
 
   const createdAtDate = new Date(deck.createdAt);
 
+     const sameArchetypeFilter = deck.archetype?.id
+    ? { archetypeId: deck.archetype.id }
+    : { slug: deck.slug };
+
   const [tournaments, prevDeck, nextDeck, gemEstimate, skillMeta] =
     await Promise.all([
       prisma.tournament.findMany({
@@ -138,11 +142,12 @@ export default async function DeckPage({ params }: Props) {
         orderBy: { date: "desc" },
         take: 30,
       }),
-      // Mazo más reciente publicado justo después que este (Previous)
+      // Mazo anterior del mismo arquetipo (Previous)
       prisma.deck.findFirst({
         where: {
           isPublic: true,
           format: deck.format,
+          ...sameArchetypeFilter,
           id: { not: deck.id },
           OR: [
             { createdAt: { gt: createdAtDate } },
@@ -152,11 +157,12 @@ export default async function DeckPage({ params }: Props) {
         orderBy: [{ createdAt: "asc" }, { id: "asc" }],
         select: { slug: true, identifier: true },
       }),
-      // Mazo anterior publicado justo antes que este (Next)
+      // Siguiente mazo del mismo arquetipo (Next)
       prisma.deck.findFirst({
         where: {
           isPublic: true,
           format: deck.format,
+          ...sameArchetypeFilter,
           id: { not: deck.id },
           OR: [
             { createdAt: { lt: createdAtDate } },
@@ -171,6 +177,7 @@ export default async function DeckPage({ params }: Props) {
         ? getSkillMetaByName(deck.skill)
         : Promise.resolve(null),
     ]);
+
 
   let tournamentInfo: {
     name: string;
