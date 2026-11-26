@@ -5,20 +5,11 @@ import Container from "@/components/ui/Container";
 import DeckViewer from "@/components/decks/DeckViewer";
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
-
 import { canManageGuides } from "@/lib/auth/roles";
-
-import {
-  getDeckArchetypeSlug,
-} from "@/lib/decks/archetypeLabel";
-
+import { getDeckArchetypeSlug } from "@/lib/decks/archetypeLabel";
 import { calculateDeckGemEstimate } from "@/lib/decks/gemCalculator";
-
 import { getSkillMetaByName } from "@/lib/skills/meta";
-
-import {
-  findDeckByIdentifier,
-} from "@/services/decks";
+import { findDeckByIdentifier } from "@/services/decks";
 
 interface Props {
   params: Promise<{
@@ -27,67 +18,121 @@ interface Props {
   }>;
 }
 
+function formatAchievementLabel(
+  achievement?: string | null,
+  placement?: string | null
+): string | null {
+  if (achievement === "KOG") return "King of Games";
+  if (achievement === "KC_MAX") {
+    return placement ? `KC Cup (${placement})` : "KC Cup";
+  }
+  if (achievement === "TOURNAMENT") {
+    return placement ? `Tournament (${placement})` : "Tournament Top";
+  }
+  return null;
+}
+
 export async function generateMetadata({
   params,
 }: Props): Promise<Metadata> {
-  const { identifier } = await params;
+  const { slug, identifier } = await params;
 
-  const user = await getCurrentUser();
-
-  const deck =
-    await findDeckByIdentifier(
-      identifier,
-      user?.id ?? null
-    );
+  const deck = await findDeckByIdentifier(identifier, null);
 
   if (!deck) {
     return {
-      title: "Deck not found",
+      title: "Deck not found | Card Meta",
     };
   }
 
+  const gemEstimate = await calculateDeckGemEstimate(deck);
+
+  const player =
+    deck.playerName?.trim() ||
+    deck.author?.displayName?.trim() ||
+    deck.author?.username ||
+    "Duelist";
+
+  const archetypeTitle =
+    deck.archetype?.name?.trim() || deck.name;
+
+  const title = `${archetypeTitle} Deck from ${player} | Card Meta`;
+
+  const submittedDate = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(deck.createdAt));
+
+  const parts: string[] = [`Submitted ${submittedDate}`];
+
+  if (deck.skill?.trim()) {
+    parts.push(`Skill: ${deck.skill.trim()}`);
+  }
+
+  const achievementText = formatAchievementLabel(
+    deck.achievement,
+    deck.placement
+  );
+  if (achievementText) {
+    parts.push(achievementText);
+  }
+
+    if (gemEstimate.maxGems > 0) {
+    parts.push(`Price: ${gemEstimate.maxGems.toLocaleString("en-US")} gems`);
+  }
+
+  const description = parts.join(" • ");
+  const imageUrl = `/decks/${slug}/${identifier}/opengraph-image`;
+
   return {
-    title: `${deck.name} | Card Meta`,
-    description:
-      deck.description ??
-      `Full guide to the ${deck.name} deck, card list, stats and strategy.`,
+    title,
+    description,
+    openGraph: {
+      siteName: "Card Meta",
+      title,
+      description,
+      type: "article",
+      images: [
+        {
+          url: imageUrl,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
+    },
   };
 }
 
 export default async function DeckPage({
   params,
 }: Props) {
-  const {
-    slug,
-    identifier,
-  } = await params;
+  const { slug, identifier } = await params;
 
   const user = await getCurrentUser();
 
-  const deck =
-    await findDeckByIdentifier(
-      identifier,
-      user?.id ?? null
-    );
+  const deck = await findDeckByIdentifier(
+    identifier,
+    user?.id ?? null
+  );
 
-  if (
-    !deck ||
-    deck.slug !== slug
-  ) {
+  if (!deck || deck.slug !== slug) {
     notFound();
   }
 
-  const [gemEstimate, skillMeta] =
-    await Promise.all([
-      calculateDeckGemEstimate(deck),
+  const [gemEstimate, skillMeta] = await Promise.all([
+    calculateDeckGemEstimate(deck),
+    deck.skill?.trim()
+      ? getSkillMetaByName(deck.skill)
+      : Promise.resolve(null),
+  ]);
 
-      deck.skill?.trim()
-        ? getSkillMetaByName(deck.skill)
-        : Promise.resolve(null),
-    ]);
-
-  const archetypeSlug =
-    getDeckArchetypeSlug(deck);
+  const archetypeSlug = getDeckArchetypeSlug(deck);
 
   const breakdownParams = new URLSearchParams();
 
@@ -95,20 +140,14 @@ export default async function DeckPage({
     breakdownParams.set("format", "rush");
   }
 
-  const breakdownQuery =
-    breakdownParams.toString();
+  const breakdownQuery = breakdownParams.toString();
 
   const breakdownHref = `/decks/breakdown/${archetypeSlug}${
     breakdownQuery ? `?${breakdownQuery}` : ""
   }`;
 
   return (
-    <main
-      className="
-        min-h-screen
-        py-8
-      "
-    >
+    <main className="min-h-screen py-8">
       <Container>
         <DeckViewer
           deck={deck}
@@ -116,10 +155,7 @@ export default async function DeckPage({
           skillMeta={skillMeta}
           breakdownHref={breakdownHref}
           canViewPlayerProfile={canManageGuides(user)}
-          isOwner={
-            Boolean(user) &&
-            user?.id === deck.authorId
-          }
+          isOwner={Boolean(user) && user?.id === deck.authorId}
         />
       </Container>
     </main>
