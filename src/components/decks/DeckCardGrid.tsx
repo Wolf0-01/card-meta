@@ -20,17 +20,19 @@ export default function DeckCardGrid({
   const sortedCards = sortDeckCards(cards);
 
   return (
-    <div
+        <div
       className="
         mx-auto
         grid
         w-full
-        max-w-[404px]
+        max-w-[392px]
         grid-cols-5
-        gap-2.5
-        sm:gap-3
+        gap-x-2
+        gap-y-3
+        sm:gap-x-2.5
       "
     >
+
       {sortedCards.map((deckCard) =>
         Array.from(
           {
