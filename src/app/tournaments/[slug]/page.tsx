@@ -50,12 +50,38 @@ export async function generateMetadata({
     };
   }
 
-  return {
-    title: `${tournament.name} | Tournaments | Card Meta`,
+  const title = `${tournament.name} | Tournaments | Card Meta`;
+  const description = `${tournament.name} results: ${tournament.organizer}, ${tournament.format}, ${tournament.players} players.`;
+  const bannerUrl = tournament.bannerUrl?.trim() || null;
 
-    description: `${tournament.name} results: ${tournament.organizer}, ${tournament.format}, ${tournament.players} players.`,
+  return {
+    title,
+    description,
+    openGraph: {
+      siteName: "Card Meta",
+      title: `${tournament.name} | Card Meta`,
+      description,
+      type: "article",
+      ...(bannerUrl
+        ? {
+            images: [
+              {
+                url: bannerUrl,
+                alt: `${tournament.name} banner`,
+              },
+            ],
+          }
+        : {}),
+    },
+    twitter: {
+      card: bannerUrl ? "summary_large_image" : "summary",
+      title: `${tournament.name} | Card Meta`,
+      description,
+      ...(bannerUrl ? { images: [bannerUrl] } : {}),
+    },
   };
 }
+
 
 export default async function TournamentPage({
   params,
