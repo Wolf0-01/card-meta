@@ -15,9 +15,9 @@ interface HomeShowcaseCardProps {
 }
 
 /**
- * Tarjeta ilustrada grande de la portada. La imagen queda
- * cubierta por el degradado inferior para garantizar la
- * legibilidad del título.
+ * Tarjeta ilustrada grande de la portada. Aplica zoom centrado
+ * en el arte de la carta para ocultar sus marcos exteriores
+ * y garantizar la legibilidad del título.
  */
 export default function HomeShowcaseCard({
   title,
@@ -67,12 +67,13 @@ export default function HomeShowcaseCard({
               inset-0
               h-full
               w-full
+              scale-[1.45]
               object-cover
-              object-center
-              opacity-80
+              object-[50%_24%]
+              opacity-85
               transition-transform
               duration-300
-              group-hover:scale-105
+              group-hover:scale-[1.52]
               group-hover:opacity-100
             "
           />
@@ -84,7 +85,7 @@ export default function HomeShowcaseCard({
               inset-0
               bg-gradient-to-t
               from-slate-950
-              via-slate-950/60
+              via-slate-950/55
               to-transparent
             "
           />
