@@ -54,6 +54,14 @@ export async function generateMetadata({
   const description = `${tournament.name} results: ${tournament.organizer}, ${tournament.format}, ${tournament.players} players.`;
   const bannerUrl = tournament.bannerUrl?.trim() || null;
 
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/+$/, "") ||
+    "https://card-meta.vercel.app";
+
+  const imageUrl = `${baseUrl}/tournaments/${encodeURIComponent(
+    slug
+  )}/opengraph-image`;
+
   return {
     title,
     description,
@@ -62,22 +70,28 @@ export async function generateMetadata({
       title: `${tournament.name} | Card Meta`,
       description,
       type: "article",
-      ...(bannerUrl
-        ? {
-            images: [
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${tournament.name} banner`,
+        },
+        ...(bannerUrl
+          ? [
               {
                 url: bannerUrl,
                 alt: `${tournament.name} banner`,
               },
-            ],
-          }
-        : {}),
+            ]
+          : []),
+      ],
     },
     twitter: {
-      card: bannerUrl ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: `${tournament.name} | Card Meta`,
       description,
-      ...(bannerUrl ? { images: [bannerUrl] } : {}),
+      images: [imageUrl],
     },
   };
 }
