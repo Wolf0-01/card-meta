@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   Sparkles,
   Trophy,
@@ -11,6 +13,8 @@ import DeckMainDeck from "@/components/decks/DeckMainDeck";
 
 import SkillLink from "@/components/skills/SkillLink";
 
+import { prisma } from "@/lib/prisma";
+
 import { getSkillMetaByNames } from "@/lib/skills/meta";
 
 import { getSkillNameKey } from "@/lib/skills/slug";
@@ -21,16 +25,19 @@ interface TournamentDeckListsProps {
   decks: TournamentDeckEntry[];
 }
 
-const RANK_STYLES: Record<number, string> = {
-  1: "border-amber-300/50 bg-amber-400/15 text-amber-200",
-  2: "border-slate-300/40 bg-slate-300/10 text-slate-200",
-  3: "border-orange-400/40 bg-orange-400/10 text-orange-200",
-};
+function formatTournamentPlace(place: number): string {
+  if (place === 1) return "1st Place";
+  if (place === 2) return "2nd Place";
+  if (place === 3) return "3rd Place";
+  if (place === 4) return "Top 4";
+  return `Top ${place}`;
+}
 
 /**
  * Sección Top Deck Lists del detalle de un torneo.
- * Renderiza una columna alineada a la izquierda por cada
- * lista del podio que tenga un mazo público vinculado.
+ * Renderiza el encabezado "1st Place – Jugador" (en azul clicable
+ * si el jugador tiene cuenta en Card Meta, o en blanco si no)
+ * junto con la Skill y las listas Main + Extra.
  */
 export default async function TournamentDeckLists({
   decks,
@@ -39,14 +46,49 @@ export default async function TournamentDeckLists({
     return null;
   }
 
-  const skillMetaByName =
-    await getSkillMetaByNames(
+  const playerNames = Array.from(
+    new Set(
+      decks
+        .map(({ placement }) => placement.player?.trim())
+        .filter((name): name is string => Boolean(name))
+    )
+  );
+
+  const [skillMetaByName, matchedUsers] = await Promise.all([
+    getSkillMetaByNames(
       decks.flatMap(({ deck }) =>
         deck.skill?.trim()
           ? [deck.skill.trim()]
           : []
       )
-    );
+    ),
+    playerNames.length > 0
+      ? prisma.user.findMany({
+          where: {
+            OR: playerNames.flatMap((name) => [
+              { username: { equals: name, mode: "insensitive" } },
+              { displayName: { equals: name, mode: "insensitive" } },
+            ]),
+          },
+          select: {
+            username: true,
+            displayName: true,
+          },
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const usernameByPlayerKey = new Map<string, string>();
+  for (const user of matchedUsers) {
+    if (!user.username) continue;
+    usernameByPlayerKey.set(user.username.toLowerCase(), user.username);
+    if (user.displayName?.trim()) {
+      usernameByPlayerKey.set(
+        user.displayName.trim().toLowerCase(),
+        user.username
+      );
+    }
+  }
 
   return (
     <section
@@ -112,38 +154,39 @@ export default async function TournamentDeckLists({
               ) ?? null
             : null;
 
+          const rawPlayer = placement.player?.trim() || "Duelist";
+          const matchedUsername =
+            usernameByPlayerKey.get(rawPlayer.toLowerCase()) ??
+            (deck.author?.username &&
+            !deck.playerName?.trim()
+              ? deck.author.username
+              : null);
+
+          const placeLabel = formatTournamentPlace(placement.place);
+
           return (
             <article
               key={`${placement.place}-${deck.identifier}`}
               className="space-y-3 pt-6 first:pt-1"
             >
               <header className="space-y-2.5">
-                <div className="flex items-center gap-2.5">
-                  <span
-                    className={`
-                      flex
-                      h-7
-                      w-7
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-md
-                      border
-                      text-xs
-                      font-black
-                      tabular-nums
-                      ${
-                        RANK_STYLES[placement.place] ??
-                        "border-slate-700 bg-slate-800/80 text-slate-300"
-                      }
-                    `}
-                  >
-                    {placement.place}
+                <div className="flex flex-wrap items-center gap-1.5 text-lg font-black tracking-tight sm:text-xl">
+                  <span className="text-slate-100">
+                    {placeLabel}
                   </span>
-
-                  <p className="min-w-0 flex-1 truncate text-base font-black text-white">
-                    {placement.player}
-                  </p>
+                  <span className="text-slate-400">–</span>
+                  {matchedUsername ? (
+                    <Link
+                      href={`/user/${matchedUsername}`}
+                      className="text-[#1D7BFF] transition-colors hover:text-sky-400 hover:underline"
+                    >
+                      {rawPlayer}
+                    </Link>
+                  ) : (
+                    <span className="text-white">
+                      {rawPlayer}
+                    </span>
+                  )}
                 </div>
 
                 <div
