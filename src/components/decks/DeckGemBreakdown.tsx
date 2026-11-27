@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 
+import { DuelLinksGemIcon } from "@/components/ui/DuelLinksIcons";
+
 import Link from "next/link";
 
 import {
   ChevronDown,
-  Gem,
   Info,
   Package,
   Ticket,
@@ -384,25 +385,9 @@ export default function DeckGemBreakdown({
         p-4
       "
     >
-      <div className="flex items-start gap-3">
-        <span
-          aria-hidden
-          className="
-            flex
-            h-9
-            w-9
-            shrink-0
-            items-center
-            justify-center
-            rounded-xl
-            border
-            border-amber-400/30
-            bg-amber-500/10
-            text-amber-300
-          "
-        >
-          <Gem className="h-4 w-4" />
-        </span>
+      
+             <div className="flex items-start gap-3">
+     <DuelLinksGemIcon className="mt-0.5 h-8 w-8 shrink-0" />
 
         <div className="min-w-0 flex-1">
           <p

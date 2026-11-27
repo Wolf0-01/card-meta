@@ -3,9 +3,11 @@ import Link from "next/link";
 
 import {
   CalendarDays,
-  Gem,
   UserRound,
 } from "lucide-react";
+
+import { DuelLinksGemIcon } from "@/components/ui/DuelLinksIcons";
+
 
 import { getCardImageSrc } from "@/lib/cards/image";
 
@@ -279,7 +281,8 @@ export default function PublicDeckCard({
               </span>
 
               <span className="inline-flex items-center gap-1 text-amber-300/90">
-                <Gem className="h-3 w-3" />
+                <DuelLinksGemIcon className="h-3.5 w-3.5 shrink-0" />
+
                 {formatGemCost(gemCost)}
               </span>
             </div>

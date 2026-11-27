@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 
+import { DuelLinksSkillIcon } from "@/components/ui/DuelLinksIcons";
+
 import DeckActions from "./DeckActions";
 import DeckArchetypeBanner from "./DeckArchetypeBanner";
 import DeckCombos from "./DeckCombos";
@@ -300,32 +302,8 @@ export default function DeckViewer({
                 pb-3
               "
             >
-              <div className="flex min-w-0 items-center gap-2">
-                <span
-                  aria-hidden
-                  className="
-                    h-2.5
-                    w-2.5
-                    shrink-0
-                    rotate-45
-                    rounded-[2px]
-                    bg-amber-400
-                    shadow-[0_0_10px_rgba(251,191,36,0.6)]
-                  "
-                />
-
-                <span
-                  className="
-                    shrink-0
-                    text-[9px]
-                    font-black
-                    uppercase
-                    tracking-[0.16em]
-                    text-foreground-muted
-                  "
-                >
-                  Skill
-                </span>
+             <div className="flex min-w-0 items-center gap-2">
+                <DuelLinksSkillIcon className="h-4 w-4 shrink-0" />
 
                 <SkillLink
                   name={deck.skill?.trim() ?? ""}
