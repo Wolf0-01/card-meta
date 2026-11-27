@@ -15,9 +15,37 @@ interface HomeShowcaseCardProps {
 }
 
 /**
- * Tarjeta ilustrada grande de la portada. Aplica zoom centrado
- * en el arte de la carta para ocultar sus marcos exteriores
- * y garantizar la legibilidad del título.
+ * Si la URL proviene de YGOPRODeck (/cards/ o /cards_small/),
+ * devuelve la versión /cards_cropped/ en HD (arte limpio sin marcos)
+ * para evitar escalar píxeles y mantener máxima nitidez.
+ */
+function resolveShowcaseArtwork(url: string | null): {
+  src: string | null;
+  isCroppedArt: boolean;
+} {
+  if (!url) {
+    return { src: null, isCroppedArt: false };
+  }
+
+  if (url.includes("://ygoprodeck.com")) {
+    return { src: url, isCroppedArt: true };
+  }
+
+  if (
+    url.includes("://ygoprodeck.com") ||
+    url.includes("://ygoprodeck.com")
+  ) {
+    const cropped = url
+      .replace("/images/cards_small/", "/images/cards_cropped/")
+      .replace("/images/cards/", "/images/cards_cropped/");
+    return { src: cropped, isCroppedArt: true };
+  }
+
+  return { src: url, isCroppedArt: false };
+}
+
+/**
+ * Tarjeta ilustrada grande de la portada.
  */
 export default function HomeShowcaseCard({
   title,
@@ -25,6 +53,8 @@ export default function HomeShowcaseCard({
   href,
   image,
 }: HomeShowcaseCardProps) {
+  const { src, isCroppedArt } = resolveShowcaseArtwork(image);
+
   return (
     <Link
       href={href}
@@ -54,28 +84,19 @@ export default function HomeShowcaseCard({
         sm:p-4
       "
     >
-      {image ? (
+      {src ? (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={image}
+            src={src}
             alt=""
             loading="lazy"
             referrerPolicy="no-referrer"
-            className="
-              absolute
-              inset-0
-              h-full
-              w-full
-              scale-[1.45]
-              object-cover
-              object-[50%_24%]
-              opacity-85
-              transition-transform
-              duration-300
-              group-hover:scale-[1.52]
-              group-hover:opacity-100
-            "
+            className={
+              isCroppedArt
+                ? "absolute inset-0 h-full w-full object-cover object-[50%_28%] opacity-90 transition-transform duration-300 group-hover:scale-105 group-hover:opacity-100"
+                : "absolute inset-0 h-full w-full scale-[1.24] object-cover object-[50%_24%] opacity-90 transition-transform duration-300 group-hover:scale-[1.30] group-hover:opacity-100"
+            }
           />
 
           <span
@@ -85,7 +106,7 @@ export default function HomeShowcaseCard({
               inset-0
               bg-gradient-to-t
               from-slate-950
-              via-slate-950/55
+              via-slate-950/50
               to-transparent
             "
           />
