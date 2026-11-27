@@ -67,12 +67,27 @@ export default async function UserProfilePage({ params }: Props) {
     notFound();
   }
 
-  const { user, decks } = profile;
+    const { user, decks: rawDecks } = profile;
   const displayName = user.displayName?.trim() || user.username;
   const initials = displayName.slice(0, 2).toUpperCase();
   const roleBadge = ROLE_BADGES[user.role];
 
-  const tournaments = await prisma.tournament.findMany({
+  const nameKeys = new Set(
+    [user.username, user.displayName]
+      .filter((v): v is string => Boolean(v?.trim()))
+      .map((v) => v.trim().toLowerCase())
+  );
+
+  // Solo contar los mazos que pertenecen realmente a este jugador
+  // (excluye mazos de torneos/KOG que un Admin subió con el nombre de otro jugador)
+  const decks = rawDecks.filter((d) => {
+    const customPlayer = d.playerName?.trim().toLowerCase();
+    if (!customPlayer) return true;
+    return nameKeys.has(customPlayer);
+  });
+
+
+    const tournaments = await prisma.tournament.findMany({
     select: {
       slug: true,
       name: true,
@@ -83,13 +98,6 @@ export default async function UserProfilePage({ params }: Props) {
     take: 60,
   });
 
-  const nameKeys = new Set(
-    [user.username, user.displayName]
-      .filter((v): v is string => Boolean(v?.trim()))
-      .map((v) => v.trim().toLowerCase())
-  );
-
-  const deckIds = new Set(decks.map((d) => d.id));
   const tournamentResults: TournamentResultRow[] = [];
 
   for (const t of tournaments) {
@@ -104,16 +112,14 @@ export default async function UserProfilePage({ params }: Props) {
           ? rawEntry.playerName.trim().toLowerCase()
           : "";
 
-      const matchesUser =
-        (entryDeckId && deckIds.has(entryDeckId)) ||
-        (entryPlayer && nameKeys.has(entryPlayer));
+      const matchesUser = Boolean(entryPlayer && nameKeys.has(entryPlayer));
 
       if (!matchesUser) continue;
 
       const rawPlace =
         rawEntry.placement ?? rawEntry.place ?? rawEntry.rank ?? null;
 
-      tournamentResults.push({
+        tournamentResults.push({
         tournamentSlug: t.slug,
         tournamentName: t.name,
         date: t.date,
