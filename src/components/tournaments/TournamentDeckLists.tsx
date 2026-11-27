@@ -1,9 +1,8 @@
 import Link from "next/link";
 
-import {
-  Sparkles,
-  Trophy,
-} from "lucide-react";
+import { Trophy } from "lucide-react";
+import { DuelLinksSkillIcon } from "@/components/ui/DuelLinksIcons";
+
 
 import Button from "@/components/ui/Button";
 
@@ -209,7 +208,7 @@ export default async function TournamentDeckLists({
                       text-center
                     "
                   >
-                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-300" />
+                    <DuelLinksSkillIcon className="h-4 w-4 shrink-0" />
 
                     {skill ? (
                       <SkillLink

@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 
+import { DuelLinksSkillIcon } from "@/components/ui/DuelLinksIcons";
+
 import Image from "next/image";
 
 import Link from "next/link";
@@ -431,20 +433,9 @@ export default function ArchetypeDeckTable({
                       focus-visible:bg-blue-500/[0.08]
                     "
                   >
-                    <td className="max-w-[220px] px-3 py-2.5">
+                                        <td className="max-w-[220px] px-3 py-2.5">
                       <span className="flex items-center gap-2">
-                        <span
-                          aria-hidden
-                          className="
-                            h-2
-                            w-2
-                            shrink-0
-                            rotate-45
-                            rounded-[1px]
-                            bg-amber-400
-                            shadow-[0_0_8px_rgba(251,191,36,0.6)]
-                          "
-                        />
+                        <DuelLinksSkillIcon className="h-3.5 w-3.5 shrink-0" />
 
                         <span className="truncate text-[11px] font-semibold text-slate-200">
                           {row.skill?.trim() ||
