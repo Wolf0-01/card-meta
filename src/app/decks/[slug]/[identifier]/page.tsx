@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 import Container from "@/components/ui/Container";
 import DeckViewer from "@/components/decks/DeckViewer";
+import CommentsSection from "@/components/comments/CommentsSection";
 
 import { getCurrentUser } from "@/lib/auth/currentUser";
 import { canManageGuides } from "@/lib/auth/roles";
@@ -127,7 +128,7 @@ export default async function DeckPage({ params }: Props) {
 
   const createdAtDate = new Date(deck.createdAt);
 
-     const sameArchetypeFilter = deck.archetype?.id
+  const sameArchetypeFilter = deck.archetype?.id
     ? { archetypeId: deck.archetype.id }
     : { slug: deck.slug };
 
@@ -142,7 +143,6 @@ export default async function DeckPage({ params }: Props) {
         orderBy: { date: "desc" },
         take: 30,
       }),
-      // Mazo anterior del mismo arquetipo (Previous)
       prisma.deck.findFirst({
         where: {
           isPublic: true,
@@ -157,7 +157,6 @@ export default async function DeckPage({ params }: Props) {
         orderBy: [{ createdAt: "asc" }, { id: "asc" }],
         select: { slug: true, identifier: true },
       }),
-      // Siguiente mazo del mismo arquetipo (Next)
       prisma.deck.findFirst({
         where: {
           isPublic: true,
@@ -177,7 +176,6 @@ export default async function DeckPage({ params }: Props) {
         ? getSkillMetaByName(deck.skill)
         : Promise.resolve(null),
     ]);
-
 
   let tournamentInfo: {
     name: string;
@@ -239,6 +237,16 @@ export default async function DeckPage({ params }: Props) {
           nextDeckHref={nextDeckHref}
           canViewPlayerProfile={canManageGuides(user)}
           isOwner={Boolean(user) && user?.id === deck.authorId}
+        />
+
+        <CommentsSection
+          type="deck"
+          targetId={deck.id}
+          currentUser={
+            user
+              ? { id: user.id, username: user.username, role: user.role }
+              : null
+          }
         />
       </Container>
     </main>

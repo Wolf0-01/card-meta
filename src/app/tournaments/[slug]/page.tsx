@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import CommentsSection from "@/components/comments/CommentsSection";
+
 import Link from "next/link";
 
 import { notFound } from "next/navigation";
@@ -373,9 +375,18 @@ export default async function TournamentPage({
           </section>
         )}
 
-        <TournamentDeckLists
-          decks={tournament.podiumDecks}
-        />
+             <TournamentDeckLists decks={tournament.podiumDecks} />
+
+     <CommentsSection
+       type="tournament"
+       targetId={tournament.id}
+       currentUser={
+         user
+           ? { id: user.id, username: user.username, role: user.role }
+           : null
+       }
+     />
+
       </div>
     </main>
   );

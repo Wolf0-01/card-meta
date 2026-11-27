@@ -51,6 +51,8 @@ model User {
 
   decks Deck[]
 
+  comments Comment[]
+
   createdAt DateTime @default(now())
 
   updatedAt DateTime @updatedAt
@@ -262,6 +264,8 @@ model Deck {
   losses Int @default(0)
 
   cards DeckCard[]
+  
+  comments Comment[]
 
   createdAt DateTime @default(now())
 
@@ -365,6 +369,8 @@ model Tournament {
   description String?
 
   standings Json
+  
+  comments Comment[]
 
   createdAt DateTime @default(now())
 
@@ -455,4 +461,23 @@ model DeckCard {
   @@unique([deckId, cardId, zone])
   @@index([deckId])
   @@index([cardId])
+}
+model Comment {
+  id String @id @default(cuid())
+
+  content String @db.VarChar(600)
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  deckId String?
+  deck Deck? @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  tournamentId String?
+  tournament Tournament? @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([deckId, createdAt])
+  @@index([tournamentId, createdAt])
 }
