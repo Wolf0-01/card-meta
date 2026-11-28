@@ -37,8 +37,8 @@ interface HomeFeedCardProps {
 }
 
 /**
- * Tarjeta del feed cronológico de la portada. Combina
- * torneos y noticias reales en un mismo formato.
+ * Tarjeta del feed cronológico de la portada. Muestra únicamente
+ * categoría, fecha y título para mantener la vista limpia.
  */
 export default function HomeFeedCard({
   item,
@@ -75,7 +75,7 @@ export default function HomeFeedCard({
           overflow-hidden
           bg-[#070D1F]
           sm:aspect-auto
-          sm:h-auto
+          sm:min-h-[84px]
           sm:w-48
           sm:self-stretch
         "
@@ -150,7 +150,7 @@ export default function HomeFeedCard({
         </span>
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col p-3">
+      <div className="flex min-w-0 flex-1 flex-col justify-center p-3">
         <div
           className="
             flex
@@ -207,20 +207,6 @@ export default function HomeFeedCard({
         >
           {item.title}
         </h3>
-
-        {item.summary && (
-          <p
-            className="
-              mt-1
-              line-clamp-2
-              text-[11px]
-              leading-relaxed
-              text-slate-400
-            "
-          >
-            {item.summary}
-          </p>
-        )}
       </div>
     </Link>
   );
